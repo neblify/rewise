@@ -24,3 +24,19 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer base {
+
+  input::placeholder,
+  textarea::placeholder {
+    color: #6b7280;
+    /* gray-500 - much darker */
+    opacity: 1;
+  }
+
+  /* Make all inputs a bit darker by default */
+  .placeholder-indigo-300::placeholder {
+    color: #4f46e5 !important;
+    /* indigo-600 */
+  }
+}
