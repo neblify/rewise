@@ -7,9 +7,9 @@ import { Play } from "lucide-react";
 
 export default async function StudentDashboard() {
     await dbConnect();
-    // Fetch only published tests
+    // Fetch only published and public tests
     // @ts-ignore
-    const tests = await Test.find({ isPublished: true }).sort({ createdAt: -1 });
+    const tests = await Test.find({ isPublished: true, visibility: 'public' }).sort({ createdAt: -1 });
 
     return (
         <div className="p-8 max-w-7xl mx-auto space-y-8">

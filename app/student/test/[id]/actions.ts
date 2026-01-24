@@ -20,15 +20,14 @@ export async function submitTest(testId: string, answers: Record<string, any>) {
     const aiResult = await gradeTestWithAI(test, answers);
 
     if (!aiResult) {
-        // Fallback logic could go here, but for MVP we assume it works or just log error
-        console.error("AI Grading failed");
         return { message: "Grading failed" };
     }
 
     // Map AI results back to our Schema format
+    // Ensure we match the structure expected by Result Schema
     const answersToSave = aiResult.results.map((r: any) => ({
-        questionId: r.questionIndex.toString(),
-        answer: answers[r.questionIndex],
+        questionId: r.questionId, // This is now a string like "0-1" or "2"
+        answer: answers[r.questionId],
         isCorrect: r.isCorrect,
         marksObtained: r.marksObtained,
         feedback: r.feedback

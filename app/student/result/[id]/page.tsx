@@ -16,11 +16,18 @@ export default async function ResultPage({ params }: { params: { id: string } })
 
     if (!result) notFound();
 
-    // Ensure user is authorized to view (Student themselves, or Teacher/Parent - assume authorized for now for simplicity of demo)
-
     const test = result.testId;
+    const percentage = result.maxScore > 0 ? Math.round((result.totalScore / result.maxScore) * 100) : 0;
 
-    const percentage = Math.round((result.totalScore / result.maxScore) * 100);
+    // Helper to find question text by ID (which is "sIndex-qIndex" or just "index")
+    const findQuestion = (id: string) => {
+        if (id.includes('-')) {
+            const [sIndex, qIndex] = id.split('-').map(Number);
+            return test.sections?.[sIndex]?.questions?.[qIndex];
+        } else {
+            return test.questions?.[parseInt(id)];
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 p-8">
@@ -74,10 +81,7 @@ export default async function ResultPage({ params }: { params: { id: string } })
                     <h2 className="text-2xl font-bold text-gray-900">Detailed Analysis</h2>
 
                     {result.answers.map((ans: any, i: number) => {
-                        const question = test.questions[parseInt(ans.questionId)]; // Assuming ID is index for now as per Grader implementation fallback
-                        // If question not found by index (if ID was real ID), we might need better mapping. 
-                        // Currently Grader used index.
-
+                        const question = findQuestion(ans.questionId);
                         const qText = question ? question.text : `Question ${i + 1}`;
 
                         return (
