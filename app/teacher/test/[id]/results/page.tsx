@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import dbConnect from "@/lib/db/connect";
 import Test from "@/lib/db/models/Test";
 import Result from "@/lib/db/models/Result";
@@ -23,7 +23,27 @@ export default async function TestResultsPage({ params }: { params: Promise<{ id
 
     // Fetch all results for this test
     // @ts-ignore
-    const results = await Result.find({ testId: id }).populate('studentId').sort({ createdAt: -1 });
+    const results = await Result.find({ testId: id }).sort({ createdAt: -1 });
+
+    // Fetch user details from Clerk
+    const studentIds = [...new Set(results.map((r: any) => r.studentId))];
+    const client = await clerkClient();
+
+    let userMap: Record<string, any> = {};
+    if (studentIds.length > 0) {
+        try {
+            const users = await client.users.getUserList({ userId: studentIds as string[] });
+            users.data.forEach(user => {
+                userMap[user.id] = {
+                    name: `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.username || 'Student',
+                    email: user.emailAddresses[0]?.emailAddress,
+                    imageUrl: user.imageUrl
+                };
+            });
+        } catch (error) {
+            console.error("Failed to fetch users from Clerk:", error);
+        }
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 p-8">
@@ -74,7 +94,9 @@ export default async function TestResultsPage({ params }: { params: Promise<{ id
                                 {results.map((result: any) => {
                                     // Use studentId details if populated, otherwise fallback (future proofing if User model isn't fully linked yet)
                                     // In a real app, you'd rely on Clerk's user info or a synced User model
-                                    const studentName = result.studentId ? (result.studentId.name || result.studentId.email || "Student") : "Student";
+                                    // Get student info from our map
+                                    const studentInfo = userMap[result.studentId] || { name: 'Student', imageUrl: null };
+                                    const studentName = studentInfo.name || "Student";
                                     const percentage = Math.round((result.totalScore / result.maxScore) * 100);
 
                                     // Determine pass/fail based on 33% (BIOS/CBSE standard)
@@ -84,8 +106,12 @@ export default async function TestResultsPage({ params }: { params: Promise<{ id
                                         <tr key={result._id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                                                        <User className="h-4 w-4" />
+                                                    <div className="flex-shrink-0 h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 overflow-hidden">
+                                                        {studentInfo.imageUrl ? (
+                                                            <img src={studentInfo.imageUrl} alt={studentName} className="h-full w-full object-cover" />
+                                                        ) : (
+                                                            <User className="h-4 w-4" />
+                                                        )}
                                                     </div>
                                                     <div className="ml-4">
                                                         <div className="text-sm font-medium text-gray-900">{studentName}</div>
