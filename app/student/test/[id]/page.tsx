@@ -15,10 +15,10 @@ export default async function TestPage({ params }: { params: Promise<{ id: strin
     // @ts-ignore
     const test = await Test.findById(id).populate({
         path: 'sections.questions',
-        model: 'Question'
+        model: Question
     }).populate({
         path: 'questions', // For backward compatibility
-        model: 'Question'
+        model: Question
     });
 
     if (!test) {

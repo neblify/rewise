@@ -20,10 +20,10 @@ export default async function TestResultsPage({ params }: { params: Promise<{ id
     // @ts-ignore
     const test = await Test.findOne({ _id: id, createdBy: userId }).populate({
         path: 'sections.questions',
-        model: 'Question'
+        model: Question
     }).populate({
         path: 'questions',
-        model: 'Question'
+        model: Question
     });
 
     if (!test) notFound();

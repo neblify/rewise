@@ -3,6 +3,7 @@
 import { auth } from '@clerk/nextjs/server';
 import dbConnect from '@/lib/db/connect';
 import Test from '@/lib/db/models/Test';
+import Question from '@/lib/db/models/Question';
 import Result from '@/lib/db/models/Result';
 import { gradeTestWithAI } from '@/lib/ai/grader';
 import { redirect } from 'next/navigation';
@@ -15,10 +16,10 @@ export async function submitTest(testId: string, answers: Record<string, any>) {
     // @ts-ignore
     const test = await Test.findById(testId).populate({
         path: 'sections.questions',
-        model: 'Question'
+        model: Question
     }).populate({
         path: 'questions',
-        model: 'Question'
+        model: Question
     });
     if (!test) return { message: 'Test not found' };
 
