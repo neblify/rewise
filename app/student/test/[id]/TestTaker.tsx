@@ -142,12 +142,12 @@ export default function TestTaker({ test, userId }: { test: ITest; userId: strin
                             {section.description && <span className="text-sm text-gray-500">{section.description}</span>}
                         </div>
 
-                        {section.questions.map((q, qIndex) => renderQuestion(q, qIndex, `${sIndex}-${qIndex}`))}
+                        {section.questions.map((q, qIndex) => renderQuestion(q as IQuestion, qIndex, `${sIndex}-${qIndex}`))}
                     </div>
                 ))}
 
                 {/* Fallback for legacy tests with flat questions */}
-                {(!test.sections || test.sections.length === 0) && test.questions?.map((q, index) => renderQuestion(q, index, index.toString()))}
+                {(!test.sections || test.sections.length === 0) && test.questions?.map((q, index) => renderQuestion(q as IQuestion, index, index.toString()))}
 
                 <div className="flex justify-end pt-8 pb-20">
                     <button

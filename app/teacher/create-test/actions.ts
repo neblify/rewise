@@ -3,6 +3,7 @@
 import { auth } from '@clerk/nextjs/server';
 import dbConnect from '@/lib/db/connect';
 import Test from '@/lib/db/models/Test';
+import Question from '@/lib/db/models/Question';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
@@ -55,8 +56,27 @@ export async function createTest(prevState: any, formData: FormData) {
 
     try {
         await dbConnect();
+
+        // Helper to process sections and create questions
+        const sectionsWithRefs = await Promise.all(validated.data.sections.map(async (section) => {
+            const questionRefs = await Promise.all(section.questions.map(async (q) => {
+                const questionDoc = await Question.create({
+                    ...q,
+                    createdBy: userId,
+                    subject: validated.data.subject, // Inherit subject
+                });
+                return questionDoc._id;
+            }));
+
+            return {
+                ...section,
+                questions: questionRefs,
+            };
+        }));
+
         await Test.create({
             ...validated.data,
+            sections: sectionsWithRefs,
             createdBy: userId,
             isPublished: true,
         });
@@ -94,11 +114,38 @@ export async function updateTest(prevState: any, formData: FormData) {
 
     try {
         await dbConnect();
+
+        // Process sections (new or updated)
+        // Note: For updates, if questions are modified, we ideally should detect that. 
+        // For simplicity, we'll create new questions for now if they don't have IDs (which rawData won't have)
+        // A full update strategy would require checking if questions exist. 
+        // Since the UI sends the whole object, and we are decoupling, let's treat them as new versions or 
+        // we would need a more complex UI to send question IDs.
+        // CURRENT STRATEGY: Create new questions for the updated sections. 
+        // Old questions will become orphaned (orphaned cleanup is a separate task).
+
+        const sectionsWithRefs = await Promise.all(validated.data.sections.map(async (section) => {
+            const questionRefs = await Promise.all(section.questions.map(async (q) => {
+                const questionDoc = await Question.create({
+                    ...q,
+                    createdBy: userId,
+                    subject: validated.data.subject,
+                });
+                return questionDoc._id;
+            }));
+
+            return {
+                ...section,
+                questions: questionRefs,
+            };
+        }));
+
         // Ensure user owns the test
         await Test.findOneAndUpdate(
             { _id: testId, createdBy: userId },
             {
                 ...validated.data,
+                sections: sectionsWithRefs,
                 // Do not update isPublished or other status fields blindly if not intended
             }
         );

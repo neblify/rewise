@@ -24,7 +24,7 @@ export interface IQuestion {
 export interface ISection {
     title: string;
     description?: string;
-    questions: IQuestion[];
+    questions: IQuestion[] | mongoose.Types.ObjectId[]; // Can be populated or refs
 }
 
 export interface ITest extends Document {
@@ -34,8 +34,10 @@ export interface ITest extends Document {
     grade?: string; // e.g. A, B, C or 10, 12
     visibility: 'public' | 'private';
     createdBy: string; // Clerk ID of teacher
-    sections: ISection[]; // Questions are now grouped
-    questions?: IQuestion[]; // Keeping for backward compat if needed, but we will migrate to sections
+    sections: ISection[];
+    questions?: IQuestion[] | mongoose.Types.ObjectId[]; // Keeping for backward compat
+    // We can also have a flat array of refs if needed:
+    // questionRefs?: mongoose.Types.ObjectId[];
     isPublished: boolean;
     createdAt: Date;
     updatedAt: Date;
@@ -53,7 +55,7 @@ const QuestionSchema = new Schema<IQuestion>({
 const SectionSchema = new Schema<ISection>({
     title: { type: String, required: true },
     description: { type: String },
-    questions: [QuestionSchema],
+    questions: [{ type: Schema.Types.ObjectId, ref: 'Question' }],
 });
 
 const TestSchema = new Schema<ITest>(

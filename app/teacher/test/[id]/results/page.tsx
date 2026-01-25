@@ -1,6 +1,7 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import dbConnect from "@/lib/db/connect";
 import Test from "@/lib/db/models/Test";
+import Question from "@/lib/db/models/Question"; // Ensure model is registered
 import Result from "@/lib/db/models/Result";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
@@ -17,7 +18,13 @@ export default async function TestResultsPage({ params }: { params: Promise<{ id
 
     // Fetch test to ensure it exists and belongs to this teacher
     // @ts-ignore
-    const test = await Test.findOne({ _id: id, createdBy: userId });
+    const test = await Test.findOne({ _id: id, createdBy: userId }).populate({
+        path: 'sections.questions',
+        model: 'Question'
+    }).populate({
+        path: 'questions',
+        model: 'Question'
+    });
 
     if (!test) notFound();
 

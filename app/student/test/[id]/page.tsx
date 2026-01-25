@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import dbConnect from "@/lib/db/connect";
 import Test from "@/lib/db/models/Test";
+import Question from "@/lib/db/models/Question"; // Ensure model is registered
 import { notFound, redirect } from "next/navigation";
 import TestTaker from "./TestTaker";
 
@@ -12,7 +13,13 @@ export default async function TestPage({ params }: { params: Promise<{ id: strin
 
     await dbConnect();
     // @ts-ignore
-    const test = await Test.findById(id);
+    const test = await Test.findById(id).populate({
+        path: 'sections.questions',
+        model: 'Question'
+    }).populate({
+        path: 'questions', // For backward compatibility
+        model: 'Question'
+    });
 
     if (!test) {
         notFound();

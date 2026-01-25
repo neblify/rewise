@@ -13,7 +13,13 @@ export async function submitTest(testId: string, answers: Record<string, any>) {
 
     await dbConnect();
     // @ts-ignore
-    const test = await Test.findById(testId);
+    const test = await Test.findById(testId).populate({
+        path: 'sections.questions',
+        model: 'Question'
+    }).populate({
+        path: 'questions',
+        model: 'Question'
+    });
     if (!test) return { message: 'Test not found' };
 
     // Call AI Grader
