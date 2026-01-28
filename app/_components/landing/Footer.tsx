@@ -13,13 +13,13 @@ export function Footer() {
                 </div>
                 <div className="flex justify-center space-x-6 md:order-2">
                     {/* Social links or key navigation could go here */}
-                    <Link href="#" className="text-gray-400 hover:text-gray-500 text-sm">
+                    <Link href="/privacy" className="text-gray-400 hover:text-gray-500 text-sm">
                         Privacy Policy
                     </Link>
-                    <Link href="#" className="text-gray-400 hover:text-gray-500 text-sm">
+                    <Link href="/terms" className="text-gray-400 hover:text-gray-500 text-sm">
                         Terms of Service
                     </Link>
-                    <Link href="#" className="text-gray-400 hover:text-gray-500 text-sm">
+                    <Link href="/contact" className="text-gray-400 hover:text-gray-500 text-sm">
                         Contact Support
                     </Link>
                 </div>
