@@ -1,11 +1,22 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { Hero } from "./_components/landing/Hero";
+import { Features } from "./_components/landing/Features";
+import { RoleInfo } from "./_components/landing/RoleInfo";
+import { Footer } from "./_components/landing/Footer";
 
 export default async function Home() {
   const { userId } = await auth();
 
   if (!userId) {
-    redirect("/sign-in");
+    return (
+      <main className="min-h-screen bg-white">
+        <Hero />
+        <Features />
+        <RoleInfo />
+        <Footer />
+      </main>
+    );
   }
 
   const client = await clerkClient();
