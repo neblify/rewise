@@ -9,27 +9,57 @@ export async function gradeTestWithAI(test: any, studentAnswers: Record<string, 
   if (test.sections && test.sections.length > 0) {
     test.sections.forEach((sec: any, sIndex: number) => {
       sec.questions.forEach((q: any, qIndex: number) => {
+        const normalize = (str: string) => str ? str.toString().trim().toLowerCase() : "";
+
+        let processedStudentAnswer = studentAnswers[`${sIndex}-${qIndex}`] || "No Answer";
+        let processedCorrectAnswer = q.correctAnswer;
+
+        // Special handling for Fill in the Blanks to ignore strict case/space issues
+        if (q.type === 'fill_in_blanks') {
+          if (normalize(processedStudentAnswer) === normalize(processedCorrectAnswer)) {
+            // If they match loosely, send the EXACT correct answer to AI so it doesn't complain
+            processedStudentAnswer = processedCorrectAnswer;
+          } else {
+            // Otherwise just trim it
+            processedStudentAnswer = processedStudentAnswer.toString().trim();
+          }
+        }
+
         flatQuestions.push({
           id: `${sIndex}-${qIndex}`, // Unique ID matching frontend
           text: q.text,
           type: q.type,
           correctAnswer: q.correctAnswer,
           marks: q.marks,
-          studentAnswer: studentAnswers[`${sIndex}-${qIndex}`] || "No Answer",
+          studentAnswer: processedStudentAnswer,
           sectionTitle: sec.title
         });
       });
     });
   } else if (test.questions) {
     // Legacy fallback
-    flatQuestions = test.questions.map((q: any, i: number) => ({
-      id: i.toString(),
-      text: q.text,
-      type: q.type,
-      correctAnswer: q.correctAnswer,
-      marks: q.marks,
-      studentAnswer: studentAnswers[i] || "No Answer",
-    }));
+    flatQuestions = test.questions.map((q: any, i: number) => {
+      const normalize = (str: string) => str ? str.toString().trim().toLowerCase() : "";
+      let processedStudentAnswer = studentAnswers[i] || "No Answer";
+      let processedCorrectAnswer = q.correctAnswer;
+
+      if (q.type === 'fill_in_blanks') {
+        if (normalize(processedStudentAnswer) === normalize(processedCorrectAnswer)) {
+          processedStudentAnswer = processedCorrectAnswer;
+        } else {
+          processedStudentAnswer = processedStudentAnswer.toString().trim();
+        }
+      }
+
+      return {
+        id: i.toString(),
+        text: q.text,
+        type: q.type,
+        correctAnswer: q.correctAnswer,
+        marks: q.marks,
+        studentAnswer: processedStudentAnswer,
+      };
+    });
   }
 
   const prompt = `
@@ -41,11 +71,13 @@ export async function gradeTestWithAI(test: any, studentAnswers: Record<string, 
     Grade: ${test.grade || 'N/A'}
 
     Instructions:
-    1. Evaluate each answer. For objective questions (MCQ, True/False, Match), check strict correctness. For subjective (Brief Answer, etc), evaluate relevance and accuracy.
-    2. Assign marks based on correctness. Partial marks allowed for subjective.
-    3. Provide brief feedback for each answer if incorrect or could be improved.
-    4. Identify weak areas based on wrong answers.
-    5. Provide overall feedback.
+    1. Evaluate each answer. For objective questions (MCQ, True/False, Match), check strict correctness. 
+    2. For 'fill_in_blanks', IGNORE case differences and trailing/leading whitespace. If the word is correct but capitalized differently, mark it FULLY CORRECT with no negative feedback.
+    3. For subjective (Brief Answer, etc), evaluate relevance and accuracy.
+    4. Assign marks based on correctness. Partial marks allowed for subjective.
+    5. Provide brief feedback for each answer if incorrect or could be improved.
+    6. Identify weak areas based on wrong answers.
+    7. Provide overall feedback.
 
     Questions & Answers:
     ${JSON.stringify(flatQuestions, null, 2)}
