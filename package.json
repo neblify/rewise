@@ -19,7 +19,7 @@
     "lucide-react": "^0.563.0",
     "mongoose": "^9.1.5",
     "next": "16.1.4",
-    "pdf-parse": "^2.4.5",
+    "pdf-parse": "1.1.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "resend": "^6.9.1",
