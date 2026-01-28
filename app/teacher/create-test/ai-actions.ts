@@ -1,8 +1,93 @@
 'use server';
 
 import Groq from "groq-sdk";
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+const pdf = require('pdf-parse');
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+export async function extractQuestionsFromPdf(formData: FormData) {
+    if (!process.env.GROQ_API_KEY) {
+        return { error: "AI Service Unavailable (Missing Key)" };
+    }
+
+    const file = formData.get('file') as File;
+    if (!file) {
+        return { error: "No file provided" };
+    }
+
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const data = await pdf(buffer);
+        const text = data.text;
+
+        // Truncate text if too long to avoid token limits (rudimentary check)
+        // 50k chars is usually safe for large context models, but being safe.
+        const truncatedText = text.slice(0, 30000);
+
+        const prompt = `
+        You are an expert exam setter. 
+        Analyze the following text extracted from a PDF and identify all the questions present.
+        
+        Text Content:
+        """
+        ${truncatedText}
+        """
+        
+        Output must be a strictly valid JSON array of question objects matching this TypeScript interface:
+        
+        interface Question {
+            text: string;
+            type: string; // Infer from context. Options: 'mcq', 'fill_in_blanks', 'true_false', 'match_columns', 'single_word', 'brief_answer', 'difference'
+            options?: string[]; // Required for 'mcq'
+            correctAnswer: string; // Infer if possible, else leave empty string
+            marks: number; // Infer or default to 1
+        }
+
+        Notes:
+        - If multiple choice, put options in 'options' array.
+        - Clean up any scanning artifacts or weird spacing.
+        - If no questions found, return empty array [].
+        
+        Respond ONLY with the JSON array.
+        `;
+
+        const completion = await groq.chat.completions.create({
+            messages: [
+                { role: "system", content: "You are a helpful assistant that extracts exam questions in strict JSON format." },
+                { role: "user", content: prompt }
+            ],
+            model: "llama-3.3-70b-versatile",
+            response_format: { type: "json_object" },
+        });
+
+        const content = completion.choices[0]?.message?.content;
+        console.log("PDF Extraction Result:", content);
+
+        if (!content) throw new Error("No content from AI");
+
+        const parsed = JSON.parse(content);
+        const questions = Array.isArray(parsed) ? parsed : (parsed.questions || []);
+
+        const sanitizedQuestions = questions.map((q: any) => ({
+            id: Date.now() + Math.random(),
+            text: q.text,
+            type: q.type || 'brief_answer',
+            options: q.options || [],
+            correctAnswer: q.correctAnswer || '',
+            marks: q.marks || 1,
+        }));
+
+        return { data: sanitizedQuestions };
+
+    } catch (error) {
+        console.error("PDF Parse Error:", error);
+        return { error: "Failed to extract questions from PDF." };
+    }
+}
 
 export async function generateQuestionsAI(topic: string, count: number, type: string, difficulty: string, board: string, grade: string) {
     if (!process.env.GROQ_API_KEY) {

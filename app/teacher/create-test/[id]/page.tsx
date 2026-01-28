@@ -216,7 +216,7 @@ export default function CreateOrEditTestPage() {
                                     onChange={(e) => setBoard(e.target.value)}
                                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
                                 >
-                                    {BOARDS.map(b => <option key={b} value={b}>{b}</option>)}
+                                    {BOARDS?.map(b => <option key={b} value={b}>{b}</option>)}
                                 </select>
                             </div>
 
@@ -229,8 +229,8 @@ export default function CreateOrEditTestPage() {
                                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
                                 >
                                     {board === 'NIOS'
-                                        ? NIOS_LEVELS.map(l => <option key={l} value={l}>Level {l}</option>)
-                                        : STANDARD_LEVELS.map(l => <option key={l} value={l}>Class {l}</option>)
+                                        ? NIOS_LEVELS?.map(l => <option key={l} value={l}>Level {l}</option>)
+                                        : STANDARD_LEVELS?.map(l => <option key={l} value={l}>Class {l}</option>)
                                     }
                                 </select>
                             </div>
@@ -250,9 +250,9 @@ export default function CreateOrEditTestPage() {
                         </div>
                     </div>
 
-                    {/* Sections Loop - (Same as before, abbreviated here, but full code provided in tool call) */}
+                    {/* Sections Loop */}
                     <div className="space-y-8">
-                        {sections.map((section, secIndex) => (
+                        {sections?.map((section, secIndex) => (
                             <div key={section.id} className="rounded-xl bg-white border border-indigo-100 shadow-md overflow-hidden">
                                 <div className="bg-indigo-50/50 p-6 border-b border-indigo-100 flex justify-between items-start">
                                     <div className="space-y-3 flex-1">
@@ -277,7 +277,7 @@ export default function CreateOrEditTestPage() {
                                 </div>
 
                                 <div className="p-6 space-y-6">
-                                    {section.questions.map((q: any, qIndex: number) => (
+                                    {section.questions?.map((q: any, qIndex: number) => (
                                         <div key={q.id} className="pl-4 border-l-2 border-gray-200 relative group">
                                             <button type="button" onClick={() => removeQuestionExp(secIndex, qIndex)} className="absolute top-0 right-0 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <Trash2 className="h-4 w-4" />
@@ -301,7 +301,7 @@ export default function CreateOrEditTestPage() {
                                                 {/* Standardizing input for brevity in this full file replace */}
                                                 {q.type === 'mcq' && (
                                                     <div className="grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-md">
-                                                        {q.options.map((opt: string, optIndex: number) => (
+                                                        {q.options?.map((opt: string, optIndex: number) => (
                                                             <input key={optIndex} type="text" value={opt} onChange={(e) => { const newOpts = [...q.options]; newOpts[optIndex] = e.target.value; updateQuestionExp(secIndex, qIndex, 'options', newOpts); }} className="block w-full rounded border-gray-200 text-sm" placeholder={`Option ${optIndex + 1}`} />
                                                         ))}
                                                         <input type="text" value={q.correctAnswer} onChange={(e) => updateQuestionExp(secIndex, qIndex, 'correctAnswer', e.target.value)} className="col-span-2 block w-full rounded border-green-200 bg-green-50 text-sm placeholder-green-600" placeholder="Correct Option (Exact Match)" />

@@ -2,8 +2,8 @@
 
 import { useActionState, useState } from 'react';
 import { createTest } from './actions';
-import { generateQuestionsAI } from './ai-actions';
-import { Plus, Trash2, Save, Layers, Sparkles, X, Loader2 } from 'lucide-react';
+import { extractQuestionsFromPdf, generateQuestionsAI } from './ai-actions';
+import { Plus, Trash2, Save, Layers, Sparkles, X, Loader2, FileUp } from 'lucide-react';
 
 const QUESTION_TYPES = [
     { value: 'fill_in_blanks', label: 'Fill in the blanks' },
@@ -40,6 +40,7 @@ export default function CreateTestPage() {
     const [aiType, setAiType] = useState('mcq');
     const [aiDifficulty, setAiDifficulty] = useState('Medium');
     const [isGenerating, setIsGenerating] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
 
     // ... (Existing helper functions kept same, but re-included for completeness)
     const addSection = () => {
@@ -116,6 +117,37 @@ export default function CreateTestPage() {
         }
     };
 
+    // PDF Upload Handler
+    const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files?.length) return;
+
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append('file', e.target.files[0]);
+
+        try {
+            const res = await extractQuestionsFromPdf(formData);
+
+            if (res.data) {
+                const newSection = {
+                    id: Date.now(),
+                    title: `Imported PDF: ${e.target.files[0].name}`,
+                    description: 'Extracted questions',
+                    questions: res.data
+                };
+                setSections(prev => [...prev, newSection]);
+            } else {
+                alert(res.error || "Failed to extract questions");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error uploading file");
+        } finally {
+            setIsUploading(false);
+            e.target.value = ''; // Reset input
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 p-8 pb-32">
             <div className="mx-auto max-w-5xl space-y-8">
@@ -124,14 +156,32 @@ export default function CreateTestPage() {
                         <h1 className="text-3xl font-bold text-gray-900">Create New Test</h1>
                         <p className="text-gray-500">Configure your test structure, sections, and questions.</p>
                     </div>
-                    <button
-                        type="button"
-                        onClick={() => setIsAiModalOpen(true)}
-                        className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium animate-pulse hover:animate-none"
-                    >
-                        <Sparkles className="h-5 w-5" />
-                        AI Assistant
-                    </button>
+                    <div className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setIsAiModalOpen(true)}
+                            className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium animate-pulse hover:animate-none"
+                        >
+                            <Sparkles className="h-5 w-5" />
+                            AI Assistant
+                        </button>
+                        <div className="relative">
+                            <input
+                                type="file"
+                                accept=".pdf"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                                onChange={handleFileUpload}
+                                disabled={isUploading}
+                            />
+                            <button
+                                type="button"
+                                className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-full shadow-lg hover:bg-emerald-700 hover:shadow-xl transition-all font-medium disabled:opacity-50"
+                            >
+                                {isUploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileUp className="h-5 w-5" />}
+                                {isUploading ? 'Parsing...' : 'Upload PDF'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <form action={handleSubmit} className="space-y-8">
