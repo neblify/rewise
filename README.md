@@ -51,6 +51,7 @@ GROQ_API_KEY=your_groq_api_key
 ## 🏃 Getting Started
 
 1. **Clone the repository**:
+
    ```bash
    git clone <repository-url>
    cd nios-prep
@@ -59,17 +60,20 @@ GROQ_API_KEY=your_groq_api_key
 2. **Install dependencies**:
    npm install
 
-
 3. **Set up environment variables**:
+
    ```bash
    vercel link
    vercel env pull
    ```
 
 4. **Run the development server**:
+
    ```bash
    vercel dev
-   
+
+
+   ```
 
 5. **Open the app**:
    - Visit [http://localhost:3000](http://localhost:3000).

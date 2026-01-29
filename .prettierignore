@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+.next/
+out/
+
+# Generated files
+.next-env.d.ts
+*.tsbuildinfo
+
+# Config files
+package-lock.json
+
+# Environment
+.env*
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+
+# Vercel
+.vercel/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

@@ -1,22 +1,30 @@
-import Groq from "groq-sdk";
+import Groq from 'groq-sdk';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-export async function gradeTestWithAI(test: any, studentAnswers: Record<string, any>) {
+export async function gradeTestWithAI(
+  test: any,
+  studentAnswers: Record<string, any>
+) {
   // Flatten sections to a single list of questions for grading context
   let flatQuestions: any[] = [];
 
   if (test.sections && test.sections.length > 0) {
     test.sections.forEach((sec: any, sIndex: number) => {
       sec.questions.forEach((q: any, qIndex: number) => {
-        const normalize = (str: string) => str ? str.toString().trim().toLowerCase() : "";
+        const normalize = (str: string) =>
+          str ? str.toString().trim().toLowerCase() : '';
 
-        let processedStudentAnswer = studentAnswers[`${sIndex}-${qIndex}`] || "No Answer";
-        let processedCorrectAnswer = q.correctAnswer;
+        let processedStudentAnswer =
+          studentAnswers[`${sIndex}-${qIndex}`] || 'No Answer';
+        const processedCorrectAnswer = q.correctAnswer;
 
         // Special handling for Fill in the Blanks to ignore strict case/space issues
         if (q.type === 'fill_in_blanks') {
-          if (normalize(processedStudentAnswer) === normalize(processedCorrectAnswer)) {
+          if (
+            normalize(processedStudentAnswer) ===
+            normalize(processedCorrectAnswer)
+          ) {
             // If they match loosely, send the EXACT correct answer to AI so it doesn't complain
             processedStudentAnswer = processedCorrectAnswer;
           } else {
@@ -32,19 +40,23 @@ export async function gradeTestWithAI(test: any, studentAnswers: Record<string, 
           correctAnswer: q.correctAnswer,
           marks: q.marks,
           studentAnswer: processedStudentAnswer,
-          sectionTitle: sec.title
+          sectionTitle: sec.title,
         });
       });
     });
   } else if (test.questions) {
     // Legacy fallback
     flatQuestions = test.questions.map((q: any, i: number) => {
-      const normalize = (str: string) => str ? str.toString().trim().toLowerCase() : "";
-      let processedStudentAnswer = studentAnswers[i] || "No Answer";
-      let processedCorrectAnswer = q.correctAnswer;
+      const normalize = (str: string) =>
+        str ? str.toString().trim().toLowerCase() : '';
+      let processedStudentAnswer = studentAnswers[i] || 'No Answer';
+      const processedCorrectAnswer = q.correctAnswer;
 
       if (q.type === 'fill_in_blanks') {
-        if (normalize(processedStudentAnswer) === normalize(processedCorrectAnswer)) {
+        if (
+          normalize(processedStudentAnswer) ===
+          normalize(processedCorrectAnswer)
+        ) {
           processedStudentAnswer = processedCorrectAnswer;
         } else {
           processedStudentAnswer = processedStudentAnswer.toString().trim();
@@ -102,20 +114,24 @@ export async function gradeTestWithAI(test: any, studentAnswers: Record<string, 
   try {
     const completion = await groq.chat.completions.create({
       messages: [
-        { role: "system", content: "You are a helpful grading assistant. Respond only in valid JSON." },
-        { role: "user", content: prompt },
+        {
+          role: 'system',
+          content:
+            'You are a helpful grading assistant. Respond only in valid JSON.',
+        },
+        { role: 'user', content: prompt },
       ],
-      model: "llama-3.3-70b-versatile",
-      response_format: { type: "json_object" },
+      model: 'llama-3.3-70b-versatile',
+      response_format: { type: 'json_object' },
     });
 
     const content = completion.choices[0]?.message?.content;
-    if (!content) throw new Error("No content from AI");
+    if (!content) throw new Error('No content from AI');
 
     const parsed = JSON.parse(content);
     return parsed;
   } catch (error) {
-    console.error("AI Grading Framework Error:", error);
+    console.error('AI Grading Framework Error:', error);
     return null;
   }
 }

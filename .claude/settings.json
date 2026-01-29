@@ -1,0 +1,78 @@
+{
+  "project": {
+    "name": "nios-prep",
+    "description": "NIOS Prep - Smart Education Platform with Next.js, MongoDB, and AI grading",
+    "type": "nextjs",
+    "framework": "nextjs"
+  },
+  "languages": ["typescript", "tsx", "javascript"],
+  "toolchains": {
+    "node": {
+      "version": ">=18.0.0"
+    },
+    "npm": {
+      "version": ">=8.0.0"
+    }
+  },
+  "workspaces": {
+    "app": {
+      "path": "./app",
+      "description": "Next.js App Router pages and components"
+    },
+    "lib": {
+      "path": "./lib",
+      "description": "Shared utilities, database models, and AI integration"
+    }
+  },
+  "tasks": {
+    "dev": {
+      "command": "npm run dev",
+      "description": "Start development server",
+      "watch": true
+    },
+    "build": {
+      "command": "npm run build",
+      "description": "Build for production"
+    },
+    "start": {
+      "command": "npm start",
+      "description": "Start production server"
+    },
+    "lint": {
+      "command": "npm run lint",
+      "description": "Run ESLint"
+    },
+    "lint:fix": {
+      "command": "npm run lint:fix",
+      "description": "Fix ESLint issues"
+    },
+    "format": {
+      "command": "npm run format",
+      "description": "Format code with Prettier"
+    },
+    "format:check": {
+      "command": "npm run format:check",
+      "description": "Check code formatting with Prettier"
+    },
+    "type-check": {
+      "command": "npm run type-check",
+      "description": "Run TypeScript type checking"
+    },
+    "clean": {
+      "command": "npm run clean",
+      "description": "Clean build artifacts"
+    },
+    "fresh-install": {
+      "command": "npm run fresh-install",
+      "description": "Fresh reinstall of dependencies"
+    }
+  },
+  "environment": {
+    "required_vars": [
+      "MONGODB_URI",
+      "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY",
+      "CLERK_SECRET_KEY",
+      "GROQ_API_KEY"
+    ]
+  }
+}

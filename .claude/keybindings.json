@@ -1,0 +1,32 @@
+{
+  "keybindings": {
+    "dev-server": {
+      "key": "ctrl+d",
+      "description": "Start development server",
+      "command": "npm run dev"
+    },
+    "lint-fix": {
+      "key": "ctrl+l",
+      "description": "Fix linting issues",
+      "command": "npm run lint:fix"
+    },
+    "format": {
+      "key": "ctrl+f",
+      "description": "Format code with Prettier",
+      "command": "npm run format"
+    },
+    "type-check": {
+      "key": "ctrl+t",
+      "description": "Run TypeScript type checking",
+      "command": "npm run type-check"
+    }
+  },
+  "framework_shortcuts": {
+    "nextjs": {
+      "pages": "app/",
+      "components": "app/_components/",
+      "api_routes": "app/api/",
+      "lib": "lib/"
+    }
+  }
+}
