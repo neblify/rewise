@@ -56,7 +56,7 @@ if (!global.Path2D) {
     global.Path2D = class Path2D { };
 }
 
-const pdf = require('pdf-parse');
+// pdf-parse require moved inside extractQuestionsFromPdf to avoid top-level execution side-effects
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -71,6 +71,7 @@ export async function extractQuestionsFromPdf(formData: FormData) {
     }
 
     try {
+        const pdf = require('pdf-parse');
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const data = await pdf(buffer);
