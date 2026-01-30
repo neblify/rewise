@@ -33,10 +33,15 @@ if (!global.DOMMatrix) {
     constructor() {
       // @ts-ignore
       this.a = 1;
+      // @ts-ignore
       this.b = 0;
+      // @ts-ignore
       this.c = 0;
+      // @ts-ignore
       this.d = 1;
+      // @ts-ignore
       this.e = 0;
+      // @ts-ignore
       this.f = 0;
     }
     multiply() {
@@ -60,7 +65,9 @@ if (!global.ImageData) {
     constructor(width: number, height: number) {
       // @ts-ignore
       this.width = width;
+      // @ts-ignore
       this.height = height;
+      // @ts-ignore
       this.data = new Uint8ClampedArray(width * height * 4);
     }
   };
