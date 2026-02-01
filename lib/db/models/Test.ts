@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import './Question';
 
 export enum QuestionType {
   FILL_BLANKS = 'fill_in_blanks',
