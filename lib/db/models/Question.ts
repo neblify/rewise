@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export enum QuestionType {
+enum QuestionType {
   FILL_BLANKS = 'fill_in_blanks',
   MATCH_COLUMNS = 'match_columns',
   TRUE_FALSE = 'true_false',
@@ -12,7 +12,7 @@ export enum QuestionType {
   DIFFERENCE = 'difference',
 }
 
-export interface IQuestion extends Document {
+interface IQuestion extends Document {
   text: string;
   type: QuestionType;
   options?: string[]; // For MCQ, etc.

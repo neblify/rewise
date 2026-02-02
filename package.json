@@ -12,7 +12,8 @@
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf .next out",
-    "fresh-install": "rm -rf node_modules package-lock.json && npm install"
+    "fresh-install": "rm -rf node_modules package-lock.json && npm install",
+    "knip": "knip"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.37.1",
@@ -33,16 +34,16 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/pdf-parse": "^1.1.5",
+    "@types/node": "^20.19.30",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
+    "knip": "^5.82.1",
+    "postcss": "^8.5.6",
     "prettier": "^3.8.1",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }

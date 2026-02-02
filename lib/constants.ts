@@ -1,8 +1,8 @@
 export const BOARDS = ['NIOS', 'CBSE', 'ICSE', 'State Board'];
 
-export const NIOS_LEVELS = ['A', 'B', 'C'];
+const NIOS_LEVELS = ['A', 'B', 'C'];
 
-export const STANDARD_LEVELS = Array.from({ length: 12 }, (_, i) =>
+const STANDARD_LEVELS = Array.from({ length: 12 }, (_, i) =>
     (i + 1).toString()
 );
 
