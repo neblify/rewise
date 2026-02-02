@@ -55,7 +55,14 @@ export default async function TeacherDashboard() {
             </div>
 
             <div className="text-sm text-gray-500 space-y-2">
-              <p>{test.questions.length} Questions</p>
+              <p>
+                {test.sections?.reduce(
+                  (acc: number, section: any) =>
+                    acc + (section.questions?.length || 0),
+                  0
+                ) || 0}{' '}
+                Questions
+              </p>
               <p>Created on {formatDate(test.createdAt)}</p>
             </div>
 
