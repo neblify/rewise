@@ -3,7 +3,11 @@
 import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 
-export default function Navbar() {
+interface NavbarProps {
+  variant?: 'student' | 'teacher';
+}
+
+export default function Navbar({ variant = 'student' }: NavbarProps) {
   return (
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,24 +19,43 @@ export default function Navbar() {
               </span>
             </Link>
             <div className="hidden md:flex items-center gap-4">
-              <Link
-                href="/student"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/student/results"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900"
-              >
-                My Results
-              </Link>
-              <Link
-                href="/student/profile"
-                className="text-sm font-medium text-gray-600 hover:text-gray-900"
-              >
-                Profile
-              </Link>
+              {variant === 'student' ? (
+                <>
+                  <Link
+                    href="/student"
+                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/student/results"
+                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                  >
+                    My Results
+                  </Link>
+                  <Link
+                    href="/student/profile"
+                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                  >
+                    Profile
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/teacher"
+                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/teacher/create-test"
+                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                  >
+                    Create Test
+                  </Link>
+                </>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-4">

@@ -7,7 +7,7 @@ export default function TeacherLayout({
 }) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      <Navbar variant="teacher" />
       <main className="py-8">{children}</main>
     </div>
   );
