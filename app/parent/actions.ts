@@ -18,12 +18,40 @@ export async function getStudentResults(email: string) {
     return { error: 'Student not found with this email.' };
   }
 
+  // Link student to parent if not already linked
+  // userId from auth() is the Clerk ID of the parent
+  // We need to find the parent User document to update children
+  await User.findOneAndUpdate(
+    { clerkId: userId },
+    { $addToSet: { children: student.clerkId } },
+    { upsert: true } // Create parent record if it doesn't exist (though it should on login usually)
+  );
+
   // Fetch results
   // @ts-ignore
   const results = await Result.find({ studentId: student.clerkId })
-    .populate('testId')
+    .populate({ path: 'testId', model: Test })
     .sort({ createdAt: -1 });
 
   // Serialize
   return { data: JSON.parse(JSON.stringify(results)) };
+}
+
+export async function getLinkedStudents() {
+  const { userId } = await auth();
+  if (!userId) return { error: 'Unauthorized' };
+
+  await dbConnect();
+
+  const parent = await User.findOne({ clerkId: userId });
+  if (!parent || !parent.children || parent.children.length === 0) {
+    return { data: [] };
+  }
+
+  // Fetch student details
+  const students = await User.find({
+    clerkId: { $in: parent.children },
+  }).select('firstName lastName email clerkId');
+
+  return { data: JSON.parse(JSON.stringify(students)) };
 }

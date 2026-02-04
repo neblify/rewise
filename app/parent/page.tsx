@@ -1,35 +1,59 @@
 'use client';
 
 import { useState } from 'react';
-import { getStudentResults } from './actions';
-import { Search } from 'lucide-react';
+import { getStudentResults, getLinkedStudents } from './actions';
+import { Search, User as UserIcon } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 export default function ParentDashboard() {
   const [email, setEmail] = useState('');
   const [results, setResults] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [linkedStudents, setLinkedStudents] = useState<any[]>([]);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    async function loadLinkedStudents() {
+      try {
+        const res = await getLinkedStudents();
+        if (res.data) {
+          setLinkedStudents(res.data);
+        }
+      } catch (e) {
+        console.error('Failed to load linked students');
+      }
+    }
+    loadLinkedStudents();
+  }, []);
+
+  const fetchResults = async (studentEmail: string) => {
     setLoading(true);
     setError('');
     setResults(null);
+    setEmail(studentEmail);
 
     try {
-      const res = await getStudentResults(email);
+      const res = await getStudentResults(studentEmail);
       if (res.error) {
         setError(res.error);
       } else {
         setResults(res.data);
+        // Refresh linked students list as the new one might have been added
+        const linkedRes = await getLinkedStudents();
+        if (linkedRes.data) setLinkedStudents(linkedRes.data);
       }
     } catch (err) {
       setError('Failed to fetch results');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetchResults(email);
   };
 
   return (
@@ -71,6 +95,35 @@ export default function ParentDashboard() {
         {error && <p className="text-red-500 mt-2 text-sm">{error}</p>}
       </div>
 
+      {linkedStudents.length > 0 && (
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Previously Added Students
+          </h2>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {linkedStudents.map(student => (
+              <button
+                key={student.clerkId}
+                onClick={() => fetchResults(student.email)}
+                className="flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-200 hover:border-indigo-500 hover:shadow-sm transition-all text-left w-full group"
+              >
+                <div className="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-100 transition-colors">
+                  <UserIcon className="h-5 w-5 text-indigo-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">
+                    {student.firstName
+                      ? `${student.firstName} ${student.lastName || ''}`
+                      : student.email}
+                  </p>
+                  <p className="text-sm text-gray-500">{student.email}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {results && (
         <div className="space-y-6">
           <h2 className="text-xl font-semibold text-gray-900">
@@ -93,13 +146,12 @@ export default function ParentDashboard() {
                     </span>
                   </div>
                   <span
-                    className={`text-lg font-bold ${
-                      result.totalScore / result.maxScore >= 0.7
-                        ? 'text-green-600'
-                        : result.totalScore / result.maxScore >= 0.4
-                          ? 'text-yellow-600'
-                          : 'text-red-600'
-                    }`}
+                    className={`text-lg font-bold ${result.totalScore / result.maxScore >= 0.7
+                      ? 'text-green-600'
+                      : result.totalScore / result.maxScore >= 0.4
+                        ? 'text-yellow-600'
+                        : 'text-red-600'
+                      }`}
                   >
                     {result.totalScore}/{result.maxScore}
                   </span>

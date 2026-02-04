@@ -8,6 +8,7 @@ interface IUser extends Document {
   lastName?: string;
   board?: string;
   grade?: string;
+  children?: string[]; // clerkIds of linked students
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +26,7 @@ const UserSchema = new Schema<IUser>(
     lastName: { type: String },
     board: { type: String },
     grade: { type: String },
+    children: [{ type: String }], // Array of student clerkIds
   },
   { timestamps: true }
 );

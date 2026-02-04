@@ -4,7 +4,7 @@ import { UserButton } from '@clerk/nextjs';
 import Link from 'next/link';
 
 interface NavbarProps {
-  variant?: 'student' | 'teacher' | 'admin';
+  variant?: 'student' | 'teacher' | 'parent' | 'admin';
 }
 
 export default function Navbar({ variant = 'student' }: NavbarProps) {
@@ -64,10 +64,10 @@ export default function Navbar({ variant = 'student' }: NavbarProps) {
               ) : (
                 <>
                   <Link
-                    href="/admin"
+                    href={variant === 'parent' ? '/parent' : '/admin'}
                     className="text-sm font-medium text-gray-600 hover:text-gray-900"
                   >
-                    Overview
+                    {variant === 'parent' ? 'Dashboard' : 'Overview'}
                   </Link>
                 </>
               )}
