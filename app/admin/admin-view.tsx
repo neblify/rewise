@@ -135,14 +135,16 @@ export default function AdminView({ stats, users, tests, questions }: AdminViewP
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question Text</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">No.</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marks</th>
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
-                                {questions.map((q) => (
+                                {questions.map((q, index) => (
                                     <tr key={q._id}>
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-500">{index + 1}</td>
                                         <td className="px-6 py-4 text-sm font-medium text-gray-900 max-w-md truncate">{q.text}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">{q.type.replace(/_/g, ' ')}</td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{q.marks}</td>

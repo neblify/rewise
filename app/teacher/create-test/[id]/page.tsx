@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useState, useEffect } from 'react';
+import React, { useActionState, useState, useEffect } from 'react';
 import { createTest, updateTest } from '../actions';
 import { generateQuestionsAI } from '../ai-actions';
 import { Plus, Trash2, Save, Layers, Sparkles, X, Loader2 } from 'lucide-react';
@@ -387,141 +387,175 @@ export default function CreateOrEditTestPage() {
                   </button>
                 </div>
 
-                <div className="p-6 space-y-6">
-                  {section.questions?.map((q: any, qIndex: number) => (
-                    <div
-                      key={q.id}
-                      className="pl-4 border-l-2 border-gray-200 relative group"
+                <div className="p-6 overflow-x-auto">
+                  <table className="min-w-full w-full table-fixed divide-y divide-gray-200">
+                    <colgroup>
+                      <col className="w-0" style={{ width: '2.5rem' }} />
+                      <col />
+                      <col className="w-0" style={{ width: '10rem' }} />
+                      <col className="w-0" style={{ width: '4.5rem' }} />
+                      <col className="w-0" style={{ width: '3.5rem' }} />
+                    </colgroup>
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marks</th>
+                        <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {section.questions?.map((q: any, qIndex: number) => {
+                        const questionNo =
+                          sections
+                            .slice(0, secIndex)
+                            .reduce((acc, s) => acc + (s.questions?.length ?? 0), 0) +
+                          qIndex +
+                          1;
+                        return (
+                          <React.Fragment key={q.id}>
+                            <tr className="group align-top">
+                              <td className="px-3 py-2 text-sm font-medium text-gray-500 whitespace-nowrap">
+                                {questionNo}
+                              </td>
+                              <td className="px-3 py-2">
+                                <textarea
+                                  value={q.text}
+                                  onChange={e =>
+                                    updateQuestionExp(
+                                      secIndex,
+                                      qIndex,
+                                      'text',
+                                      e.target.value
+                                    )
+                                  }
+                                  className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500 min-w-0"
+                                  placeholder={`Question ${questionNo}`}
+                                  rows={2}
+                                />
+                              </td>
+                              <td className="px-3 py-2 whitespace-nowrap">
+                                <select
+                                  value={q.type}
+                                  onChange={e =>
+                                    updateQuestionExp(
+                                      secIndex,
+                                      qIndex,
+                                      'type',
+                                      e.target.value
+                                    )
+                                  }
+                                  className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500 min-w-0"
+                                >
+                                  {QUESTION_TYPES.map(t => (
+                                    <option key={t.value} value={t.value}>
+                                      {t.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </td>
+                              <td className="px-3 py-2 whitespace-nowrap">
+                                <input
+                                  type="number"
+                                  value={q.marks}
+                                  onChange={e =>
+                                    updateQuestionExp(
+                                      secIndex,
+                                      qIndex,
+                                      'marks',
+                                      parseInt(e.target.value)
+                                    )
+                                  }
+                                  className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500 w-16"
+                                  min={1}
+                                />
+                              </td>
+                              <td className="px-3 py-2 text-right">
+                                <button
+                                  type="button"
+                                  onClick={() => removeQuestionExp(secIndex, qIndex)}
+                                  className="text-gray-300 hover:text-red-500 transition-opacity"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </td>
+                            </tr>
+                            {q.type === 'mcq' && (
+                              <tr>
+                                <td colSpan={5} className="px-3 py-2 bg-gray-50">
+                                  <div className="grid grid-cols-2 gap-2">
+                                    {q.options?.map((opt: string, optIndex: number) => (
+                                      <input
+                                        key={optIndex}
+                                        type="text"
+                                        value={opt}
+                                        onChange={e => {
+                                          const newOpts = [...(q.options || [])];
+                                          newOpts[optIndex] = e.target.value;
+                                          updateQuestionExp(
+                                            secIndex,
+                                            qIndex,
+                                            'options',
+                                            newOpts
+                                          );
+                                        }}
+                                        className="block w-full rounded border border-gray-200 px-2 py-1.5 text-sm"
+                                        placeholder={`Option ${optIndex + 1}`}
+                                      />
+                                    ))}
+                                    <input
+                                      type="text"
+                                      value={q.correctAnswer}
+                                      onChange={e =>
+                                        updateQuestionExp(
+                                          secIndex,
+                                          qIndex,
+                                          'correctAnswer',
+                                          e.target.value
+                                        )
+                                      }
+                                      className="col-span-2 block w-full rounded border border-green-200 bg-green-50 px-2 py-1.5 text-sm placeholder-green-600"
+                                      placeholder="Correct Option (Exact Match)"
+                                    />
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                            {!['mcq'].includes(q.type) && (
+                              <tr>
+                                <td colSpan={5} className="px-3 py-2 bg-gray-50">
+                                  <input
+                                    type="text"
+                                    value={q.correctAnswer}
+                                    onChange={e =>
+                                      updateQuestionExp(
+                                        secIndex,
+                                        qIndex,
+                                        'correctAnswer',
+                                        e.target.value
+                                      )
+                                    }
+                                    className="block w-full rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm focus:border-green-500 focus:ring-green-500"
+                                    placeholder="Expected Answer / Key"
+                                  />
+                                </td>
+                              </tr>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => addQuestionExp(secIndex)}
+                      className="w-full py-3 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium"
                     >
-                      <button
-                        type="button"
-                        onClick={() => removeQuestionExp(secIndex, qIndex)}
-                        className="absolute top-0 right-0 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                      <div className="grid gap-4 mb-4">
-                        <div className="flex gap-4">
-                          <div className="flex-1">
-                            <textarea
-                              value={q.text}
-                              onChange={e =>
-                                updateQuestionExp(
-                                  secIndex,
-                                  qIndex,
-                                  'text',
-                                  e.target.value
-                                )
-                              }
-                              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
-                              placeholder={`Question ${qIndex + 1}`}
-                              rows={2}
-                            />
-                          </div>
-                          <div className="w-1/4">
-                            <select
-                              value={q.type}
-                              onChange={e =>
-                                updateQuestionExp(
-                                  secIndex,
-                                  qIndex,
-                                  'type',
-                                  e.target.value
-                                )
-                              }
-                              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
-                            >
-                              {QUESTION_TYPES.map(t => (
-                                <option key={t.value} value={t.value}>
-                                  {t.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className="w-20">
-                            <input
-                              type="number"
-                              value={q.marks}
-                              onChange={e =>
-                                updateQuestionExp(
-                                  secIndex,
-                                  qIndex,
-                                  'marks',
-                                  parseInt(e.target.value)
-                                )
-                              }
-                              className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500"
-                              min={1}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Type Specific Fields - Keeping logic simple for brevity in replacement, assume standard fields */}
-                        {/* Standardizing input for brevity in this full file replace */}
-                        {q.type === 'mcq' && (
-                          <div className="grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-md">
-                            {q.options?.map((opt: string, optIndex: number) => (
-                              <input
-                                key={optIndex}
-                                type="text"
-                                value={opt}
-                                onChange={e => {
-                                  const newOpts = [...q.options];
-                                  newOpts[optIndex] = e.target.value;
-                                  updateQuestionExp(
-                                    secIndex,
-                                    qIndex,
-                                    'options',
-                                    newOpts
-                                  );
-                                }}
-                                className="block w-full rounded border-gray-200 text-sm"
-                                placeholder={`Option ${optIndex + 1}`}
-                              />
-                            ))}
-                            <input
-                              type="text"
-                              value={q.correctAnswer}
-                              onChange={e =>
-                                updateQuestionExp(
-                                  secIndex,
-                                  qIndex,
-                                  'correctAnswer',
-                                  e.target.value
-                                )
-                              }
-                              className="col-span-2 block w-full rounded border-green-200 bg-green-50 text-sm placeholder-green-600"
-                              placeholder="Correct Option (Exact Match)"
-                            />
-                          </div>
-                        )}
-
-                        {!['mcq'].includes(q.type) && (
-                          <input
-                            type="text"
-                            value={q.correctAnswer}
-                            onChange={e =>
-                              updateQuestionExp(
-                                secIndex,
-                                qIndex,
-                                'correctAnswer',
-                                e.target.value
-                              )
-                            }
-                            className="block w-full rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm focus:border-green-500 focus:ring-green-500"
-                            placeholder="Expected Answer / Key"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => addQuestionExp(secIndex)}
-                    className="w-full py-3 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium"
-                  >
-                    <Plus className="h-4 w-4" /> Add Question to {section.title}
-                  </button>
+                      <Plus className="h-4 w-4" /> Add Question to {section.title}
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
