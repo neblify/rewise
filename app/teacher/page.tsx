@@ -93,7 +93,7 @@ export default async function TeacherDashboard(props: Props) {
             Browse and manage all tests in the system.
           </p>
         </div>
-        <Button asChild className="bg-indigo-600 hover:bg-indigo-700">
+        <Button asChild variant="indigo">
           <Link href="/teacher/create-test">
             <Plus className="h-4 w-4 mr-2" />
             Create New Test

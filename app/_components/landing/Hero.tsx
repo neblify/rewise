@@ -36,7 +36,7 @@ export function Hero() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="mt-10 gap-4 flex flex-col sm:flex-row"
             >
-              <Button asChild size="lg" className="px-8 py-6 text-base font-medium md:text-lg shadow-lg hover:shadow-xl transition-all bg-indigo-600 hover:bg-indigo-700">
+              <Button asChild variant="indigo" size="lg" className="px-8 py-6 text-base font-medium md:text-lg shadow-lg hover:shadow-xl transition-all">
                 <Link href="/sign-up">
                   Start Learning Free
                   <ArrowRight className="ml-2 h-5 w-5" />

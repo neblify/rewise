@@ -4,9 +4,12 @@ import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Test from '@/lib/db/models/Test';
 import Question from '@/lib/db/models/Question';
-import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
+import {
+  parseTimedPayload,
+  omitTimedFormFields,
+} from './lib/timed';
 
 const questionSchema = z.object({
   text: z.string().min(1, 'Question text is required'),
@@ -31,6 +34,9 @@ const createTestSchema = z.object({
   board: z.string().min(1),
   grade: z.string().min(1),
   visibility: z.enum(['public', 'private']),
+  isTimed: z.enum(['true', 'false']).optional(),
+  durationHours: z.string().optional(),
+  durationMinutes: z.string().optional(),
   sections: z.array(sectionSchema).min(1, 'At least one section is required'),
 });
 
@@ -47,6 +53,9 @@ export async function createTest(prevState: any, formData: FormData) {
     board: formData.get('board'),
     grade: formData.get('grade'),
     visibility: formData.get('visibility'),
+    isTimed: formData.get('isTimed'),
+    durationHours: formData.get('durationHours'),
+    durationMinutes: formData.get('durationMinutes'),
     sections: JSON.parse((formData.get('sections') as string) || '[]'),
   };
 
@@ -60,6 +69,10 @@ export async function createTest(prevState: any, formData: FormData) {
         JSON.stringify(validated.error.flatten().fieldErrors),
     };
   }
+
+  const { isTimed, durationMinutes: durationMinutesTotal } = parseTimedPayload(
+    validated.data
+  );
 
   try {
     await dbConnect();
@@ -86,7 +99,9 @@ export async function createTest(prevState: any, formData: FormData) {
     );
 
     await Test.create({
-      ...validated.data,
+      ...omitTimedFormFields(validated.data),
+      isTimed,
+      durationMinutes: durationMinutesTotal,
       sections: sectionsWithRefs,
       createdBy: userId,
       isPublished: true,
@@ -113,6 +128,9 @@ export async function updateTest(prevState: any, formData: FormData) {
     board: formData.get('board'),
     grade: formData.get('grade'),
     visibility: formData.get('visibility'),
+    isTimed: formData.get('isTimed'),
+    durationHours: formData.get('durationHours'),
+    durationMinutes: formData.get('durationMinutes'),
     sections: JSON.parse((formData.get('sections') as string) || '[]'),
   };
 
@@ -126,6 +144,10 @@ export async function updateTest(prevState: any, formData: FormData) {
         JSON.stringify(validated.error.flatten().fieldErrors),
     };
   }
+
+  const { isTimed, durationMinutes: durationMinutesTotal } = parseTimedPayload(
+    validated.data
+  );
 
   try {
     await dbConnect();
@@ -159,12 +181,13 @@ export async function updateTest(prevState: any, formData: FormData) {
       })
     );
 
-    // Ensure user owns the test
     await Test.findOneAndUpdate(
       { _id: testId, createdBy: userId },
       {
         $set: {
-          ...validated.data,
+          ...omitTimedFormFields(validated.data),
+          isTimed,
+          durationMinutes: durationMinutesTotal,
           sections: sectionsWithRefs,
         },
         $push: {

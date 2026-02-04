@@ -34,6 +34,8 @@ export interface ITest extends Document {
   board?: string; // e.g. NIOS, CBSE
   grade?: string; // e.g. A, B, C or 10, 12
   visibility: 'public' | 'private';
+  isTimed?: boolean;
+  durationMinutes?: number; // total when isTimed is true
   createdBy: string; // Clerk ID of teacher
   sections: ISection[];
   questions?: IQuestion[] | mongoose.Types.ObjectId[]; // Keeping for backward compat
@@ -77,6 +79,8 @@ const TestSchema = new Schema<ITest>(
       enum: ['public', 'private'],
       default: 'public',
     },
+    isTimed: { type: Boolean, default: false },
+    durationMinutes: { type: Number },
     createdBy: { type: String, required: true },
     sections: [SectionSchema],
     questions: [QuestionSchema], // Deprecated but Schema remains valid

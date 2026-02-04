@@ -91,7 +91,7 @@ export default async function StudentDashboard() {
               </div>
             </CardContent>
             <CardFooter className="pt-0">
-              <Button asChild className="w-full bg-indigo-600 hover:bg-indigo-700">
+              <Button asChild variant="indigo" className="w-full">
                 <Link href={`/student/test/${test._id}`}>
                   <Play className="h-4 w-4 mr-2" />
                   Start Test
