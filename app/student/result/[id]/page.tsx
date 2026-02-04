@@ -6,7 +6,7 @@ import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, CheckCircle, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface Props {

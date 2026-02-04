@@ -1,4 +1,4 @@
-import { auth } from '@clerk/nextjs/server';
+import { clerkClient } from '@clerk/nextjs/server';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Test from '@/lib/db/models/Test';
