@@ -35,7 +35,7 @@ const createTestSchema = z.object({
 });
 
 export async function createTest(prevState: any, formData: FormData) {
-  const { userId } = await auth();
+  const { userId } = await currentAuth();
 
   if (!userId) {
     return { message: 'Unauthorized' };
@@ -100,7 +100,7 @@ export async function createTest(prevState: any, formData: FormData) {
 }
 
 export async function updateTest(prevState: any, formData: FormData) {
-  const { userId } = await auth();
+  const { userId } = await currentAuth();
 
   if (!userId) {
     return { message: 'Unauthorized' };
