@@ -98,55 +98,57 @@ export default function DeleteTestButton({
             </Button>
 
             <AlertDialog open={showDialog} onOpenChange={setShowDialog}>
-                <AlertDialogContent>
+                <AlertDialogContent className="bg-white">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Test</AlertDialogTitle>
-                        <AlertDialogDescription className="space-y-4">
-                            <p>
-                                Are you sure you want to delete{' '}
-                                <span className="font-semibold text-gray-900">
-                                    &quot;{testTitle}&quot;
-                                </span>
-                                ?
-                            </p>
-                            <p className="text-red-600 font-medium">
-                                This action cannot be undone. The test and all associated
-                                questions will be permanently deleted.
-                            </p>
-
-                            {hasResults && (
-                                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 space-y-3">
-                                    <p className="text-yellow-800 font-medium">
-                                        ⚠️ This test has {resultCount} student{' '}
-                                        {resultCount === 1 ? 'result' : 'results'}
-                                    </p>
-                                    <div className="flex items-start space-x-2">
-                                        <Checkbox
-                                            id="delete-results"
-                                            checked={deleteResults}
-                                            onCheckedChange={(checked: boolean) =>
-                                                setDeleteResults(checked)
-                                            }
-                                            className="mt-1"
-                                        />
-                                        <label
-                                            htmlFor="delete-results"
-                                            className="text-sm text-yellow-900 cursor-pointer leading-relaxed"
-                                        >
-                                            Also delete all student results for this test
-                                            <span className="block text-xs text-yellow-700 mt-1">
-                                                Recommended to maintain data integrity
-                                            </span>
-                                        </label>
-                                    </div>
+                        <AlertDialogDescription asChild>
+                            <div className="space-y-4 text-sm">
+                                <div className="text-gray-700">
+                                    Are you sure you want to delete{' '}
+                                    <span className="font-semibold text-gray-900">
+                                        &quot;{testTitle}&quot;
+                                    </span>
+                                    ?
                                 </div>
-                            )}
+                                <div className="text-red-700 font-semibold bg-red-50 p-3 rounded-md border border-red-200">
+                                    ⚠️ This action cannot be undone. The test and all associated
+                                    questions will be permanently deleted.
+                                </div>
 
-                            {error && (
-                                <Alert variant="destructive">
-                                    <AlertDescription>{error}</AlertDescription>
-                                </Alert>
-                            )}
+                                {hasResults && (
+                                    <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 space-y-3">
+                                        <div className="text-yellow-900 font-semibold">
+                                            ⚠️ This test has {resultCount} student{' '}
+                                            {resultCount === 1 ? 'result' : 'results'}
+                                        </div>
+                                        <div className="flex items-start space-x-2">
+                                            <Checkbox
+                                                id="delete-results"
+                                                checked={deleteResults}
+                                                onCheckedChange={(checked: boolean) =>
+                                                    setDeleteResults(checked)
+                                                }
+                                                className="mt-1"
+                                            />
+                                            <label
+                                                htmlFor="delete-results"
+                                                className="text-sm text-yellow-900 cursor-pointer leading-relaxed"
+                                            >
+                                                Also delete all student results for this test
+                                                <span className="block text-xs text-yellow-800 mt-1 font-medium">
+                                                    Recommended to maintain data integrity
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {error && (
+                                    <Alert variant="destructive">
+                                        <AlertDescription>{error}</AlertDescription>
+                                    </Alert>
+                                )}
+                            </div>
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
