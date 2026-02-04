@@ -28,6 +28,8 @@ const QUESTION_TYPES = [
 
 import { BOARDS } from '@/lib/constants/boards';
 import { getGradesForBoard } from '@/lib/constants/levels';
+import { defaultTimedState, appendTimedToFormData } from './lib/timed';
+import { TestTimeLimitField } from './components/TestTimeLimitField';
 
 export default function CreateTestPage() {
   const [state, formAction] = useActionState(createTest, null);
@@ -43,6 +45,7 @@ export default function CreateTestPage() {
   // Test Metadata State
   const [board, setBoard] = useState('NIOS');
   const [grade, setGrade] = useState('A');
+  const [timedState, setTimedState] = useState(defaultTimedState);
 
   const gradeOptions = getGradesForBoard(board);
 
@@ -120,6 +123,7 @@ export default function CreateTestPage() {
 
   const handleSubmit = (formData: FormData) => {
     formData.set('sections', JSON.stringify(sections));
+    appendTimedToFormData(formData, timedState);
     // @ts-ignore
     formAction(formData);
   };
@@ -140,10 +144,13 @@ export default function CreateTestPage() {
       );
 
       if (res.data) {
-        // Add a new section for these questions
+        const timedSuffix =
+          timedState.isTimed === 'timed'
+            ? ` (Timed ${timedState.durationHours} Hours : ${String(timedState.durationMinutes).padStart(2, '0')} Minutes)`
+            : '';
         const newSection = {
           id: Date.now(),
-          title: `AI Generated: ${aiTopic}`,
+          title: `AI Generated: ${aiTopic}${timedSuffix}`,
           description: `${aiDifficulty} - ${aiType}`,
           questions: res.data,
         };
@@ -320,6 +327,8 @@ export default function CreateTestPage() {
                   <option value="private">Private (Invite Only)</option>
                 </select>
               </div>
+
+              <TestTimeLimitField value={timedState} onChange={setTimedState} />
             </div>
           </div>
 

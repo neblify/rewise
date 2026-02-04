@@ -20,6 +20,8 @@ const QUESTION_TYPES = [
 
 import { BOARDS } from '@/lib/constants/boards';
 import { NIOS_LEVELS, STANDARD_LEVELS, getGradesForBoard } from '@/lib/constants/levels';
+import { defaultTimedState, parseTimedFromTest, appendTimedToFormData } from '../lib/timed';
+import { TestTimeLimitField } from '../components/TestTimeLimitField';
 
 const generateId = () =>
   Math.random().toString(36).substring(2, 15) +
@@ -47,6 +49,7 @@ export default function CreateOrEditTestPage() {
   const [board, setBoard] = useState('NIOS');
   const [grade, setGrade] = useState('A');
   const [visibility, setVisibility] = useState('public');
+  const [timedState, setTimedState] = useState(defaultTimedState);
 
   // Sections State
   const [sections, setSections] = useState<any[]>([
@@ -74,6 +77,7 @@ export default function CreateOrEditTestPage() {
             setBoard(data.test.board || 'NIOS');
             setGrade(data.test.grade || 'A');
             setVisibility(data.test.visibility || 'public');
+            setTimedState(parseTimedFromTest(data.test));
 
             // Transform sections if needed or use existing structure
             // Assuming backend returns sections as matches.
@@ -170,8 +174,8 @@ export default function CreateOrEditTestPage() {
   };
 
   const handleSubmit = (formData: FormData) => {
-    console.log('Submitting form with sections:', sections);
     formData.set('sections', JSON.stringify(sections));
+    appendTimedToFormData(formData, timedState);
     if (isEditMode && testId) {
       formData.set('testId', testId);
     }
@@ -206,10 +210,13 @@ export default function CreateOrEditTestPage() {
       );
 
       if (res.data) {
-        // Add a new section for these questions
+        const timedSuffix =
+          timedState.isTimed === 'timed'
+            ? ` (Timed ${timedState.durationHours} Hours : ${String(timedState.durationMinutes).padStart(2, '0')} Minutes)`
+            : '';
         const newSection = {
           id: generateId(),
-          title: `AI Generated: ${aiTopic}`,
+          title: `AI Generated: ${aiTopic}${timedSuffix}`,
           description: `${aiDifficulty} - ${aiType}`,
           questions: res.data.map((q: any) => ({ ...q, id: generateId() })), // Ensure AI questions also get new unique IDs if needed, or rely on server-side ID but client-side ID is safer for lists
         };
@@ -347,6 +354,8 @@ export default function CreateOrEditTestPage() {
                   <option value="private">Private (Invite Only)</option>
                 </select>
               </div>
+
+              <TestTimeLimitField value={timedState} onChange={setTimedState} />
             </div>
           </div>
 
