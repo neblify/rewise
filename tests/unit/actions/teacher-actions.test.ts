@@ -1,13 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createTest, updateTest } from '@/app/teacher/create-test/actions';
-import { auth } from '@clerk/nextjs/server';
 import Test from '@/lib/db/models/Test';
 import Question from '@/lib/db/models/Question';
 import { redirect } from 'next/navigation';
 
 // Mock Dependencies
-vi.mock('@clerk/nextjs/server', () => ({
-  auth: vi.fn(),
+vi.mock('@/lib/auth-wrapper', () => ({
+  currentAuth: vi.fn(),
 }));
 
 vi.mock('@/lib/db/connect', () => ({
@@ -39,14 +38,16 @@ describe('Teacher Actions', () => {
 
   describe('createTest', () => {
     it('should fail if user is not authenticated', async () => {
-      (auth as any).mockResolvedValue({ userId: null });
+      const { currentAuth } = await import('@/lib/auth-wrapper');
+      (currentAuth as any).mockResolvedValue({ userId: null });
       const formData = new FormData();
       const result = await createTest({}, formData);
       expect(result.message).toBe('Unauthorized');
     });
 
     it('should fail if input validation fails', async () => {
-      (auth as any).mockResolvedValue({ userId: 'user_123' });
+      const { currentAuth } = await import('@/lib/auth-wrapper');
+      (currentAuth as any).mockResolvedValue({ userId: 'user_123' });
       const formData = new FormData();
       // Empty form data
       const result = await createTest({}, formData);
@@ -54,7 +55,8 @@ describe('Teacher Actions', () => {
     });
 
     it('should create a test successfully', async () => {
-      (auth as any).mockResolvedValue({ userId: 'user_123' });
+      const { currentAuth } = await import('@/lib/auth-wrapper');
+      (currentAuth as any).mockResolvedValue({ userId: 'user_123' });
 
       const formData = new FormData();
       formData.append('title', 'Math Final');
@@ -62,6 +64,9 @@ describe('Teacher Actions', () => {
       formData.append('board', 'CBSE');
       formData.append('grade', '10');
       formData.append('visibility', 'public');
+      formData.append('isTimed', 'false');
+      formData.append('durationHours', '1');
+      formData.append('durationMinutes', '30');
 
       const sections = [
         {
@@ -93,7 +98,8 @@ describe('Teacher Actions', () => {
 
   describe('updateTest', () => {
     it('should update a test successfully', async () => {
-      (auth as any).mockResolvedValue({ userId: 'user_123' });
+      const { currentAuth } = await import('@/lib/auth-wrapper');
+      (currentAuth as any).mockResolvedValue({ userId: 'user_123' });
 
       const formData = new FormData();
       formData.append('testId', 't_existing');
@@ -102,6 +108,9 @@ describe('Teacher Actions', () => {
       formData.append('board', 'CBSE');
       formData.append('grade', '10');
       formData.append('visibility', 'public');
+      formData.append('isTimed', 'false');
+      formData.append('durationHours', '1');
+      formData.append('durationMinutes', '30');
 
       const sections = [
         {
