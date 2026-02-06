@@ -1,10 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { ITest, IQuestion } from '@/lib/db/models/Test';
 import { submitTest } from './actions';
 import { cn } from '@/lib/utils';
+import { Clock } from 'lucide-react';
+
+const EXTRA_SECONDS = 5;
+
+function formatCountdown(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
 
 export default function TestTaker({
   test,
@@ -16,6 +25,48 @@ export default function TestTaker({
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+
+  const totalSeconds =
+    test.isTimed && test.durationMinutes != null
+      ? test.durationMinutes * 60 + EXTRA_SECONDS
+      : null;
+  const [secondsLeft, setSecondsLeft] = useState<number | null>(totalSeconds);
+  const submittedRef = useRef(false);
+
+  useEffect(() => {
+    if (totalSeconds == null) return;
+    const id = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev == null || prev <= 0) return prev;
+        if (prev === 1) {
+          clearInterval(id);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [totalSeconds]);
+
+  useEffect(() => {
+    if (secondsLeft !== 0 || submittedRef.current) return;
+    submittedRef.current = true;
+    (async () => {
+      setIsSubmitting(true);
+      try {
+        const result = await submitTest(test._id as unknown as string, answers);
+        if (result && 'success' in result && result.success) {
+          router.push(`/student/result/${result.resultId}`);
+        } else {
+          setIsSubmitting(false);
+          submittedRef.current = false;
+        }
+      } catch {
+        setIsSubmitting(false);
+        submittedRef.current = false;
+      }
+    })();
+  }, [secondsLeft, test._id, answers, router]);
 
   const handleAnswerChange = (questionId: string, value: any) => {
     setAnswers(prev => ({
@@ -153,6 +204,19 @@ export default function TestTaker({
 
   return (
     <div className="space-y-8">
+      {secondsLeft != null && (
+        <div
+          className={cn(
+            'sticky top-0 z-10 flex items-center justify-center gap-2 rounded-xl border px-4 py-3 text-lg font-semibold',
+            secondsLeft <= 60
+              ? 'border-red-200 bg-red-50 text-red-700'
+              : 'border-indigo-200 bg-indigo-50 text-indigo-700'
+          )}
+        >
+          <Clock className="h-5 w-5" />
+          <span>Time remaining: {formatCountdown(secondsLeft)}</span>
+        </div>
+      )}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
         <h1 className="text-2xl font-bold text-gray-900">{test.title}</h1>
         <div className="flex gap-4 text-sm text-gray-500 mt-2">

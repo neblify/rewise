@@ -3,7 +3,7 @@ import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Test from '@/lib/db/models/Test';
 import Link from 'next/link';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatDurationMinutes } from '@/lib/utils';
 import { Play } from 'lucide-react';
 import User from '@/lib/db/models/User';
 import {
@@ -102,6 +102,11 @@ export default async function StudentDashboard() {
                     ) || 0)}{' '}
                   Questions
                 </p>
+                {test.isTimed && test.durationMinutes != null && (
+                  <p className="text-indigo-600 font-medium">
+                    Time: {formatDurationMinutes(test.durationMinutes)}
+                  </p>
+                )}
                 <p>Added on {formatDate(test.createdAt)}</p>
               </div>
             </CardContent>

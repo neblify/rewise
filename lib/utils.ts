@@ -13,3 +13,13 @@ export function formatDate(input: string | number | Date): string {
     year: 'numeric',
   });
 }
+
+/** Format total minutes as "Xh Ym" for display (e.g. 90 -> "1h 30m"). */
+export function formatDurationMinutes(totalMinutes: number): string {
+  if (totalMinutes <= 0) return '0m';
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  if (h === 0) return `${m}m`;
+  if (m === 0) return `${h}h`;
+  return `${h}h ${m}m`;
+}

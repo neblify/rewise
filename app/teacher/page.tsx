@@ -5,7 +5,7 @@ import Test from '@/lib/db/models/Test';
 import User from '@/lib/db/models/User';
 import { Plus, Search, Filter } from 'lucide-react';
 import Link from 'next/link';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatDurationMinutes } from '@/lib/utils';
 import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -178,6 +178,7 @@ export default async function TeacherDashboard(props: Props) {
                 <th className="px-6 py-4">Test Name</th>
                 <th className="px-6 py-4">Subject & Board</th>
                 <th className="px-6 py-4">Questions</th>
+                <th className="px-6 py-4">Time</th>
                 <th className="px-6 py-4">Created By</th>
                 <th className="px-6 py-4">Dates</th>
                 <th className="px-6 py-4">Status</th>
@@ -188,7 +189,7 @@ export default async function TeacherDashboard(props: Props) {
               {tests.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     className="px-6 py-12 text-center text-gray-500"
                   >
                     No tests found matching your filters.
@@ -229,6 +230,11 @@ export default async function TeacherDashboard(props: Props) {
                         </div>
                       </td>
                       <td className="px-6 py-4">{questionCount}</td>
+                      <td className="px-6 py-4 text-gray-600">
+                        {test.isPublished && test.isTimed && test.durationMinutes != null
+                          ? formatDurationMinutes(test.durationMinutes)
+                          : '—'}
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs text-indigo-600 font-bold uppercase">
