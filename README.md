@@ -83,20 +83,25 @@ GROQ_API_KEY=your_groq_api_key
 The project uses **Vitest** for unit/integration testing and **Playwright** for end-to-end (E2E) testing.
 
 ### Running Unit Tests
+
 ```bash
 npm run test:unit
 ```
 
 ### Running E2E Tests
+
 ```bash
 npm run test:e2e
 ```
+
 To run E2E tests with UI mode:
+
 ```bash
 npm run test:e2e:ui
 ```
 
 ### Running All Tests
+
 ```bash
 npm test
 ```

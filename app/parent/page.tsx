@@ -146,12 +146,13 @@ export default function ParentDashboard() {
                     </span>
                   </div>
                   <span
-                    className={`text-lg font-bold ${result.totalScore / result.maxScore >= 0.7
-                      ? 'text-green-600'
-                      : result.totalScore / result.maxScore >= 0.4
-                        ? 'text-yellow-600'
-                        : 'text-red-600'
-                      }`}
+                    className={`text-lg font-bold ${
+                      result.totalScore / result.maxScore >= 0.7
+                        ? 'text-green-600'
+                        : result.totalScore / result.maxScore >= 0.4
+                          ? 'text-yellow-600'
+                          : 'text-red-600'
+                    }`}
                   >
                     {result.totalScore}/{result.maxScore}
                   </span>

@@ -1,10 +1,6 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "project": [
-    "**/*.{ts,tsx}"
-  ],
-  "ignore": [
-    "**/*.d.ts"
-  ],
+  "project": ["**/*.{ts,tsx}"],
+  "ignore": ["**/*.d.ts"],
   "ignoreDependencies": []
 }

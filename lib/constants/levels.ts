@@ -4,8 +4,8 @@ export const STANDARD_LEVELS = Array.from({ length: 12 }, (_, i) =>
 );
 
 export const getGradesForBoard = (board: string) => {
-    if (board === 'NIOS') {
-        return NIOS_LEVELS.map(l => ({ value: l, label: `Level ${l}` }));
-    }
-    return STANDARD_LEVELS.map(l => ({ value: l, label: `Class ${l}` }));
+  if (board === 'NIOS') {
+    return NIOS_LEVELS.map(l => ({ value: l, label: `Level ${l}` }));
+  }
+  return STANDARD_LEVELS.map(l => ({ value: l, label: `Class ${l}` }));
 };

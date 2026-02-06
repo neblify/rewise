@@ -123,7 +123,9 @@ export default async function TeacherDashboard(props: Props) {
             >
               <option value="">All Subjects</option>
               {subjects.map((s: string) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>
+                  {s}
+                </option>
               ))}
             </select>
 
@@ -134,7 +136,9 @@ export default async function TeacherDashboard(props: Props) {
             >
               <option value="">All Boards</option>
               {boards.map((b: string) => (
-                <option key={b} value={b}>{b}</option>
+                <option key={b} value={b}>
+                  {b}
+                </option>
               ))}
             </select>
 
@@ -149,10 +153,18 @@ export default async function TeacherDashboard(props: Props) {
               <option value="title_asc">Name (A-Z)</option>
             </select>
 
-            <Button type="submit" variant="secondary" className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700">
+            <Button
+              type="submit"
+              variant="secondary"
+              className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+            >
               Apply
             </Button>
-            <Button asChild variant="ghost" className="text-gray-500 hover:text-gray-700">
+            <Button
+              asChild
+              variant="ghost"
+              className="text-gray-500 hover:text-gray-700"
+            >
               <Link href="/teacher">Clear</Link>
             </Button>
           </form>
@@ -175,53 +187,99 @@ export default async function TeacherDashboard(props: Props) {
             <tbody className="divide-y divide-gray-200">
               {tests.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                  <td
+                    colSpan={7}
+                    className="px-6 py-12 text-center text-gray-500"
+                  >
                     No tests found matching your filters.
                   </td>
                 </tr>
               ) : (
                 tests.map((test: any) => {
                   const creator = creatorMap.get(test.createdBy);
-                  const creatorName = creator ? `${creator.firstName || ''} ${creator.lastName || ''}`.trim() || creator.email : 'Unknown';
-                  const questionCount = test.sections?.reduce((acc: number, s: any) => acc + (s.questions?.length || 0), 0) || 0;
+                  const creatorName = creator
+                    ? `${creator.firstName || ''} ${creator.lastName || ''}`.trim() ||
+                      creator.email
+                    : 'Unknown';
+                  const questionCount =
+                    test.sections?.reduce(
+                      (acc: number, s: any) => acc + (s.questions?.length || 0),
+                      0
+                    ) || 0;
 
                   return (
-                    <tr key={test._id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={test._id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="px-6 py-4 font-medium text-gray-900">
                         {test.title}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col items-start gap-1">
-                          <Badge variant="outline" className="font-medium text-gray-900 bg-white">{test.subject}</Badge>
-                          <span className="text-gray-400 text-xs">{test.board} {test.grade && `• Class ${test.grade}`}</span>
+                          <Badge
+                            variant="outline"
+                            className="font-medium text-gray-900 bg-white"
+                          >
+                            {test.subject}
+                          </Badge>
+                          <span className="text-gray-400 text-xs">
+                            {test.board} {test.grade && `• Class ${test.grade}`}
+                          </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4">
-                        {questionCount}
-                      </td>
+                      <td className="px-6 py-4">{questionCount}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs text-indigo-600 font-bold uppercase">
                             {creatorName.charAt(0)}
                           </div>
-                          <span className="truncate max-w-[120px]" title={creatorName}>{creatorName}</span>
+                          <span
+                            className="truncate max-w-[120px]"
+                            title={creatorName}
+                          >
+                            {creatorName}
+                          </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-xs space-y-1">
-                        <div><span className="text-gray-400">Created:</span> {formatDate(test.createdAt)}</div>
-                        <div><span className="text-gray-400">Updated:</span> {formatDate(test.updatedAt)}</div>
+                        <div>
+                          <span className="text-gray-400">Created:</span>{' '}
+                          {formatDate(test.createdAt)}
+                        </div>
+                        <div>
+                          <span className="text-gray-400">Updated:</span>{' '}
+                          {formatDate(test.updatedAt)}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
-                        <Badge variant={test.isPublished ? "default" : "secondary"} className={test.isPublished ? "bg-green-100 text-green-700 hover:bg-green-200 border-green-200" : "bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-yellow-200"}>
+                        <Badge
+                          variant={test.isPublished ? 'default' : 'secondary'}
+                          className={
+                            test.isPublished
+                              ? 'bg-green-100 text-green-700 hover:bg-green-200 border-green-200'
+                              : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-yellow-200'
+                          }
+                        >
                           {test.isPublished ? 'Published' : 'Draft'}
                         </Badge>
                       </td>
 
                       <td className="px-6 py-4 text-right space-x-3">
-                        <Link href={`/teacher/test/${test._id}/results`} className="text-indigo-600 hover:text-indigo-900 font-medium">Results</Link>
+                        <Link
+                          href={`/teacher/test/${test._id}/results`}
+                          className="text-indigo-600 hover:text-indigo-900 font-medium"
+                        >
+                          Results
+                        </Link>
                         {test.createdBy === userId && (
                           <>
-                            <Link href={`/teacher/create-test/${test._id}`} className="text-gray-500 hover:text-gray-900 font-medium">Edit</Link>
+                            <Link
+                              href={`/teacher/create-test/${test._id}`}
+                              className="text-gray-500 hover:text-gray-900 font-medium"
+                            >
+                              Edit
+                            </Link>
                             <DeleteTestButton
                               testId={test._id.toString()}
                               testTitle={test.title}

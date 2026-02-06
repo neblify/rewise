@@ -85,6 +85,6 @@ export default function Navbar({ variant = 'student' }: NavbarProps) {
           </div>
         </div>
       </div>
-    </nav >
+    </nav>
   );
 }

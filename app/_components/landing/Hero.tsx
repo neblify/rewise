@@ -18,7 +18,10 @@ export function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <Badge variant="secondary" className="px-3 py-1 text-sm font-semibold text-indigo-600 bg-indigo-100 hover:bg-indigo-200 mb-4 w-fit">
+              <Badge
+                variant="secondary"
+                className="px-3 py-1 text-sm font-semibold text-indigo-600 bg-indigo-100 hover:bg-indigo-200 mb-4 w-fit"
+              >
                 🚀 Smart Prep for NIOS Exams
               </Badge>
               <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
@@ -36,16 +39,24 @@ export function Hero() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="mt-10 gap-4 flex flex-col sm:flex-row"
             >
-              <Button asChild variant="indigo" size="lg" className="px-8 py-6 text-base font-medium md:text-lg shadow-lg hover:shadow-xl transition-all">
+              <Button
+                asChild
+                variant="indigo"
+                size="lg"
+                className="px-8 py-6 text-base font-medium md:text-lg shadow-lg hover:shadow-xl transition-all"
+              >
                 <Link href="/sign-up">
                   Start Learning Free
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="px-8 py-6 text-base font-medium md:text-lg bg-white hover:bg-gray-50 text-gray-900 border-gray-200">
-                <Link href="/sign-in">
-                  Welcome Back
-                </Link>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="px-8 py-6 text-base font-medium md:text-lg bg-white hover:bg-gray-50 text-gray-900 border-gray-200"
+              >
+                <Link href="/sign-in">Welcome Back</Link>
               </Button>
             </motion.div>
           </div>

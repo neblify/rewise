@@ -108,12 +108,12 @@ export default async function TestResultsPage(props: Props) {
             <p className="text-3xl font-bold text-indigo-600 mt-2">
               {results.length > 0
                 ? Math.round(
-                  results.reduce(
-                    (acc: number, curr: any) =>
-                      acc + (curr.totalScore / curr.maxScore) * 100,
-                    0
-                  ) / results.length
-                )
+                    results.reduce(
+                      (acc: number, curr: any) =>
+                        acc + (curr.totalScore / curr.maxScore) * 100,
+                      0
+                    ) / results.length
+                  )
                 : 0}
               %
             </p>

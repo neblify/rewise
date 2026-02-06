@@ -19,8 +19,16 @@ const QUESTION_TYPES = [
 ];
 
 import { BOARDS } from '@/lib/constants/boards';
-import { NIOS_LEVELS, STANDARD_LEVELS, getGradesForBoard } from '@/lib/constants/levels';
-import { defaultTimedState, parseTimedFromTest, appendTimedToFormData } from '../lib/timed';
+import {
+  NIOS_LEVELS,
+  STANDARD_LEVELS,
+  getGradesForBoard,
+} from '@/lib/constants/levels';
+import {
+  defaultTimedState,
+  parseTimedFromTest,
+  appendTimedToFormData,
+} from '../lib/timed';
 import { TestTimeLimitField } from '../components/TestTimeLimitField';
 
 const generateId = () =>
@@ -407,11 +415,21 @@ export default function CreateOrEditTestPage() {
                     </colgroup>
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marks</th>
-                        <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          No.
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Question
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Type
+                        </th>
+                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Marks
+                        </th>
+                        <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -419,7 +437,10 @@ export default function CreateOrEditTestPage() {
                         const questionNo =
                           sections
                             .slice(0, secIndex)
-                            .reduce((acc, s) => acc + (s.questions?.length ?? 0), 0) +
+                            .reduce(
+                              (acc, s) => acc + (s.questions?.length ?? 0),
+                              0
+                            ) +
                           qIndex +
                           1;
                         return (
@@ -483,7 +504,9 @@ export default function CreateOrEditTestPage() {
                               <td className="px-3 py-2 text-right">
                                 <button
                                   type="button"
-                                  onClick={() => removeQuestionExp(secIndex, qIndex)}
+                                  onClick={() =>
+                                    removeQuestionExp(secIndex, qIndex)
+                                  }
                                   className="text-gray-300 hover:text-red-500 transition-opacity"
                                 >
                                   <Trash2 className="h-4 w-4" />
@@ -492,27 +515,34 @@ export default function CreateOrEditTestPage() {
                             </tr>
                             {q.type === 'mcq' && (
                               <tr>
-                                <td colSpan={5} className="px-3 py-2 bg-gray-50">
+                                <td
+                                  colSpan={5}
+                                  className="px-3 py-2 bg-gray-50"
+                                >
                                   <div className="grid grid-cols-2 gap-2">
-                                    {q.options?.map((opt: string, optIndex: number) => (
-                                      <input
-                                        key={optIndex}
-                                        type="text"
-                                        value={opt}
-                                        onChange={e => {
-                                          const newOpts = [...(q.options || [])];
-                                          newOpts[optIndex] = e.target.value;
-                                          updateQuestionExp(
-                                            secIndex,
-                                            qIndex,
-                                            'options',
-                                            newOpts
-                                          );
-                                        }}
-                                        className="block w-full rounded border border-gray-200 px-2 py-1.5 text-sm"
-                                        placeholder={`Option ${optIndex + 1}`}
-                                      />
-                                    ))}
+                                    {q.options?.map(
+                                      (opt: string, optIndex: number) => (
+                                        <input
+                                          key={optIndex}
+                                          type="text"
+                                          value={opt}
+                                          onChange={e => {
+                                            const newOpts = [
+                                              ...(q.options || []),
+                                            ];
+                                            newOpts[optIndex] = e.target.value;
+                                            updateQuestionExp(
+                                              secIndex,
+                                              qIndex,
+                                              'options',
+                                              newOpts
+                                            );
+                                          }}
+                                          className="block w-full rounded border border-gray-200 px-2 py-1.5 text-sm"
+                                          placeholder={`Option ${optIndex + 1}`}
+                                        />
+                                      )
+                                    )}
                                     <input
                                       type="text"
                                       value={q.correctAnswer}
@@ -533,7 +563,10 @@ export default function CreateOrEditTestPage() {
                             )}
                             {!['mcq'].includes(q.type) && (
                               <tr>
-                                <td colSpan={5} className="px-3 py-2 bg-gray-50">
+                                <td
+                                  colSpan={5}
+                                  className="px-3 py-2 bg-gray-50"
+                                >
                                   <input
                                     type="text"
                                     value={q.correctAnswer}
@@ -562,7 +595,8 @@ export default function CreateOrEditTestPage() {
                       onClick={() => addQuestionExp(secIndex)}
                       className="w-full py-3 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium"
                     >
-                      <Plus className="h-4 w-4" /> Add Question to {section.title}
+                      <Plus className="h-4 w-4" /> Add Question to{' '}
+                      {section.title}
                     </button>
                   </div>
                 </div>

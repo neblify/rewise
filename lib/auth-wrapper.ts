@@ -7,21 +7,21 @@ import { cookies } from 'next/headers';
  * the mocked userId. Otherwise, it returns the real Clerk auth.
  */
 export async function currentAuth() {
-    const isDev = process.env.NODE_ENV === 'development';
+  const isDev = process.env.NODE_ENV === 'development';
 
-    if (isDev) {
-        const cookieStore = await cookies();
-        const mockSession = cookieStore.get('mock_session');
+  if (isDev) {
+    const cookieStore = await cookies();
+    const mockSession = cookieStore.get('mock_session');
 
-        if (mockSession?.value) {
-            return {
-                userId: mockSession.value,
-                sessionId: 'mock_session_id',
-                getToken: async () => 'mock_token',
-                debug: () => console.log('Mock auth active'),
-            };
-        }
+    if (mockSession?.value) {
+      return {
+        userId: mockSession.value,
+        sessionId: 'mock_session_id',
+        getToken: async () => 'mock_token',
+        debug: () => console.log('Mock auth active'),
+      };
     }
+  }
 
-    return auth();
+  return auth();
 }

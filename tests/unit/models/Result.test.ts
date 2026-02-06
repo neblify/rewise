@@ -3,63 +3,63 @@ import Result from '@/lib/db/models/Result';
 import mongoose from 'mongoose';
 
 describe('Result Model', () => {
-    it('should validate a correct result', () => {
-        const validResult = new Result({
-            testId: new mongoose.Types.ObjectId(),
-            studentId: 'student_123',
-            answers: [
-                {
-                    questionId: 'q1',
-                    answer: 'A',
-                    isCorrect: true,
-                    marksObtained: 1
-                }
-            ],
-            totalScore: 10,
-            maxScore: 10
-        });
-
-        const error = validResult.validateSync();
-        expect(error).toBeUndefined();
+  it('should validate a correct result', () => {
+    const validResult = new Result({
+      testId: new mongoose.Types.ObjectId(),
+      studentId: 'student_123',
+      answers: [
+        {
+          questionId: 'q1',
+          answer: 'A',
+          isCorrect: true,
+          marksObtained: 1,
+        },
+      ],
+      totalScore: 10,
+      maxScore: 10,
     });
 
-    it('should require testId', () => {
-        const result = new Result({
-            studentId: 'student_123'
-        });
+    const error = validResult.validateSync();
+    expect(error).toBeUndefined();
+  });
 
-        const error = result.validateSync();
-        expect(error?.errors['testId']).toBeDefined();
+  it('should require testId', () => {
+    const result = new Result({
+      studentId: 'student_123',
     });
 
-    it('should require studentId', () => {
-        const result = new Result({
-            testId: new mongoose.Types.ObjectId()
-        });
+    const error = result.validateSync();
+    expect(error?.errors['testId']).toBeDefined();
+  });
 
-        const error = result.validateSync();
-        expect(error?.errors['studentId']).toBeDefined();
+  it('should require studentId', () => {
+    const result = new Result({
+      testId: new mongoose.Types.ObjectId(),
     });
 
-    it('should have default scores of 0', () => {
-        const result = new Result({
-            testId: new mongoose.Types.ObjectId(),
-            studentId: 'student_123'
-        });
+    const error = result.validateSync();
+    expect(error?.errors['studentId']).toBeDefined();
+  });
 
-        expect(result.totalScore).toBe(0);
-        expect(result.maxScore).toBe(0);
+  it('should have default scores of 0', () => {
+    const result = new Result({
+      testId: new mongoose.Types.ObjectId(),
+      studentId: 'student_123',
     });
 
-    it('should allow optional fields to be empty', () => {
-        const result = new Result({
-            testId: new mongoose.Types.ObjectId(),
-            studentId: 'student_123'
-        });
+    expect(result.totalScore).toBe(0);
+    expect(result.maxScore).toBe(0);
+  });
 
-        const error = result.validateSync();
-        expect(error).toBeUndefined();
-        expect(result.answers).toHaveLength(0);
-        expect(result.weakAreas).toHaveLength(0);
+  it('should allow optional fields to be empty', () => {
+    const result = new Result({
+      testId: new mongoose.Types.ObjectId(),
+      studentId: 'student_123',
     });
+
+    const error = result.validateSync();
+    expect(error).toBeUndefined();
+    expect(result.answers).toHaveLength(0);
+    expect(result.weakAreas).toHaveLength(0);
+  });
 });

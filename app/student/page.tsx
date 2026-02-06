@@ -6,7 +6,13 @@ import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import { Play } from 'lucide-react';
 import User from '@/lib/db/models/User';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -45,9 +51,12 @@ export default async function StudentDashboard() {
             <div className="flex gap-3">
               <span className="text-2xl">⚠️</span>
               <div>
-                <h3 className="font-semibold text-yellow-800">Complete your profile</h3>
+                <h3 className="font-semibold text-yellow-800">
+                  Complete your profile
+                </h3>
                 <p className="text-sm text-yellow-700 mt-1">
-                  Set your Board and Grade to see relevant tests. Currently showing all public tests.
+                  Set your Board and Grade to see relevant tests. Currently
+                  showing all public tests.
                 </p>
               </div>
             </div>
@@ -63,14 +72,20 @@ export default async function StudentDashboard() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {tests.map((test: any) => (
-          <Card key={test._id} className="hover:shadow-md transition-shadow group border-gray-100">
+          <Card
+            key={test._id}
+            className="hover:shadow-md transition-shadow group border-gray-100"
+          >
             <CardHeader className="pb-4">
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="font-semibold text-lg text-gray-900 group-hover:text-indigo-600 transition-colors">
                     {test.title}
                   </CardTitle>
-                  <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 mt-2">
+                  <Badge
+                    variant="secondary"
+                    className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 mt-2"
+                  >
                     {test.subject}
                   </Badge>
                 </div>
@@ -110,4 +125,3 @@ export default async function StudentDashboard() {
     </div>
   );
 }
-

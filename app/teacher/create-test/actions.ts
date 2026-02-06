@@ -6,10 +6,7 @@ import Test from '@/lib/db/models/Test';
 import Question from '@/lib/db/models/Question';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import {
-  parseTimedPayload,
-  omitTimedFormFields,
-} from './lib/timed';
+import { parseTimedPayload, omitTimedFormFields } from './lib/timed';
 
 const questionSchema = z.object({
   text: z.string().min(1, 'Question text is required'),

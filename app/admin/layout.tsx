@@ -3,28 +3,28 @@ import { redirect } from 'next/navigation';
 import Navbar from '@/app/_components/dashboard/Navbar';
 
 export default async function AdminLayout({
-    children,
+  children,
 }: {
-    children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-    const user = await currentUser();
+  const user = await currentUser();
 
-    if (!user) {
-        redirect('/sign-in');
-    }
+  if (!user) {
+    redirect('/sign-in');
+  }
 
-    const email = user.emailAddresses[0]?.emailAddress;
-    const role = user.publicMetadata.role as string;
+  const email = user.emailAddresses[0]?.emailAddress;
+  const role = user.publicMetadata.role as string;
 
-    // Access Control: Allow deenaik@gmail.com OR any user with 'admin' role
-    if (email !== 'deenaik@gmail.com' && role !== 'admin') {
-        redirect('/');
-    }
+  // Access Control: Allow deenaik@gmail.com OR any user with 'admin' role
+  if (email !== 'deenaik@gmail.com' && role !== 'admin') {
+    redirect('/');
+  }
 
-    return (
-        <div className="min-h-screen bg-gray-50">
-            <Navbar variant="admin" />
-            <main className="py-8">{children}</main>
-        </div>
-    );
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar variant="admin" />
+      <main className="py-8">{children}</main>
+    </div>
+  );
 }

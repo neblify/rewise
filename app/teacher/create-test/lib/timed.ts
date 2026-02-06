@@ -50,15 +50,20 @@ export function parseTimedPayload(payload: TimedFormPayload): {
 } {
   const isTimed = payload.isTimed === 'true';
   const durationMinutes =
-    isTimed &&
-    payload.durationHours != null &&
-    payload.durationMinutes != null
+    isTimed && payload.durationHours != null && payload.durationMinutes != null
       ? Number(payload.durationHours) * 60 + Number(payload.durationMinutes)
       : undefined;
   return { isTimed, durationMinutes };
 }
 
-export function omitTimedFormFields<T extends TimedFormPayload>(data: T): Omit<T, keyof TimedFormPayload> {
-  const { isTimed: _it, durationHours: _dh, durationMinutes: _dm, ...rest } = data;
+export function omitTimedFormFields<T extends TimedFormPayload>(
+  data: T
+): Omit<T, keyof TimedFormPayload> {
+  const {
+    isTimed: _it,
+    durationHours: _dh,
+    durationMinutes: _dm,
+    ...rest
+  } = data;
   return rest as Omit<T, keyof TimedFormPayload>;
 }

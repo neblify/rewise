@@ -1,6 +1,5 @@
 'use server';
 
-
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Test from '@/lib/db/models/Test';
@@ -8,7 +7,6 @@ import Question from '@/lib/db/models/Question';
 import Result from '@/lib/db/models/Result';
 import { gradeTestWithAI } from '@/lib/ai/grader';
 import { redirect } from 'next/navigation';
-
 
 export async function submitTest(testId: string, answers: Record<string, any>) {
   const { userId } = await currentAuth();
