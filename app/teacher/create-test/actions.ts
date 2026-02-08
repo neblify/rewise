@@ -32,8 +32,8 @@ const createTestSchema = z.object({
   grade: z.string().min(1),
   visibility: z.enum(['public', 'private']),
   isTimed: z.enum(['true', 'false']).optional(),
-  durationHours: z.string().optional(),
-  durationMinutes: z.string().optional(),
+  durationHours: z.string().nullish(),
+  durationMinutes: z.string().nullish(),
   sections: z.array(sectionSchema).min(1, 'At least one section is required'),
 });
 
