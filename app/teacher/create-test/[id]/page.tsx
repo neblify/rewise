@@ -485,7 +485,7 @@ export default function CreateOrEditTestPage() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {section.questions?.map((q: Question, qIndex: number) => {
+                      {section.questions.map((q: Question, qIndex: number) => {
                         const questionNo =
                           sections
                             .slice(0, secIndex)
