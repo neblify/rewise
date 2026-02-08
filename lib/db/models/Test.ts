@@ -16,8 +16,9 @@ export enum QuestionType {
 export interface IQuestion {
   text: string;
   type: QuestionType;
-  options?: string[]; // For MCQ, etc.
-  correctAnswer?: string | string[]; // Can be text or array of matches
+  options?: string[]; // For MCQ; for match_columns = right column
+  leftColumn?: string[]; // For match_columns = left column
+  correctAnswer?: string | string[] | number[];
   mediaUrl?: string; // For picture based
   marks: number;
 }
@@ -57,7 +58,8 @@ const QuestionSchema = new Schema<IQuestion>({
   text: { type: String, required: true },
   type: { type: String, enum: Object.values(QuestionType), required: true },
   options: [{ type: String }],
-  correctAnswer: { type: Schema.Types.Mixed }, // Flexible for different types
+  leftColumn: [{ type: String }],
+  correctAnswer: { type: Schema.Types.Mixed },
   mediaUrl: { type: String },
   marks: { type: Number, default: 1 },
 });

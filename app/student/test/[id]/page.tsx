@@ -30,14 +30,14 @@ export default async function TestPage(props: Props) {
     .populate({
       path: 'questions', // For backward compatibility
       model: Question,
-    });
+    })
+    .lean();
 
   if (!test) {
     notFound();
   }
 
-  // Serialize the test object to remove mongoose specific fields that can't be passed to client components easily if using spread
-  // But usually just .toObject() or JSON parse/stringify works.
+  // Ensure plain object for client (lean() already gives plain object; stringify/parse preserves all fields including leftColumn/options)
   const serializedTest = JSON.parse(JSON.stringify(test));
 
   return (

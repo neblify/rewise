@@ -7,6 +7,133 @@ import { submitTest } from './actions';
 import { cn } from '@/lib/utils';
 import { Clock } from 'lucide-react';
 
+function MatchColumnQuestion({
+  leftColumn,
+  rightColumn,
+  value,
+  onChange,
+}: {
+  leftColumn: string[];
+  rightColumn: string[];
+  value: number[];
+  onChange: (val: number[]) => void;
+}) {
+  const [draggedRightIndex, setDraggedRightIndex] = useState<number | null>(
+    null
+  );
+  const getMapping = useCallback((leftIdx: number) =>
+    leftIdx < value.length ? value[leftIdx] : -1, [value]);
+  const setMapping = useCallback((leftIdx: number, rightIdx: number) => {
+    const arr = [...value];
+    while (arr.length <= leftIdx) arr.push(-1);
+    arr[leftIdx] = rightIdx;
+    onChange(arr);
+  }, [value, onChange]);
+
+  if (!leftColumn.length || !rightColumn.length) {
+    return (
+      <div className="text-sm text-gray-500">
+        No column items defined for this question.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-gray-500">
+        Drag an item from Column B onto a row in Column A, or use the dropdown.
+      </p>
+      <div className="flex flex-col gap-2">
+        {leftColumn.map((leftItem, leftIdx) => (
+          <div
+            key={leftIdx}
+            className={cn(
+              'flex flex-wrap items-center gap-2 p-3 rounded-lg border bg-gray-50/50 min-h-12',
+              draggedRightIndex !== null &&
+                getMapping(leftIdx) === -1 &&
+                'border-dashed border-indigo-300'
+            )}
+            onDragOver={e => {
+              e.preventDefault();
+              e.currentTarget.classList.add('ring-2', 'ring-indigo-200');
+            }}
+            onDragLeave={e => {
+              e.currentTarget.classList.remove('ring-2', 'ring-indigo-200');
+            }}
+            onDrop={e => {
+              e.preventDefault();
+              e.currentTarget.classList.remove('ring-2', 'ring-indigo-200');
+              const fromState = draggedRightIndex;
+              const fromData = e.dataTransfer.getData('text/plain');
+              const rightIdx =
+                typeof fromState === 'number'
+                  ? fromState
+                  : fromData !== ''
+                    ? parseInt(fromData, 10)
+                    : NaN;
+              setDraggedRightIndex(null);
+              if (!Number.isNaN(rightIdx) && rightIdx >= 0)
+                setMapping(leftIdx, rightIdx);
+            }}
+          >
+            <span className="font-medium text-gray-800 flex-shrink-0 min-w-[120px]">
+              {leftItem || `Item ${leftIdx + 1}`}
+            </span>
+            <span className="text-gray-400">→</span>
+            <select
+              value={getMapping(leftIdx) >= 0 ? getMapping(leftIdx) : ''}
+              onChange={e =>
+                setMapping(
+                  leftIdx,
+                  e.target.value === '' ? -1 : parseInt(e.target.value, 10)
+                )
+              }
+              className="rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white text-gray-900 focus:border-indigo-500 focus:ring-indigo-500"
+            >
+              <option value="">Select match...</option>
+              {rightColumn.map((opt, ri) => (
+                <option key={ri} value={ri}>
+                  {opt || `Option ${ri + 1}`}
+                </option>
+              ))}
+            </select>
+            {getMapping(leftIdx) >= 0 && (
+              <span className="text-sm text-gray-600">
+                {rightColumn[getMapping(leftIdx)]}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+      <div className="mt-2 pt-2 border-t border-gray-100">
+        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+          Column B (drag from here)
+        </span>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {rightColumn.map((opt, ri) => (
+            <span
+              key={ri}
+              draggable
+              onDragStart={e => {
+                setDraggedRightIndex(ri);
+                e.dataTransfer.setData('text/plain', String(ri));
+                e.dataTransfer.effectAllowed = 'copy';
+              }}
+              onDragEnd={() => setDraggedRightIndex(null)}
+              className={cn(
+                'inline-block px-3 py-1.5 rounded-md border text-sm cursor-grab active:cursor-grabbing bg-white border-gray-200 text-gray-700 hover:border-indigo-300',
+                draggedRightIndex === ri && 'opacity-50'
+              )}
+            >
+              {opt || `Option ${ri + 1}`}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function TestTaker({
   test,
   userId,
@@ -173,18 +300,12 @@ export default function TestTaker({
           )}
 
           {q.type === 'match_columns' && (
-            <div className="space-y-2">
-              <p className="text-sm text-gray-500">
-                Enter the matching pairs below (e.g. 1-A, 2-B)
-              </p>
-              <textarea
-                value={answers[uniqueId] || ''}
-                onChange={e => handleAnswerChange(uniqueId, e.target.value)}
-                className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
-                rows={4}
-                placeholder="Write your matches..."
-              />
-            </div>
+            <MatchColumnQuestion
+              leftColumn={Array.isArray(q.leftColumn) ? q.leftColumn : []}
+              rightColumn={Array.isArray(q.options) ? q.options : []}
+              value={(answers[uniqueId] as number[] | undefined) ?? []}
+              onChange={val => handleAnswerChange(uniqueId, val)}
+            />
           )}
         </div>
       </div>
