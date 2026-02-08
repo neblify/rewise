@@ -285,7 +285,7 @@ export default function CreateOrEditTestPage() {
           </div>
           <button
             type="button"
-            onClick={() => { setIsAiModalOpen(true); }}
+            onClick={() => { setIsAiModalOpen(true); setAiTopic(title); }}
             className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium animate-pulse hover:animate-none"
           >
             <Sparkles className="h-5 w-5" />
