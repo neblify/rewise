@@ -198,7 +198,7 @@ export async function generateQuestionsAI(
     Notes:
     - For 'mcq', provide 4 options in 'options' array.
     - For 'true_false', options should be ignored, correctAnswer must be "True" or "False".
-    - For 'match_columns', provide pairs in 'options' array like ["A - 1", "B - 2"].
+    - For 'match_columns', provide pairs in 'options' array as "Key - Value" (e.g. ["Father - The male parent", "Mother - The female parent"]). One string per pair; we will split into left column (keys) and right column (values).
     - Ensure questions are academic and appropriate.
     
     Respond ONLY with the JSON array.
@@ -229,14 +229,58 @@ export async function generateQuestionsAI(
     const questions = Array.isArray(parsed) ? parsed : parsed.questions || [];
 
     // Post-processing to ensure compatibility
-    const sanitizedQuestions = questions.map((q: any) => ({
-      id: Date.now() + Math.random(), // Temporary ID
-      text: q.text,
-      type: type === 'mixed' ? q.type : type, // Fallback if mixed
-      options: q.options || [],
-      correctAnswer: q.correctAnswer,
-      marks: q.marks || 1,
-    }));
+    const sanitizedQuestions = questions.map((q: any) => {
+      const effectiveType = type === 'mixed' ? q.type : type;
+      if (effectiveType === 'match_columns' && Array.isArray(q.options) && q.options.length > 0) {
+        // Parse "Key - Value" strings into keys and values
+        const keys: string[] = [];
+        const values: string[] = [];
+        const separator = ' - ';
+        for (const pair of q.options as string[]) {
+          const str = String(pair).trim();
+          const idx = str.indexOf(separator);
+          if (idx !== -1) {
+            keys.push(str.slice(0, idx).trim());
+            values.push(str.slice(idx + separator.length).trim());
+          } else {
+            keys.push('');
+            values.push(str);
+          }
+        }
+        const n = keys.length;
+        const shuffle = <T>(arr: T[]): T[] => {
+          const out = [...arr];
+          for (let i = out.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [out[i], out[j]] = [out[j], out[i]];
+          }
+          return out;
+        };
+        const leftOrder = shuffle(Array.from({ length: n }, (_, i) => i));
+        const rightOrder = shuffle(Array.from({ length: n }, (_, i) => i));
+        const leftColumn = leftOrder.map((i) => keys[i]);
+        const options = rightOrder.map((i) => values[i]);
+        // correctAnswer[i] = index in options (right column) that matches leftColumn[i]
+        const correctAnswer = leftOrder.map((keyIdx) => rightOrder.indexOf(keyIdx));
+        return {
+          id: Date.now() + Math.random(),
+          text: q.text,
+          type: effectiveType,
+          leftColumn,
+          options,
+          correctAnswer,
+          marks: q.marks || 1,
+        };
+      }
+      return {
+        id: Date.now() + Math.random(),
+        text: q.text,
+        type: effectiveType,
+        options: q.options || [],
+        correctAnswer: q.correctAnswer,
+        marks: q.marks || 1,
+      };
+    });
 
     return { data: sanitizedQuestions };
   } catch (error) {
