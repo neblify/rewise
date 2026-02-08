@@ -33,6 +33,27 @@ const sectionSchema = z.object({
     .min(1, 'Section must have at least one question'),
 });
 
+function formatValidationError(error: z.ZodError): string {
+  console.error(error.flatten());
+  const first = error.issues[0];
+  const pathParts = first.path.filter(Boolean);
+  let msg = first.message;
+  const secIdx = pathParts.indexOf('sections');
+  const qIdx = pathParts.indexOf('questions');
+  if (secIdx !== -1 && pathParts[secIdx + 1] !== undefined) {
+    const secNum = Number(pathParts[secIdx + 1]) + 1;
+    if (qIdx !== -1 && pathParts[qIdx + 1] !== undefined) {
+      const qNum = Number(pathParts[qIdx + 1]) + 1;
+      msg = `Section ${secNum}, Question ${qNum}: ${first.message}`;
+    } else {
+      msg = `Section ${secNum}: ${first.message}`;
+    }
+  } else if (pathParts.length) {
+    msg = `${pathParts.join('.')}: ${first.message}`;
+  }
+  return `Invalid Input: ${msg}`;
+}
+
 const createTestSchema = z.object({
   title: z.string().min(1),
   subject: z.string().min(1),
@@ -83,25 +104,7 @@ export async function createTest(prevState: unknown, formData: FormData) {
   const validated = createTestSchema.safeParse(rawData);
 
   if (!validated.success) {
-    const err = validated.error;
-    console.error(err.flatten());
-    const first = err.issues[0];
-    const pathParts = first.path.filter(Boolean);
-    let msg = first.message;
-    const secIdx = pathParts.indexOf('sections');
-    const qIdx = pathParts.indexOf('questions');
-    if (secIdx !== -1 && pathParts[secIdx + 1] !== undefined) {
-      const secNum = Number(pathParts[secIdx + 1]) + 1;
-      if (qIdx !== -1 && pathParts[qIdx + 1] !== undefined) {
-        const qNum = Number(pathParts[qIdx + 1]) + 1;
-        msg = `Section ${secNum}, Question ${qNum}: ${first.message}`;
-      } else {
-        msg = `Section ${secNum}: ${first.message}`;
-      }
-    } else if (pathParts.length) {
-      msg = `${pathParts.join('.')}: ${first.message}`;
-    }
-    return { message: `Invalid Input: ${msg}` };
+    return { message: formatValidationError(validated.error) };
   }
 
   const { isTimed, durationMinutes: durationMinutesTotal } = parseTimedPayload(
@@ -190,25 +193,7 @@ export async function updateTest(prevState: unknown, formData: FormData) {
   const validated = createTestSchema.safeParse(rawData);
 
   if (!validated.success) {
-    const err = validated.error;
-    console.error(err.flatten());
-    const first = err.issues[0];
-    const pathParts = first.path.filter(Boolean);
-    let msg = first.message;
-    const secIdx = pathParts.indexOf('sections');
-    const qIdx = pathParts.indexOf('questions');
-    if (secIdx !== -1 && pathParts[secIdx + 1] !== undefined) {
-      const secNum = Number(pathParts[secIdx + 1]) + 1;
-      if (qIdx !== -1 && pathParts[qIdx + 1] !== undefined) {
-        const qNum = Number(pathParts[qIdx + 1]) + 1;
-        msg = `Section ${secNum}, Question ${qNum}: ${first.message}`;
-      } else {
-        msg = `Section ${secNum}: ${first.message}`;
-      }
-    } else if (pathParts.length) {
-      msg = `${pathParts.join('.')}: ${first.message}`;
-    }
-    return { message: `Invalid Input: ${msg}` };
+    return { message: formatValidationError(validated.error) };
   }
 
   const { isTimed, durationMinutes: durationMinutesTotal } = parseTimedPayload(
