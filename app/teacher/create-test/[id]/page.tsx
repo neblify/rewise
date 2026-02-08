@@ -278,7 +278,7 @@ export default function CreateOrEditTestPage() {
           id: generateId(),
           title: `AI Generated: ${aiTopic}${timedSuffix}`,
           description: `${aiDifficulty} - ${aiType}`,
-          questions: res.data.map((q: Omit<Question, 'id'>) => ({ ...q, id: generateId() })),
+          questions: res.data.map((q: Question) => ({ ...q, id: generateId() })),
         };
         setSections(isEmptyDefaultSection(sections) ? [newSection] : [...sections, newSection]);
         setIsAiModalOpen(false);
