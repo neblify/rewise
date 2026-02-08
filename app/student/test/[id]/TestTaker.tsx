@@ -21,14 +21,14 @@ function MatchColumnQuestion({
   const [draggedRightIndex, setDraggedRightIndex] = useState<number | null>(
     null
   );
-  const getMapping = (leftIdx: number) =>
-    leftIdx < value.length ? value[leftIdx] : -1;
-  const setMapping = (leftIdx: number, rightIdx: number) => {
+  const getMapping = useCallback((leftIdx: number) =>
+    leftIdx < value.length ? value[leftIdx] : -1, [value]);
+  const setMapping = useCallback((leftIdx: number, rightIdx: number) => {
     const arr = [...value];
     while (arr.length <= leftIdx) arr.push(-1);
     arr[leftIdx] = rightIdx;
     onChange(arr);
-  };
+  }, [value, onChange]);
 
   if (!leftColumn.length || !rightColumn.length) {
     return (
