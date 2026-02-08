@@ -6,8 +6,9 @@ export { QuestionType };
 interface IQuestion extends Document {
   text: string;
   type: QuestionType;
-  options?: string[]; // For MCQ, etc.
-  correctAnswer?: string | string[]; // Can be text or array of matches
+  options?: string[]; // For MCQ options; for match_columns = right column (values)
+  leftColumn?: string[]; // For match_columns only: left column (keys)
+  correctAnswer?: string | string[] | number[]; // For match_columns: number[] (right index per left index)
   mediaUrl?: string; // For picture based
   marks: number;
   subject?: string;
@@ -26,6 +27,7 @@ const QuestionSchema = new Schema<IQuestion>(
     text: { type: String, required: true },
     type: { type: String, enum: Object.values(QuestionType), required: true },
     options: [{ type: String }],
+    leftColumn: [{ type: String }], // match_columns: left column items
     correctAnswer: { type: Schema.Types.Mixed }, // Flexible for different types
     mediaUrl: { type: String },
     marks: { type: Number, default: 1 },

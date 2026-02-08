@@ -458,14 +458,44 @@ export default function CreateTestPage() {
                               <td className="px-3 py-2 whitespace-nowrap">
                                 <select
                                   value={q.type}
-                                  onChange={e =>
-                                    updateQuestionExp(
-                                      secIndex,
-                                      qIndex,
-                                      'type',
-                                      e.target.value
-                                    )
-                                  }
+                                  onChange={e => {
+                                    const newType = e.target.value;
+                                    if (newType === 'match_columns') {
+                                      const left =
+                                        q.leftColumn?.length > 0
+                                          ? [...(q.leftColumn || [])]
+                                          : ['', ''];
+                                      const right =
+                                        q.options?.length > 0
+                                          ? [...(q.options || [])]
+                                          : ['', ''];
+                                      const mapping = Array.from(
+                                        { length: left.length },
+                                        (_, i) =>
+                                          Array.isArray(q.correctAnswer) &&
+                                          typeof (q.correctAnswer as number[])[i] === 'number'
+                                            ? (q.correctAnswer as number[])[i]
+                                            : Math.min(i, right.length - 1)
+                                      );
+                                      const newSecs = [...sections];
+                                      const qu = newSecs[secIndex].questions[qIndex] as any;
+                                      newSecs[secIndex].questions[qIndex] = {
+                                        ...qu,
+                                        type: newType,
+                                        leftColumn: left,
+                                        options: right,
+                                        correctAnswer: mapping,
+                                      };
+                                      setSections(newSecs);
+                                    } else {
+                                      updateQuestionExp(
+                                        secIndex,
+                                        qIndex,
+                                        'type',
+                                        newType
+                                      );
+                                    }
+                                  }}
                                   className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 bg-white min-w-0"
                                 >
                                   {QUESTION_TYPES.map(t => (
@@ -551,7 +581,176 @@ export default function CreateTestPage() {
                                 </td>
                               </tr>
                             )}
-                            {!['mcq'].includes(q.type) && (
+                            {q.type === 'match_columns' && (
+                              <tr>
+                                <td
+                                  colSpan={5}
+                                  className="px-3 py-2 bg-gray-50"
+                                >
+                                  <div className="space-y-4">
+                                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider">
+                                      Column A (Left) — Column B (Right) — Correct mapping
+                                    </p>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                          Left column (keys)
+                                        </label>
+                                        {(q.leftColumn || ['', '']).map(
+                                          (item: string, i: number) => (
+                                            <div key={i} className="flex gap-1 mb-1">
+                                              <input
+                                                type="text"
+                                                value={item}
+                                                onChange={e => {
+                                                  const arr = [...(q.leftColumn || ['', ''])];
+                                                  arr[i] = e.target.value;
+                                                  updateQuestionExp(secIndex, qIndex, 'leftColumn', arr);
+                                                  const ans = (q.correctAnswer as number[]) || [];
+                                                  if (ans.length !== arr.length) {
+                                                    updateQuestionExp(
+                                                      secIndex,
+                                                      qIndex,
+                                                      'correctAnswer',
+                                                      arr.map((_, j) => ans[j] ?? 0)
+                                                    );
+                                                  }
+                                                }}
+                                                className="flex-1 rounded border border-gray-200 px-2 py-1.5 text-sm text-gray-900"
+                                                placeholder={`Item ${i + 1}`}
+                                              />
+                                              {(q.leftColumn?.length || 2) > 1 && (
+                                                <button
+                                                  type="button"
+                                                  onClick={() => {
+                                                    const arr = (q.leftColumn || ['', '']).filter(
+                                                      (_: string, j: number) => j !== i
+                                                    );
+                                                    const mapping = (q.correctAnswer as number[]) || [];
+                                                    const newMapping = mapping
+                                                      .filter((_: number, j: number) => j !== i)
+                                                      .map((v: number) => (v >= (q.options?.length || 0) ? 0 : v));
+                                                    const newSecs = [...sections];
+                                                    const qu = { ...(newSecs[secIndex].questions[qIndex] as any) };
+                                                    qu.leftColumn = arr.length ? arr : [''];
+                                                    qu.correctAnswer = newMapping.length ? newMapping : [0];
+                                                    newSecs[secIndex].questions[qIndex] = qu;
+                                                    setSections(newSecs);
+                                                  }}
+                                                  className="text-red-500 hover:text-red-700"
+                                                >
+                                                  <X className="h-4 w-4" />
+                                                </button>
+                                              )}
+                                            </div>
+                                          )
+                                        )}
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const arr = [...(q.leftColumn || ['', '']), ''];
+                                            const mapping = [...((q.correctAnswer as number[]) || [0]), 0];
+                                            updateQuestionExp(secIndex, qIndex, 'leftColumn', arr);
+                                            updateQuestionExp(secIndex, qIndex, 'correctAnswer', mapping);
+                                          }}
+                                          className="text-xs text-indigo-600 hover:text-indigo-800"
+                                        >
+                                          + Add left item
+                                        </button>
+                                      </div>
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                          Right column (values)
+                                        </label>
+                                        {(q.options || ['', '']).map(
+                                          (opt: string, optIndex: number) => (
+                                            <div key={optIndex} className="flex gap-1 mb-1">
+                                              <input
+                                                type="text"
+                                                value={opt}
+                                                onChange={e => {
+                                                  const arr = [...(q.options || ['', ''])];
+                                                  arr[optIndex] = e.target.value;
+                                                  updateQuestionExp(secIndex, qIndex, 'options', arr);
+                                                }}
+                                                className="flex-1 rounded border border-gray-200 px-2 py-1.5 text-sm text-gray-900"
+                                                placeholder={`Option ${optIndex + 1}`}
+                                              />
+                                              {(q.options?.length || 2) > 1 && (
+                                                <button
+                                                  type="button"
+                                                  onClick={() => {
+                                                    const arr = (q.options || ['', '']).filter(
+                                                      (_: string, j: number) => j !== optIndex
+                                                    );
+                                                    const mapping = ((q.correctAnswer as number[]) || []).map(
+                                                      (v: number) => (v === optIndex ? 0 : v > optIndex ? v - 1 : v)
+                                                    );
+                                                    const newSecs = [...sections];
+                                                    const qu = { ...(newSecs[secIndex].questions[qIndex] as any) };
+                                                    qu.options = arr.length ? arr : [''];
+                                                    qu.correctAnswer = mapping;
+                                                    newSecs[secIndex].questions[qIndex] = qu;
+                                                    setSections(newSecs);
+                                                  }}
+                                                  className="text-red-500 hover:text-red-700"
+                                                >
+                                                  <X className="h-4 w-4" />
+                                                </button>
+                                              )}
+                                            </div>
+                                          )
+                                        )}
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            const arr = [...(q.options || ['', '']), ''];
+                                            updateQuestionExp(secIndex, qIndex, 'options', arr);
+                                          }}
+                                          className="text-xs text-indigo-600 hover:text-indigo-800"
+                                        >
+                                          + Add right item
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Correct mapping (Column A → Column B)
+                                      </label>
+                                      <div className="flex flex-wrap gap-2">
+                                        {(q.leftColumn || ['', '']).map((_: string, leftIdx: number) => (
+                                          <div key={leftIdx} className="flex items-center gap-1">
+                                            <span className="text-xs text-gray-500">
+                                              {leftIdx + 1} →
+                                            </span>
+                                            <select
+                                              value={
+                                                Array.isArray(q.correctAnswer) && typeof (q.correctAnswer as number[])[leftIdx] === 'number'
+                                                  ? (q.correctAnswer as number[])[leftIdx]
+                                                  : 0
+                                              }
+                                              onChange={e => {
+                                                const mapping = [...((q.correctAnswer as number[]) || [0])];
+                                                mapping[leftIdx] = parseInt(e.target.value, 10);
+                                                updateQuestionExp(secIndex, qIndex, 'correctAnswer', mapping);
+                                              }}
+                                              className="rounded border border-green-200 bg-green-50 px-2 py-1 text-sm text-gray-900"
+                                            >
+                                              {(q.options || ['', '']).map((opt: string, ri: number) => (
+                                                <option key={ri} value={ri}>
+                                                  {opt || `Option ${ri + 1}`}
+                                                </option>
+                                              ))}
+                                            </select>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                            {!['mcq', 'match_columns'].includes(q.type) && (
                               <tr>
                                 <td
                                   colSpan={5}

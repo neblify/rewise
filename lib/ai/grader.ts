@@ -16,7 +16,9 @@ export async function gradeTestWithAI(
           str ? str.toString().trim().toLowerCase() : '';
 
         let processedStudentAnswer =
-          studentAnswers[`${sIndex}-${qIndex}`] || 'No Answer';
+          studentAnswers[`${sIndex}-${qIndex}`];
+        if (q.type !== 'match_columns')
+          processedStudentAnswer = processedStudentAnswer ?? 'No Answer';
         const processedCorrectAnswer = q.correctAnswer;
 
         // Special handling for Fill in the Blanks to ignore strict case/space issues
@@ -133,6 +135,43 @@ export async function gradeTestWithAI(
     if (!content) throw new Error('No content from AI');
 
     const parsed = JSON.parse(content);
+
+    // Deterministic scoring for match_columns: partial marks per correct pair
+    for (const item of flatQuestions) {
+      if (item.type !== 'match_columns') continue;
+      const correct = item.correctAnswer as number[] | undefined;
+      const student = Array.isArray(item.studentAnswer) ? item.studentAnswer : [];
+      if (!correct?.length) continue;
+      const totalPairs = correct.length;
+      let correctPairs = 0;
+      for (let i = 0; i < totalPairs; i++) {
+        const studentVal = i < student.length ? student[i] : -1;
+        if (typeof studentVal === 'number' && studentVal >= 0 && correct[i] === studentVal)
+          correctPairs++;
+      }
+      const marksPerPair = (item.marks || 1) / totalPairs;
+      const marksObtained = Math.round(marksPerPair * correctPairs * 100) / 100;
+      const res = parsed.results?.find((r: any) => r.questionId === item.id);
+      if (res) {
+        res.marksObtained = marksObtained;
+        res.isCorrect = marksObtained > 0;
+        res.feedback =
+          correctPairs === totalPairs
+            ? 'All pairs matched correctly.'
+            : `${correctPairs} of ${totalPairs} pairs correct.`;
+      }
+    }
+    if (parsed.results?.length) {
+      parsed.totalMarksObtained = parsed.results.reduce(
+        (sum: number, r: any) => sum + (r.marksObtained ?? 0),
+        0
+      );
+      parsed.maxMarks = flatQuestions.reduce(
+        (sum: number, q: any) => sum + (q.marks ?? 1),
+        0
+      );
+    }
+
     return parsed;
   } catch (error) {
     console.error('AI Grading Framework Error:', error);
