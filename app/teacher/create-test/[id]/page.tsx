@@ -40,7 +40,8 @@ interface Question {
   text: string;
   type: string;
   options?: string[];
-  correctAnswer: string;
+  leftColumn?: string[];
+  correctAnswer: string | number[];
   marks: number;
 }
 
@@ -205,7 +206,7 @@ export default function CreateOrEditTestPage() {
     secIndex: number,
     qIndex: number,
     field: string,
-    value: string | number | string[]
+    value: string | number | string[] | number[]
   ) => {
     const newSecs = [...sections];
     newSecs[secIndex].questions[qIndex] = {
@@ -524,11 +525,11 @@ export default function CreateOrEditTestPage() {
                                     const newType = e.target.value;
                                     if (newType === 'match_columns') {
                                       const left =
-                                        q.leftColumn?.length > 0
+                                        (q.leftColumn?.length ?? 0) > 0
                                           ? [...(q.leftColumn || [])]
                                           : ['', ''];
                                       const right =
-                                        q.options?.length > 0
+                                        (q.options?.length ?? 0) > 0
                                           ? [...(q.options || [])]
                                           : ['', ''];
                                       const mapping = Array.from(
@@ -628,7 +629,7 @@ export default function CreateOrEditTestPage() {
                                     )}
                                     <input
                                       type="text"
-                                      value={q.correctAnswer}
+                                      value={q.correctAnswer as string}
                                       onChange={e =>
                                         updateQuestionExp(
                                           secIndex,
@@ -821,7 +822,7 @@ export default function CreateOrEditTestPage() {
                                 >
                                   <input
                                     type="text"
-                                    value={q.correctAnswer}
+                                    value={q.correctAnswer as string}
                                     onChange={e =>
                                       updateQuestionExp(
                                         secIndex,
