@@ -478,7 +478,7 @@ export default function CreateTestPage() {
                                             : Math.min(i, right.length - 1)
                                       );
                                       const newSecs = [...sections];
-                                      const qu = newSecs[secIndex].questions[qIndex] as any;
+                                      const qu = newSecs[secIndex].questions[qIndex] as unknown;
                                       newSecs[secIndex].questions[qIndex] = {
                                         ...qu,
                                         type: newType,
