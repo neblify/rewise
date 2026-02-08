@@ -40,8 +40,8 @@ export function parseTimedFromTest(test: {
 
 export type TimedFormPayload = {
   isTimed?: string;
-  durationHours?: string;
-  durationMinutes?: string;
+  durationHours?: string | null;
+  durationMinutes?: string | null;
 };
 
 export function parseTimedPayload(payload: TimedFormPayload): {
