@@ -12,9 +12,17 @@ const questionSchema = z.object({
   text: z.string().min(1, 'Question text is required'),
   type: z.string(),
   options: z.array(z.string()).optional(),
-  correctAnswer: z.union([z.string(), z.array(z.string())]).optional(),
+  leftColumn: z.array(z.string()).optional(),
+  correctAnswer: z
+    .union([
+      z.string(),
+      z.array(z.string()),
+      z.array(z.number()),
+      z.array(z.coerce.number()),
+    ])
+    .optional(),
   mediaUrl: z.string().optional(),
-  marks: z.number().min(1),
+  marks: z.coerce.number().min(1),
 });
 
 const sectionSchema = z.object({
@@ -24,6 +32,27 @@ const sectionSchema = z.object({
     .array(questionSchema)
     .min(1, 'Section must have at least one question'),
 });
+
+function formatValidationError(error: z.ZodError): string {
+  console.error(error.flatten());
+  const first = error.issues[0];
+  const pathParts = first.path.filter(Boolean);
+  let msg = first.message;
+  const secIdx = pathParts.indexOf('sections');
+  const qIdx = pathParts.indexOf('questions');
+  if (secIdx !== -1 && pathParts[secIdx + 1] !== undefined) {
+    const secNum = Number(pathParts[secIdx + 1]) + 1;
+    if (qIdx !== -1 && pathParts[qIdx + 1] !== undefined) {
+      const qNum = Number(pathParts[qIdx + 1]) + 1;
+      msg = `Section ${secNum}, Question ${qNum}: ${first.message}`;
+    } else {
+      msg = `Section ${secNum}: ${first.message}`;
+    }
+  } else if (pathParts.length) {
+    msg = `${pathParts.join('.')}: ${first.message}`;
+  }
+  return `Invalid Input: ${msg}`;
+}
 
 const createTestSchema = z.object({
   title: z.string().min(1),
@@ -75,12 +104,7 @@ export async function createTest(prevState: unknown, formData: FormData) {
   const validated = createTestSchema.safeParse(rawData);
 
   if (!validated.success) {
-    console.error(validated.error.flatten());
-    return {
-      message:
-        'Invalid Input: ' +
-        JSON.stringify(validated.error.flatten().fieldErrors),
-    };
+    return { message: formatValidationError(validated.error) };
   }
 
   const { isTimed, durationMinutes: durationMinutesTotal } = parseTimedPayload(
@@ -169,12 +193,7 @@ export async function updateTest(prevState: unknown, formData: FormData) {
   const validated = createTestSchema.safeParse(rawData);
 
   if (!validated.success) {
-    console.error(validated.error.flatten());
-    return {
-      message:
-        'Invalid Input: ' +
-        JSON.stringify(validated.error.flatten().fieldErrors),
-    };
+    return { message: formatValidationError(validated.error) };
   }
 
   const { isTimed, durationMinutes: durationMinutesTotal } = parseTimedPayload(
