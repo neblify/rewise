@@ -46,6 +46,7 @@ export default function CreateTestPage() {
   }, [state]);
 
   // Test Metadata State
+  const [testTitle, setTestTitle] = useState('');
   const [board, setBoard] = useState('NIOS');
   const [grade, setGrade] = useState('A');
   const [timedState, setTimedState] = useState(defaultTimedState);
@@ -175,7 +176,11 @@ export default function CreateTestPage() {
           description: `${aiDifficulty} - ${aiType}`,
           questions: res.data,
         };
-        setSections([...sections, newSection]);
+        const isDefaultSectionA =
+          sections.length === 1 &&
+          sections[0].title === 'Section A' &&
+          (!sections[0].questions || sections[0].questions.length === 0);
+        setSections(isDefaultSectionA ? [newSection] : [...sections, newSection]);
         setIsAiModalOpen(false);
         setAiTopic('');
       } else {
@@ -234,7 +239,7 @@ export default function CreateTestPage() {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => { setIsAiModalOpen(true); }}
+              onClick={() => { setIsAiModalOpen(true); setAiTopic(testTitle); }}
               className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium animate-pulse hover:animate-none"
             >
               <Sparkles className="h-5 w-5" />
@@ -281,6 +286,8 @@ export default function CreateTestPage() {
                 <input
                   name="title"
                   type="text"
+                  value={testTitle}
+                  onChange={e => { setTestTitle(e.target.value); }}
                   required
                   className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900"
                   placeholder="e.g. Science Mid-Term"

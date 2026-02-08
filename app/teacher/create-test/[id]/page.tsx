@@ -244,9 +244,13 @@ export default function CreateOrEditTestPage() {
           id: generateId(),
           title: `AI Generated: ${aiTopic}${timedSuffix}`,
           description: `${aiDifficulty} - ${aiType}`,
-          questions: res.data.map((q: any) => ({ ...q, id: generateId() })), // Ensure AI questions also get new unique IDs if needed, or rely on server-side ID but client-side ID is safer for lists
+          questions: res.data.map((q: any) => ({ ...q, id: generateId() })),
         };
-        setSections([...sections, newSection]);
+        const isDefaultSectionA =
+          sections.length === 1 &&
+          sections[0].title === 'Section A' &&
+          (!sections[0].questions || sections[0].questions.length === 0);
+        setSections(isDefaultSectionA ? [newSection] : [...sections, newSection]);
         setIsAiModalOpen(false);
         setAiTopic('');
       } else {
@@ -281,7 +285,7 @@ export default function CreateOrEditTestPage() {
           </div>
           <button
             type="button"
-            onClick={() => { setIsAiModalOpen(true); }}
+            onClick={() => { setIsAiModalOpen(true); setAiTopic(title); }}
             className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium animate-pulse hover:animate-none"
           >
             <Sparkles className="h-5 w-5" />
