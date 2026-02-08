@@ -1,27 +1,9 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import './Question';
+import { IQuestionBase } from './Question';
+import { QuestionType } from '@/lib/constants/question-types';
 
-export enum QuestionType {
-  FILL_BLANKS = 'fill_in_blanks',
-  MATCH_COLUMNS = 'match_columns',
-  TRUE_FALSE = 'true_false',
-  SINGLE_WORD = 'single_word',
-  ONE_SENTENCE = 'one_sentence',
-  PICTURE_BASED = 'picture_based',
-  MCQ = 'mcq',
-  BRIEF_ANSWER = 'brief_answer',
-  DIFFERENCE = 'difference',
-}
-
-export interface IQuestion {
-  text: string;
-  type: QuestionType;
-  options?: string[]; // For MCQ; for match_columns = right column
-  leftColumn?: string[]; // For match_columns = left column
-  correctAnswer?: string | string[] | number[];
-  mediaUrl?: string; // For picture based
-  marks: number;
-}
+export type IQuestion = IQuestionBase;
+export { QuestionType };
 
 export interface ISection {
   title: string;

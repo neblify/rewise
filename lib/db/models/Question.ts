@@ -3,7 +3,7 @@ import { QuestionType } from '@/lib/constants/question-types';
 
 export { QuestionType };
 
-interface IQuestion extends Document {
+export interface IQuestionBase {
   text: string;
   type: QuestionType;
   options?: string[]; // For MCQ options; for match_columns = right column (values)
@@ -11,6 +11,9 @@ interface IQuestion extends Document {
   correctAnswer?: string | string[] | number[]; // For match_columns: number[] (right index per left index)
   mediaUrl?: string; // For picture based
   marks: number;
+}
+
+interface IQuestion extends Document, IQuestionBase {
   subject?: string;
   topic?: string;
   difficulty?: 'easy' | 'medium' | 'hard';
