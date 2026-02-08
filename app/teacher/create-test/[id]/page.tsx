@@ -35,6 +35,36 @@ import {
 } from '../lib/timed';
 import { TestTimeLimitField } from '../components/TestTimeLimitField';
 
+interface Question {
+  id: string;
+  text: string;
+  type: string;
+  options?: string[];
+  correctAnswer: string;
+  marks: number;
+}
+
+interface Section {
+  id: string;
+  title: string;
+  description: string;
+  questions: Question[];
+}
+
+interface TestApiResponse {
+  test?: {
+    title: string;
+    subject: string;
+    board?: string;
+    grade?: string;
+    visibility?: string;
+    isTimed?: boolean;
+    durationMinutes?: number;
+    sections?: Section[];
+    questions?: Question[];
+  };
+}
+
 const generateId = () =>
   Math.random().toString(36).substring(2, 15) +
   Math.random().toString(36).substring(2, 15);
@@ -64,7 +94,7 @@ export default function CreateOrEditTestPage() {
   const [timedState, setTimedState] = useState(defaultTimedState);
 
   // Sections State
-  const [sections, setSections] = useState<any[]>([
+  const [sections, setSections] = useState<Section[]>([
     { id: generateId(), title: DEFAULT_SECTION_TITLE, description: '', questions: [] },
   ]);
 
@@ -82,7 +112,7 @@ export default function CreateOrEditTestPage() {
     if (isEditMode) {
       fetch(`/api/test/${testId}`)
         .then(res => res.json())
-        .then(data => {
+        .then((data: TestApiResponse) => {
           if (data.test) {
             setTitle(data.test.title);
             setSubject(data.test.subject);
@@ -96,11 +126,11 @@ export default function CreateOrEditTestPage() {
             // If legacy, might need adapting.
             if (data.test.sections && data.test.sections.length > 0) {
               // Sanitize IDs: Existing data might have duplicate or numeric IDs from Date.now() collisions
-              const sanitizedSections = data.test.sections.map((sec: any) => ({
+              const sanitizedSections = data.test.sections.map((sec: Section) => ({
                 ...sec,
                 id: generateId(),
                 questions:
-                  sec.questions?.map((q: any) => ({
+                  sec.questions?.map((q: Question) => ({
                     ...q,
                     id: generateId(),
                   })) || [],
@@ -113,7 +143,7 @@ export default function CreateOrEditTestPage() {
                   id: generateId(),
                   title: 'General Section',
                   description: 'Imported questions',
-                  questions: data.test.questions.map((q: any) => ({
+                  questions: data.test.questions.map((q: Question) => ({
                     ...q,
                     id: generateId(),
                   })), // Sanitize legacy questions too
@@ -144,7 +174,7 @@ export default function CreateOrEditTestPage() {
     setSections(sections.filter((_, i) => i !== secIndex));
   };
 
-  const updateSection = (index: number, field: string, value: any) => {
+  const updateSection = (index: number, field: string, value: string) => {
     const newSecs = [...sections];
     newSecs[index] = { ...newSecs[index], [field]: value };
     setSections(newSecs);
@@ -166,7 +196,7 @@ export default function CreateOrEditTestPage() {
   const removeQuestionExp = (secIndex: number, qIndex: number) => {
     const newSecs = [...sections];
     newSecs[secIndex].questions = newSecs[secIndex].questions.filter(
-      (_: any, i: number) => i !== qIndex
+      (_: Question, i: number) => i !== qIndex
     );
     setSections(newSecs);
   };
@@ -175,7 +205,7 @@ export default function CreateOrEditTestPage() {
     secIndex: number,
     qIndex: number,
     field: string,
-    value: any
+    value: string | number | string[]
   ) => {
     const newSecs = [...sections];
     newSecs[secIndex].questions[qIndex] = {
@@ -248,7 +278,7 @@ export default function CreateOrEditTestPage() {
           id: generateId(),
           title: `AI Generated: ${aiTopic}${timedSuffix}`,
           description: `${aiDifficulty} - ${aiType}`,
-          questions: res.data.map((q: any) => ({ ...q, id: generateId() })),
+          questions: res.data.map((q: Omit<Question, 'id'>) => ({ ...q, id: generateId() })),
         };
         setSections(isEmptyDefaultSection(sections) ? [newSection] : [...sections, newSection]);
         setIsAiModalOpen(false);
@@ -455,7 +485,7 @@ export default function CreateOrEditTestPage() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {section.questions?.map((q: any, qIndex: number) => {
+                      {section.questions?.map((q: Question, qIndex: number) => {
                         const questionNo =
                           sections
                             .slice(0, secIndex)
