@@ -40,7 +40,8 @@ interface Question {
   text: string;
   type: string;
   options?: string[];
-  correctAnswer: string;
+  leftColumn?: string[];
+  correctAnswer: string | number[];
   marks: number;
 }
 
@@ -205,7 +206,7 @@ export default function CreateOrEditTestPage() {
     secIndex: number,
     qIndex: number,
     field: string,
-    value: string | number | string[]
+    value: string | number | string[] | number[]
   ) => {
     const newSecs = [...sections];
     newSecs[secIndex].questions[qIndex] = {
@@ -524,11 +525,11 @@ export default function CreateOrEditTestPage() {
                                     const newType = e.target.value;
                                     if (newType === 'match_columns') {
                                       const left =
-                                        q.leftColumn?.length > 0
+                                        (q.leftColumn?.length ?? 0) > 0
                                           ? [...(q.leftColumn || [])]
                                           : ['', ''];
                                       const right =
-                                        q.options?.length > 0
+                                        (q.options?.length ?? 0) > 0
                                           ? [...(q.options || [])]
                                           : ['', ''];
                                       const mapping = Array.from(
@@ -540,10 +541,8 @@ export default function CreateOrEditTestPage() {
                                             : Math.min(i, right.length - 1)
                                       );
                                       const newSecs = [...sections];
-                                      const qu = newSecs[secIndex].questions?.[qIndex] as any;
-                                      if (newSecs[secIndex].questions)
-                                        newSecs[secIndex].questions[qIndex] = {
-                                          ...qu,
+                                      newSecs[secIndex].questions[qIndex] = {
+                                          ...newSecs[secIndex].questions[qIndex],
                                           type: newType,
                                           leftColumn: left,
                                           options: right,
@@ -628,7 +627,7 @@ export default function CreateOrEditTestPage() {
                                     )}
                                     <input
                                       type="text"
-                                      value={q.correctAnswer}
+                                      value={q.correctAnswer as string}
                                       onChange={e =>
                                         updateQuestionExp(
                                           secIndex,
@@ -694,10 +693,11 @@ export default function CreateOrEditTestPage() {
                                                       .filter((_: number, j: number) => j !== i)
                                                       .map((v: number) => (v >= (q.options?.length || 0) ? 0 : v));
                                                     const newSecs = [...sections];
-                                                    const qu = { ...(newSecs[secIndex].questions?.[qIndex] as any) };
-                                                    qu.leftColumn = arr.length ? arr : [''];
-                                                    qu.correctAnswer = newMapping.length ? newMapping : [0];
-                                                    newSecs[secIndex].questions[qIndex] = qu;
+                                                    newSecs[secIndex].questions[qIndex] = {
+                                                      ...newSecs[secIndex].questions[qIndex],
+                                                      leftColumn: arr.length ? arr : [''],
+                                                      correctAnswer: newMapping.length ? newMapping : [0],
+                                                    };
                                                     setSections(newSecs);
                                                   }}
                                                   className="text-red-500 hover:text-red-700"
@@ -750,10 +750,11 @@ export default function CreateOrEditTestPage() {
                                                       (v: number) => (v === optIndex ? 0 : v > optIndex ? v - 1 : v)
                                                     );
                                                     const newSecs = [...sections];
-                                                    const qu = { ...(newSecs[secIndex].questions?.[qIndex] as any) };
-                                                    qu.options = arr.length ? arr : [''];
-                                                    qu.correctAnswer = mapping;
-                                                    newSecs[secIndex].questions[qIndex] = qu;
+                                                    newSecs[secIndex].questions[qIndex] = {
+                                                      ...newSecs[secIndex].questions[qIndex],
+                                                      options: arr.length ? arr : [''],
+                                                      correctAnswer: mapping,
+                                                    };
                                                     setSections(newSecs);
                                                   }}
                                                   className="text-red-500 hover:text-red-700"
@@ -821,7 +822,7 @@ export default function CreateOrEditTestPage() {
                                 >
                                   <input
                                     type="text"
-                                    value={q.correctAnswer}
+                                    value={q.correctAnswer as string}
                                     onChange={e =>
                                       updateQuestionExp(
                                         secIndex,
