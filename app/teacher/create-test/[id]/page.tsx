@@ -174,7 +174,7 @@ export default function CreateOrEditTestPage() {
     setSections(sections.filter((_, i) => i !== secIndex));
   };
 
-  const updateSection = (index: number, field: string, value: string) => {
+  const updateSection = (index: number, field: 'title' | 'description', value: string) => {
     const newSecs = [...sections];
     newSecs[index] = { ...newSecs[index], [field]: value };
     setSections(newSecs);
