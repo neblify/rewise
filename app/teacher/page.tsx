@@ -253,16 +253,29 @@ export default async function TeacherDashboard(props: Props) {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <Badge
-                          variant={test.isPublished ? 'default' : 'secondary'}
-                          className={
-                            test.isPublished
-                              ? 'bg-green-100 text-green-700 hover:bg-green-200 border-green-200'
-                              : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-yellow-200'
-                          }
-                        >
-                          {test.isPublished ? 'Published' : 'Draft'}
-                        </Badge>
+                        <div className="flex flex-wrap gap-1.5">
+                          <Badge
+                            variant={test.isPublished ? 'default' : 'secondary'}
+                            className={
+                              test.isPublished
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200 border-green-200'
+                                : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-yellow-200'
+                            }
+                          >
+                            {test.isPublished ? 'Published' : 'Draft'}
+                          </Badge>
+                          {test.isPublished && test.isTimed && (
+                            <Badge
+                              variant="outline"
+                              className="bg-amber-50 text-amber-700 border-amber-200 text-xs"
+                            >
+                              Timed
+                              {test.durationMinutes != null &&
+                                test.durationMinutes > 0 &&
+                                ` ${Math.floor(test.durationMinutes / 60)}h ${test.durationMinutes % 60}m`}
+                            </Badge>
+                          )}
+                        </div>
                       </td>
 
                       <td className="px-6 py-4 text-right space-x-3">

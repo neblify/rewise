@@ -82,12 +82,25 @@ export default async function StudentDashboard() {
                   <CardTitle className="font-semibold text-lg text-gray-900 group-hover:text-indigo-600 transition-colors">
                     {test.title}
                   </CardTitle>
-                  <Badge
-                    variant="secondary"
-                    className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 mt-2"
-                  >
-                    {test.subject}
-                  </Badge>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <Badge
+                      variant="secondary"
+                      className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                    >
+                      {test.subject}
+                    </Badge>
+                    {test.isTimed && (
+                      <Badge
+                        variant="outline"
+                        className="bg-amber-50 text-amber-700 border-amber-200"
+                      >
+                        Timed
+                        {test.durationMinutes != null &&
+                          test.durationMinutes > 0 &&
+                          ` ${Math.floor(test.durationMinutes / 60)}h ${test.durationMinutes % 60}m`}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </div>
             </CardHeader>

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ITest, IQuestion } from '@/lib/db/models/Test';
 import { submitTest } from './actions';
 import { cn } from '@/lib/utils';
+import { Clock } from 'lucide-react';
 
 export default function TestTaker({
   test,
@@ -16,6 +17,45 @@ export default function TestTaker({
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+
+  const totalSeconds =
+    (test.isTimed && test.durationMinutes ? test.durationMinutes * 60 : 0) + 5;
+  const [remainingSeconds, setRemainingSeconds] = useState(totalSeconds);
+  const answersRef = useRef(answers);
+  const hasAutoSubmitted = useRef(false);
+  const setSubmittingRef = useRef(setIsSubmitting);
+  answersRef.current = answers;
+  setSubmittingRef.current = setIsSubmitting;
+
+  useEffect(() => {
+    if (!test.isTimed || totalSeconds <= 0) return;
+    const id = setInterval(() => {
+      setRemainingSeconds(prev => {
+        if (prev <= 1) {
+          if (!hasAutoSubmitted.current) {
+            hasAutoSubmitted.current = true;
+            setSubmittingRef.current(true);
+            submitTest(test._id as unknown as string, answersRef.current)
+              .then(result => {
+                if (result && 'success' in result && result.success) {
+                  router.push(`/student/result/${result.resultId}`);
+                } else {
+                  setSubmittingRef.current(false);
+                  alert('Failed to submit: ' + (result?.message || 'Unknown error'));
+                }
+              })
+              .catch(() => {
+                setSubmittingRef.current(false);
+                alert('Failed to submit test');
+              });
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [test.isTimed, test._id, totalSeconds, router]);
 
   const handleAnswerChange = (questionId: string, value: any) => {
     setAnswers(prev => ({
@@ -151,8 +191,27 @@ export default function TestTaker({
     </div>
   );
 
+  const formatTime = (sec: number) => {
+    const m = Math.floor(sec / 60);
+    const s = sec % 60;
+    return `${m}:${String(s).padStart(2, '0')}`;
+  };
+
   return (
     <div className="space-y-8">
+      {test.isTimed && totalSeconds > 0 && (
+        <div
+          className={cn(
+            'sticky top-0 z-10 flex items-center justify-center gap-2 py-3 px-4 rounded-lg border font-mono text-lg font-semibold',
+            remainingSeconds <= 60
+              ? 'bg-red-50 border-red-200 text-red-700'
+              : 'bg-amber-50 border-amber-200 text-amber-800'
+          )}
+        >
+          <Clock className="h-5 w-5" />
+          <span>{formatTime(remainingSeconds)}</span>
+        </div>
+      )}
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
         <h1 className="text-2xl font-bold text-gray-900">{test.title}</h1>
         <div className="flex gap-4 text-sm text-gray-500 mt-2">
