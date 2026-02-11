@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,7 @@ import { Card } from '@/components/ui/card';
 export function Hero() {
   return (
     <div className="relative overflow-hidden bg-white">
-      <div className="mx-auto max-w-7xl pb-16 pt-20 sm:pb-24 sm:pt-24 lg:pb-32 lg:pt-32">
+      <div className="mx-auto max-w-7xl pb-16 pt-8 sm:pb-24 sm:pt-12 lg:pb-32 lg:pt-16">
         <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
           <div className="sm:max-w-lg">
             <motion.div
@@ -18,6 +19,16 @@ export function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
+              <div className="mb-6">
+                <Image
+                  src="/logo.png"
+                  alt="ReWise"
+                  width={240}
+                  height={240}
+                  priority
+                  className="h-60 w-auto"
+                />
+              </div>
               <Badge
                 variant="secondary"
                 className="px-3 py-1 text-sm font-semibold text-indigo-600 bg-indigo-100 hover:bg-indigo-200 mb-4 w-fit"
