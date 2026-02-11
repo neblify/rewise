@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,16 @@ export function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
+              <div className="mb-6">
+                <Image
+                  src="/logo.png"
+                  alt="ReWise"
+                  width={780}
+                  height={780}
+                  priority
+                  className="h-60 w-auto"
+                />
+              </div>
               <Badge
                 variant="secondary"
                 className="px-3 py-1 text-sm font-semibold text-indigo-600 bg-indigo-100 hover:bg-indigo-200 mb-4 w-fit"
