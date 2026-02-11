@@ -26,8 +26,7 @@ export default function UpdateProfileForm({
     const result = await updateProfile(formData);
 
     if (result.success) {
-      alert('Profile updated successfully!');
-      router.refresh();
+      router.push('/student');
     } else {
       alert(result.message);
     }

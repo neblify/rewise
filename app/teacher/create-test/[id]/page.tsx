@@ -216,6 +216,36 @@ export default function CreateOrEditTestPage() {
     setSections(newSecs);
   };
 
+  const removeMatchColumnsLeftItem = (
+    currentSections: Section[],
+    secIndex: number,
+    qIndex: number,
+    leftItemIndex: number
+  ): Section[] => {
+    const sectionsCopy = currentSections.map(sec => ({
+      ...sec,
+      questions: sec.questions.map(q => ({ ...q })),
+    }));
+    const q = sectionsCopy[secIndex]?.questions[qIndex];
+    if (!q) return currentSections;
+
+    const leftColumn = q.leftColumn ?? ['', ''];
+    const mapping = Array.isArray(q.correctAnswer) ? (q.correctAnswer as number[]) : [];
+    const optionsLength = q.options?.length ?? 0;
+
+    const newLeftColumn = leftColumn.filter((_, j) => j !== leftItemIndex);
+    const newMapping = mapping
+      .filter((_, j) => j !== leftItemIndex)
+      .map(v => (v >= optionsLength ? 0 : v));
+
+    sectionsCopy[secIndex].questions[qIndex] = {
+      ...q,
+      leftColumn: newLeftColumn.length > 0 ? newLeftColumn : [''],
+      correctAnswer: newMapping.length > 0 ? newMapping : [0],
+    };
+    return sectionsCopy;
+  };
+
   const handleSubmit = (formData: FormData) => {
     const sectionsJson = JSON.stringify(sections);
 
@@ -684,22 +714,16 @@ export default function CreateOrEditTestPage() {
                                               {(q.leftColumn?.length || 2) > 1 && (
                                                 <button
                                                   type="button"
-                                                  onClick={() => {
-                                                    const arr = (q.leftColumn || ['', '']).filter(
-                                                      (_: string, j: number) => j !== i
-                                                    );
-                                                    const mapping = (q.correctAnswer as number[]) || [];
-                                                    const newMapping = mapping
-                                                      .filter((_: number, j: number) => j !== i)
-                                                      .map((v: number) => (v >= (q.options?.length || 0) ? 0 : v));
-                                                    const newSecs = [...sections];
-                                                    newSecs[secIndex].questions[qIndex] = {
-                                                      ...newSecs[secIndex].questions[qIndex],
-                                                      leftColumn: arr.length ? arr : [''],
-                                                      correctAnswer: newMapping.length ? newMapping : [0],
-                                                    };
-                                                    setSections(newSecs);
-                                                  }}
+                                                  onClick={() =>
+                                                    setSections(
+                                                      removeMatchColumnsLeftItem(
+                                                        sections,
+                                                        secIndex,
+                                                        qIndex,
+                                                        i
+                                                      )
+                                                    )
+                                                  }
                                                   className="text-red-500 hover:text-red-700"
                                                 >
                                                   <X className="h-4 w-4" />

@@ -1,6 +1,7 @@
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Test from '@/lib/db/models/Test';
+import '@/lib/db/models/Question'; // Ensure model is registered for populate
 import { NextResponse } from 'next/server';
 
 export async function GET(
@@ -19,7 +20,8 @@ export async function GET(
     await dbConnect();
 
     // @ts-ignore
-    const test = await Test.findOne({ _id: id, createdBy: userId });
+    const test = await Test.findOne({ _id: id, createdBy: userId })
+      .populate('sections.questions');
 
     if (!test) {
       return NextResponse.json({ error: 'Test not found' }, { status: 404 });
