@@ -1,24 +1,26 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from '@/app/api/test/[id]/route';
-import { auth } from '@clerk/nextjs/server';
+import { currentAuth } from '@/lib/auth-wrapper';
 import Test from '@/lib/db/models/Test';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Mock Dependencies
-vi.mock('@clerk/nextjs/server', () => ({
-  auth: vi.fn(),
+vi.mock('@/lib/auth-wrapper', () => ({
+  currentAuth: vi.fn(),
 }));
 
 vi.mock('@/lib/db/connect', () => ({
   default: vi.fn().mockResolvedValue(true),
 }));
 
-// Mock Mongoose Model
+// Mock Mongoose Model with chainable populate
 vi.mock('@/lib/db/models/Test', () => ({
   default: {
     findOne: vi.fn(),
   },
 }));
+
+vi.mock('@/lib/db/models/Question', () => ({}));
 
 // Helper to create mock request
 function createMockRequest(url: string) {
@@ -33,7 +35,7 @@ describe('API Route: GET /api/test/[id]', () => {
   });
 
   it('should return 401 if user is not authenticated', async () => {
-    (auth as any).mockResolvedValue({ userId: null });
+    (currentAuth as any).mockResolvedValue({ userId: null });
     const req = createMockRequest('http://localhost/api/test/123');
     const params = Promise.resolve({ id: '123' });
 
@@ -45,8 +47,10 @@ describe('API Route: GET /api/test/[id]', () => {
   });
 
   it('should return 404 if test is not found', async () => {
-    (auth as any).mockResolvedValue({ userId: 'user_123' });
-    (Test.findOne as any).mockResolvedValue(null);
+    (currentAuth as any).mockResolvedValue({ userId: 'user_123' });
+    (Test.findOne as any).mockReturnValue({
+      populate: vi.fn().mockResolvedValue(null),
+    });
 
     const req = createMockRequest('http://localhost/api/test/123');
     const params = Promise.resolve({ id: '123' });
@@ -59,14 +63,16 @@ describe('API Route: GET /api/test/[id]', () => {
   });
 
   it('should return test data if found', async () => {
-    (auth as any).mockResolvedValue({ userId: 'user_123' });
+    (currentAuth as any).mockResolvedValue({ userId: 'user_123' });
 
     const mockTest = {
       _id: '123',
       title: 'Sample Test',
       createdBy: 'user_123',
     };
-    (Test.findOne as any).mockResolvedValue(mockTest);
+    (Test.findOne as any).mockReturnValue({
+      populate: vi.fn().mockResolvedValue(mockTest),
+    });
 
     const req = createMockRequest('http://localhost/api/test/123');
     const params = Promise.resolve({ id: '123' });
