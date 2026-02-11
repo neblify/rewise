@@ -11,7 +11,7 @@ import { Card } from '@/components/ui/card';
 export function Hero() {
   return (
     <div className="relative overflow-hidden bg-white">
-      <div className="mx-auto max-w-7xl pb-16 pt-20 sm:pb-24 sm:pt-24 lg:pb-32 lg:pt-32">
+      <div className="mx-auto max-w-7xl pb-16 pt-8 sm:pb-24 sm:pt-12 lg:pb-32 lg:pt-16">
         <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
           <div className="sm:max-w-lg">
             <motion.div
