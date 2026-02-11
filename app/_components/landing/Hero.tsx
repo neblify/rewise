@@ -23,8 +23,8 @@ export function Hero() {
                 <Image
                   src="/logo.png"
                   alt="ReWise"
-                  width={780}
-                  height={780}
+                  width={240}
+                  height={240}
                   priority
                   className="h-60 w-auto"
                 />
