@@ -15,8 +15,7 @@ export async function gradeTestWithAI(
         const normalize = (str: string) =>
           str ? str.toString().trim().toLowerCase() : '';
 
-        let processedStudentAnswer =
-          studentAnswers[`${sIndex}-${qIndex}`];
+        let processedStudentAnswer = studentAnswers[`${sIndex}-${qIndex}`];
         if (q.type !== 'match_columns')
           processedStudentAnswer = processedStudentAnswer ?? 'No Answer';
         const processedCorrectAnswer = q.correctAnswer;
@@ -140,13 +139,19 @@ export async function gradeTestWithAI(
     for (const item of flatQuestions) {
       if (item.type !== 'match_columns') continue;
       const correct = item.correctAnswer as number[] | undefined;
-      const student = Array.isArray(item.studentAnswer) ? item.studentAnswer : [];
+      const student = Array.isArray(item.studentAnswer)
+        ? item.studentAnswer
+        : [];
       if (!correct?.length) continue;
       const totalPairs = correct.length;
       let correctPairs = 0;
       for (let i = 0; i < totalPairs; i++) {
         const studentVal = i < student.length ? student[i] : -1;
-        if (typeof studentVal === 'number' && studentVal >= 0 && correct[i] === studentVal)
+        if (
+          typeof studentVal === 'number' &&
+          studentVal >= 0 &&
+          correct[i] === studentVal
+        )
           correctPairs++;
       }
       const marksPerPair = (item.marks || 1) / totalPairs;

@@ -21,18 +21,23 @@ function MatchColumnQuestion({
   const [draggedRightIndex, setDraggedRightIndex] = useState<number | null>(
     null
   );
-  const getMapping = useCallback((leftIdx: number) =>
-    leftIdx < value.length ? value[leftIdx] : -1, [value]);
-  const setMapping = useCallback((leftIdx: number, rightIdx: number) => {
-    const arr = [...value];
-    while (arr.length <= leftIdx) arr.push(-1);
-    arr[leftIdx] = rightIdx;
-    onChange(arr);
-  }, [value, onChange]);
+  const getMapping = useCallback(
+    (leftIdx: number) => (leftIdx < value.length ? value[leftIdx] : -1),
+    [value]
+  );
+  const setMapping = useCallback(
+    (leftIdx: number, rightIdx: number) => {
+      const arr = [...value];
+      while (arr.length <= leftIdx) arr.push(-1);
+      arr[leftIdx] = rightIdx;
+      onChange(arr);
+    },
+    [value, onChange]
+  );
 
   if (!leftColumn.length || !rightColumn.length) {
     return (
-      <div className="text-sm text-gray-500">
+      <div className="text-sm text-muted-foreground">
         No column items defined for this question.
       </div>
     );
@@ -40,7 +45,7 @@ function MatchColumnQuestion({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-muted-foreground">
         Drag an item from Column B onto a row in Column A, or use the dropdown.
       </p>
       <div className="flex flex-col gap-2">
@@ -48,21 +53,21 @@ function MatchColumnQuestion({
           <div
             key={leftIdx}
             className={cn(
-              'flex flex-wrap items-center gap-2 p-3 rounded-lg border bg-gray-50/50 min-h-12',
+              'flex flex-wrap items-center gap-2 p-3 rounded-lg border bg-background/50 min-h-12',
               draggedRightIndex !== null &&
                 getMapping(leftIdx) === -1 &&
-                'border-dashed border-indigo-300'
+                'border-dashed border-primary/30'
             )}
             onDragOver={e => {
               e.preventDefault();
-              e.currentTarget.classList.add('ring-2', 'ring-indigo-200');
+              e.currentTarget.classList.add('ring-2', 'ring-primary/20');
             }}
             onDragLeave={e => {
-              e.currentTarget.classList.remove('ring-2', 'ring-indigo-200');
+              e.currentTarget.classList.remove('ring-2', 'ring-primary/20');
             }}
             onDrop={e => {
               e.preventDefault();
-              e.currentTarget.classList.remove('ring-2', 'ring-indigo-200');
+              e.currentTarget.classList.remove('ring-2', 'ring-primary/20');
               const fromState = draggedRightIndex;
               const fromData = e.dataTransfer.getData('text/plain');
               const rightIdx =
@@ -76,10 +81,10 @@ function MatchColumnQuestion({
                 setMapping(leftIdx, rightIdx);
             }}
           >
-            <span className="font-medium text-gray-800 flex-shrink-0 min-w-[120px]">
+            <span className="font-medium text-foreground flex-shrink-0 min-w-[120px]">
               {leftItem || `Item ${leftIdx + 1}`}
             </span>
-            <span className="text-gray-400">→</span>
+            <span className="text-muted-foreground">→</span>
             <select
               value={getMapping(leftIdx) >= 0 ? getMapping(leftIdx) : ''}
               onChange={e =>
@@ -88,7 +93,7 @@ function MatchColumnQuestion({
                   e.target.value === '' ? -1 : parseInt(e.target.value, 10)
                 )
               }
-              className="rounded-md border border-gray-300 px-2 py-1.5 text-sm bg-white text-gray-900 focus:border-indigo-500 focus:ring-indigo-500"
+              className="rounded-md border border-border px-2 py-1.5 text-sm bg-card text-foreground focus:border-primary focus:ring-primary"
             >
               <option value="">Select match...</option>
               {rightColumn.map((opt, ri) => (
@@ -98,15 +103,15 @@ function MatchColumnQuestion({
               ))}
             </select>
             {getMapping(leftIdx) >= 0 && (
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-muted-foreground">
                 {rightColumn[getMapping(leftIdx)]}
               </span>
             )}
           </div>
         ))}
       </div>
-      <div className="mt-2 pt-2 border-t border-gray-100">
-        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+      <div className="mt-2 pt-2 border-t border-border">
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
           Column B (drag from here)
         </span>
         <div className="flex flex-wrap gap-2 mt-1">
@@ -121,7 +126,7 @@ function MatchColumnQuestion({
               }}
               onDragEnd={() => setDraggedRightIndex(null)}
               className={cn(
-                'inline-block px-3 py-1.5 rounded-md border text-sm cursor-grab active:cursor-grabbing bg-white border-gray-200 text-gray-700 hover:border-indigo-300',
+                'inline-block px-3 py-1.5 rounded-md border text-sm cursor-grab active:cursor-grabbing bg-card border-border text-foreground hover:border-primary/30',
                 draggedRightIndex === ri && 'opacity-50'
               )}
             >
@@ -168,7 +173,9 @@ export default function TestTaker({
                   router.push(`/student/result/${result.resultId}`);
                 } else {
                   setSubmittingRef.current(false);
-                  alert('Failed to submit: ' + (result?.message || 'Unknown error'));
+                  alert(
+                    'Failed to submit: ' + (result?.message || 'Unknown error')
+                  );
                 }
               })
               .catch(() => {
@@ -214,17 +221,17 @@ export default function TestTaker({
   const renderQuestion = (q: IQuestion, qIndex: number, uniqueId: string) => (
     <div
       key={uniqueId}
-      className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-4"
+      className="bg-card rounded-xl p-6 shadow-sm border border-border mb-4"
     >
       <div className="flex gap-4">
-        <span className="flex-none flex items-center justify-center w-8 h-8 rounded-full bg-indigo-50 text-indigo-700 font-bold text-sm">
+        <span className="flex-none flex items-center justify-center w-8 h-8 rounded-full bg-violet-light text-primary font-bold text-sm">
           {qIndex + 1}
         </span>
         <div className="flex-1 space-y-4">
           <div>
             <div className="flex justify-between items-start">
-              <p className="text-lg font-medium text-gray-900">{q.text}</p>
-              <span className="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-1 rounded">
+              <p className="text-lg font-medium text-foreground">{q.text}</p>
+              <span className="text-xs font-medium bg-muted text-muted-foreground px-2 py-1 rounded">
                 {q.marks} Marks
               </span>
             </div>
@@ -243,7 +250,7 @@ export default function TestTaker({
               {q.options?.map((opt, i) => (
                 <label
                   key={i}
-                  className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors"
                 >
                   <input
                     type="radio"
@@ -251,9 +258,9 @@ export default function TestTaker({
                     value={opt}
                     checked={answers[uniqueId] === opt}
                     onChange={e => handleAnswerChange(uniqueId, e.target.value)}
-                    className="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+                    className="w-4 h-4 text-primary focus:ring-primary"
                   />
-                  <span className="text-gray-700">{opt}</span>
+                  <span className="text-foreground">{opt}</span>
                 </label>
               ))}
             </div>
@@ -264,7 +271,7 @@ export default function TestTaker({
               {['True', 'False'].map(opt => (
                 <label
                   key={opt}
-                  className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors"
                 >
                   <input
                     type="radio"
@@ -272,9 +279,9 @@ export default function TestTaker({
                     value={opt}
                     checked={answers[uniqueId] === opt}
                     onChange={e => handleAnswerChange(uniqueId, e.target.value)}
-                    className="w-4 h-4 text-indigo-600 focus:ring-indigo-500"
+                    className="w-4 h-4 text-primary focus:ring-primary"
                   />
-                  <span className="text-gray-700">{opt}</span>
+                  <span className="text-foreground">{opt}</span>
                 </label>
               ))}
             </div>
@@ -291,7 +298,7 @@ export default function TestTaker({
             <textarea
               value={answers[uniqueId] || ''}
               onChange={e => handleAnswerChange(uniqueId, e.target.value)}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+              className="block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary"
               rows={
                 q.type === 'brief_answer' || q.type === 'difference' ? 4 : 1
               }
@@ -333,9 +340,9 @@ export default function TestTaker({
           <span>{formatTime(remainingSeconds)}</span>
         </div>
       )}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-        <h1 className="text-2xl font-bold text-gray-900">{test.title}</h1>
-        <div className="flex gap-4 text-sm text-gray-500 mt-2">
+      <div className="bg-card rounded-xl p-6 shadow-sm border border-border">
+        <h1 className="text-2xl font-bold text-foreground">{test.title}</h1>
+        <div className="flex gap-4 text-sm text-muted-foreground mt-2">
           <span>{test.subject}</span>
           <span>•</span>
           <span>{test.board || 'Standard'} Board</span>
@@ -347,12 +354,12 @@ export default function TestTaker({
       <div className="space-y-8">
         {test.sections?.map((section, sIndex) => (
           <div key={sIndex} className="space-y-4">
-            <div className="flex items-baseline gap-2 border-b border-gray-200 pb-2">
-              <h2 className="text-xl font-semibold text-gray-800">
+            <div className="flex items-baseline gap-2 border-b border-border pb-2">
+              <h2 className="text-xl font-semibold text-foreground">
                 {section.title}
               </h2>
               {section.description && (
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-muted-foreground">
                   {section.description}
                 </span>
               )}
@@ -374,7 +381,7 @@ export default function TestTaker({
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="rounded-md bg-indigo-600 px-8 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+            className="rounded-md gradient-primary px-8 py-3 text-base font-medium text-white shadow-sm focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Submitting...' : 'Submit Test'}
           </button>

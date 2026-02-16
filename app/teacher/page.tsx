@@ -88,12 +88,12 @@ export default async function TeacherDashboard(props: Props) {
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">All Tests</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-foreground">All Tests</h1>
+          <p className="text-muted-foreground mt-1">
             Browse and manage all tests in the system.
           </p>
         </div>
-        <Button asChild variant="indigo">
+        <Button asChild variant="gradient">
           <Link href="/teacher/create-test">
             <Plus className="h-4 w-4 mr-2" />
             Create New Test
@@ -101,25 +101,25 @@ export default async function TeacherDashboard(props: Props) {
         </Button>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
         {/* Filters Toolbar */}
-        <div className="p-4 border-b border-gray-200 bg-gray-50/50">
+        <div className="p-4 border-b border-border bg-background">
           <form className="flex flex-col md:flex-row gap-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
               <Input
                 type="text"
                 name="query"
                 placeholder="Search tests..."
                 defaultValue={query}
-                className="pl-10 bg-white"
+                className="pl-10 bg-card"
               />
             </div>
 
             <select
               name="subject"
               defaultValue={subject}
-              className="px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white h-10 min-w-[140px]"
+              className="px-3 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-card h-10 min-w-[140px]"
             >
               <option value="">All Subjects</option>
               {subjects.map((s: string) => (
@@ -132,7 +132,7 @@ export default async function TeacherDashboard(props: Props) {
             <select
               name="board"
               defaultValue={board}
-              className="px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white h-10 min-w-[140px]"
+              className="px-3 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-card h-10 min-w-[140px]"
             >
               <option value="">All Boards</option>
               {boards.map((b: string) => (
@@ -145,7 +145,7 @@ export default async function TeacherDashboard(props: Props) {
             <select
               name="sort"
               defaultValue={sort}
-              className="px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white h-10 min-w-[160px]"
+              className="px-3 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-card h-10 min-w-[160px]"
             >
               <option value="createdAt_desc">Newest First</option>
               <option value="createdAt_asc">Oldest First</option>
@@ -156,14 +156,14 @@ export default async function TeacherDashboard(props: Props) {
             <Button
               type="submit"
               variant="secondary"
-              className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+              className="border border-border bg-card hover:bg-muted text-foreground"
             >
               Apply
             </Button>
             <Button
               asChild
               variant="ghost"
-              className="text-gray-500 hover:text-gray-700"
+              className="text-muted-foreground hover:text-foreground"
             >
               <Link href="/teacher">Clear</Link>
             </Button>
@@ -172,8 +172,8 @@ export default async function TeacherDashboard(props: Props) {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 text-xs uppercase font-medium text-gray-500">
+          <table className="w-full text-left text-sm text-muted-foreground">
+            <thead className="bg-background text-xs uppercase font-medium text-muted-foreground">
               <tr>
                 <th className="px-6 py-4">Test Name</th>
                 <th className="px-6 py-4">Subject & Board</th>
@@ -184,12 +184,12 @@ export default async function TeacherDashboard(props: Props) {
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {tests.length === 0 ? (
                 <tr>
                   <td
                     colSpan={7}
-                    className="px-6 py-12 text-center text-gray-500"
+                    className="px-6 py-12 text-center text-muted-foreground"
                   >
                     No tests found matching your filters.
                   </td>
@@ -210,20 +210,20 @@ export default async function TeacherDashboard(props: Props) {
                   return (
                     <tr
                       key={test._id}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-muted transition-colors"
                     >
-                      <td className="px-6 py-4 font-medium text-gray-900">
+                      <td className="px-6 py-4 font-medium text-foreground">
                         {test.title}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex flex-col items-start gap-1">
                           <Badge
                             variant="outline"
-                            className="font-medium text-gray-900 bg-white"
+                            className="font-medium text-foreground bg-card"
                           >
                             {test.subject}
                           </Badge>
-                          <span className="text-gray-400 text-xs">
+                          <span className="text-muted-foreground text-xs">
                             {test.board} {test.grade && `• Class ${test.grade}`}
                           </span>
                         </div>
@@ -231,7 +231,7 @@ export default async function TeacherDashboard(props: Props) {
                       <td className="px-6 py-4">{questionCount}</td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs text-indigo-600 font-bold uppercase">
+                          <div className="w-6 h-6 rounded-full bg-violet-light flex items-center justify-center text-xs text-primary font-bold uppercase">
                             {creatorName.charAt(0)}
                           </div>
                           <span
@@ -244,11 +244,15 @@ export default async function TeacherDashboard(props: Props) {
                       </td>
                       <td className="px-6 py-4 text-xs space-y-1">
                         <div>
-                          <span className="text-gray-400">Created:</span>{' '}
+                          <span className="text-muted-foreground">
+                            Created:
+                          </span>{' '}
                           {formatDate(test.createdAt)}
                         </div>
                         <div>
-                          <span className="text-gray-400">Updated:</span>{' '}
+                          <span className="text-muted-foreground">
+                            Updated:
+                          </span>{' '}
                           {formatDate(test.updatedAt)}
                         </div>
                       </td>
@@ -281,7 +285,7 @@ export default async function TeacherDashboard(props: Props) {
                       <td className="px-6 py-4 text-right space-x-3">
                         <Link
                           href={`/teacher/test/${test._id}/results`}
-                          className="text-indigo-600 hover:text-indigo-900 font-medium"
+                          className="text-primary hover:text-primary/90 font-medium"
                         >
                           Results
                         </Link>
@@ -289,7 +293,7 @@ export default async function TeacherDashboard(props: Props) {
                           <>
                             <Link
                               href={`/teacher/create-test/${test._id}`}
-                              className="text-gray-500 hover:text-gray-900 font-medium"
+                              className="text-muted-foreground hover:text-foreground font-medium"
                             >
                               Edit
                             </Link>

@@ -231,7 +231,11 @@ export async function generateQuestionsAI(
     // Post-processing to ensure compatibility
     const sanitizedQuestions = questions.map((q: any) => {
       const effectiveType = type === 'mixed' ? q.type : type;
-      if (effectiveType === 'match_columns' && Array.isArray(q.options) && q.options.length > 0) {
+      if (
+        effectiveType === 'match_columns' &&
+        Array.isArray(q.options) &&
+        q.options.length > 0
+      ) {
         // Parse "Key - Value" strings into keys and values
         const keys: string[] = [];
         const values: string[] = [];
@@ -258,10 +262,12 @@ export async function generateQuestionsAI(
         };
         const leftOrder = shuffle(Array.from({ length: n }, (_, i) => i));
         const rightOrder = shuffle(Array.from({ length: n }, (_, i) => i));
-        const leftColumn = leftOrder.map((i) => keys[i]);
-        const options = rightOrder.map((i) => values[i]);
+        const leftColumn = leftOrder.map(i => keys[i]);
+        const options = rightOrder.map(i => values[i]);
         // correctAnswer[i] = index in options (right column) that matches leftColumn[i]
-        const correctAnswer = leftOrder.map((keyIdx) => rightOrder.indexOf(keyIdx));
+        const correctAnswer = leftOrder.map(keyIdx =>
+          rightOrder.indexOf(keyIdx)
+        );
         return {
           id: Date.now() + Math.random(),
           text: q.text,

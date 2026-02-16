@@ -23,13 +23,13 @@ export default async function ProfilePage() {
   return (
     <div className="p-8 max-w-2xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">My Profile</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-3xl font-bold text-foreground">My Profile</h1>
+        <p className="text-muted-foreground mt-1">
           Update your academic details to see relevant tests.
         </p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+      <div className="bg-card rounded-xl border border-border shadow-sm p-8">
         <UpdateProfileForm
           initialBoard={user?.board || ''}
           initialGrade={user?.grade || ''}

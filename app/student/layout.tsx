@@ -6,7 +6,7 @@ export default function StudentLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navbar variant="student" />
       <main className="py-8">{children}</main>
     </div>

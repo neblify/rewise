@@ -3,32 +3,32 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function PrivacyPolicy() {
   return (
-    <div className="bg-white px-6 py-32 lg:px-8">
-      <div className="mx-auto max-w-3xl text-base leading-7 text-gray-700">
+    <div className="bg-card px-6 py-32 lg:px-8">
+      <div className="mx-auto max-w-3xl text-base leading-7 text-muted-foreground">
         <div className="mb-8">
           <Link
             href="/"
-            className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 mb-6"
+            className="inline-flex items-center text-sm text-primary hover:text-primary/90 mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
           </Link>
-          <p className="text-base font-semibold leading-7 text-indigo-600">
+          <p className="text-base font-semibold leading-7 text-primary">
             Legal
           </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Privacy Policy
           </h1>
-          <p className="mt-6 text-xl leading-8 text-gray-700">
+          <p className="mt-6 text-xl leading-8 text-muted-foreground">
             <strong>Effective Date:</strong> January 28, 2026
           </p>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-muted-foreground">
             <strong>Website:</strong> https://nios-prep.vercel.app/ ("we", "us",
             "our", "ReWise")
           </p>
         </div>
 
-        <div className="prose prose-indigo max-w-none space-y-8">
+        <div className="prose max-w-none space-y-8">
           <p>
             We are committed to protecting your privacy. This Privacy Policy
             explains what information we collect, how we use it, with whom we
@@ -37,8 +37,8 @@ export default function PrivacyPolicy() {
           </p>
           <p>
             This policy applies to all visitors, users, and others who access or
-            use the ReWise website and any related services (collectively,
-            the "Service").
+            use the ReWise website and any related services (collectively, the
+            "Service").
           </p>
           <p>
             By using the Service, you agree to the collection and use of
@@ -46,11 +46,11 @@ export default function PrivacyPolicy() {
             please do not use the Service.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             1. Information We Collect
           </h2>
 
-          <h3 className="text-xl font-semibold text-gray-900 mt-6">
+          <h3 className="text-xl font-semibold text-foreground mt-6">
             A. Information You Provide Voluntarily
           </h3>
           <p>We may collect information you give us directly, such as:</p>
@@ -63,7 +63,7 @@ export default function PrivacyPolicy() {
             <li>Any other information you choose to provide</li>
           </ul>
 
-          <h3 className="text-xl font-semibold text-gray-900 mt-6">
+          <h3 className="text-xl font-semibold text-foreground mt-6">
             B. Automatically Collected Information
           </h3>
           <p>
@@ -88,7 +88,7 @@ export default function PrivacyPolicy() {
             </li>
           </ul>
 
-          <h3 className="text-xl font-semibold text-gray-900 mt-6">
+          <h3 className="text-xl font-semibold text-foreground mt-6">
             C. Third-Party Analytics & Services
           </h3>
           <p>
@@ -114,7 +114,7 @@ export default function PrivacyPolicy() {
             collected such data, we will delete it.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             2. How We Use Your Information
           </h2>
           <p>We use the collected information to:</p>
@@ -135,7 +135,7 @@ export default function PrivacyPolicy() {
             data.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             3. Cookies and Tracking Technologies
           </h2>
           <p>We use minimal cookies and similar technologies:</p>
@@ -159,7 +159,7 @@ export default function PrivacyPolicy() {
             short section).
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             4. Sharing of Information
           </h2>
           <p>
@@ -181,7 +181,7 @@ export default function PrivacyPolicy() {
             </li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             5. Data Storage & Security
           </h2>
           <p>
@@ -194,7 +194,7 @@ export default function PrivacyPolicy() {
             storage is 100% secure. We cannot guarantee absolute security.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             6. Data Retention
           </h2>
           <p>
@@ -213,7 +213,7 @@ export default function PrivacyPolicy() {
             </li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             7. Your Rights
           </h2>
           <p>
@@ -236,7 +236,7 @@ export default function PrivacyPolicy() {
             engage in cross-site tracking for advertising.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             8. International Transfers
           </h2>
           <p>
@@ -247,7 +247,7 @@ export default function PrivacyPolicy() {
             for such transfers where required.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             9. Children's Privacy
           </h2>
           <p>
@@ -257,7 +257,7 @@ export default function PrivacyPolicy() {
             data, please contact us immediately.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             10. Changes to This Privacy Policy
           </h2>
           <p>
@@ -270,7 +270,7 @@ export default function PrivacyPolicy() {
             (if feasible).
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             11. Contact Us
           </h2>
           <p>
@@ -280,8 +280,8 @@ export default function PrivacyPolicy() {
             Or reach out via any contact form available on the site.
           </p>
 
-          <hr className="my-10 border-gray-200" />
-          <p className="text-sm text-gray-500">
+          <hr className="my-10 border-border" />
+          <p className="text-sm text-muted-foreground">
             Thank you for using ReWise. We value your trust.
           </p>
         </div>

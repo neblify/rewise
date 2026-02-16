@@ -2,7 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { GraduationCap, School, UserCheck } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { PlayfulCard } from '@/components/playful';
 
 const roles = [
   {
@@ -15,8 +16,9 @@ const roles = [
       'Instant AI feedback',
       'Performance tracking',
     ],
-    color: 'bg-blue-50 text-blue-700',
-    iconColor: 'text-blue-600',
+    shadowColor: 'sky' as const,
+    iconBg: 'bg-sky-light',
+    iconColor: 'text-[#0C7FA8]',
   },
   {
     title: 'For Teachers',
@@ -28,8 +30,9 @@ const roles = [
       'Automated grading',
       'Class performance insights',
     ],
-    color: 'bg-green-50 text-green-700',
-    iconColor: 'text-green-600',
+    shadowColor: 'mint' as const,
+    iconBg: 'bg-mint-light',
+    iconColor: 'text-mint',
   },
   {
     title: 'For Parents',
@@ -41,20 +44,21 @@ const roles = [
       'Track exam readiness',
       'Stay connected with progress',
     ],
-    color: 'bg-purple-50 text-purple-700',
-    iconColor: 'text-purple-600',
+    shadowColor: 'coral' as const,
+    iconBg: 'bg-coral-light',
+    iconColor: 'text-coral',
   },
 ];
 
 export function RoleInfo() {
   return (
-    <div className="bg-white py-24 sm:py-32">
+    <div className="bg-card py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:text-center mb-16">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Built for Everyone
           </h2>
-          <p className="mt-6 text-lg leading-8 text-gray-600">
+          <p className="mt-6 text-lg leading-8 text-muted-foreground">
             A complete ecosystem connecting students, teachers, and parents.
           </p>
         </div>
@@ -67,26 +71,29 @@ export function RoleInfo() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.2 }}
             >
-              <Card className="flex flex-col h-full border-gray-200 shadow-sm hover:shadow-lg transition-shadow">
+              <PlayfulCard
+                shadowColor={role.shadowColor}
+                className="flex flex-col h-full"
+              >
                 <CardHeader>
                   <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-xl ${role.color} mb-4`}
+                    className={`flex h-12 w-12 items-center justify-center rounded-xl ${role.iconBg} mb-4`}
                   >
                     <role.icon className={`h-6 w-6 ${role.iconColor}`} />
                   </div>
-                  <CardTitle className="text-xl font-semibold leading-7 text-gray-900">
+                  <CardTitle className="text-xl font-semibold leading-7 text-foreground">
                     {role.title}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="flex-auto text-base leading-7 text-gray-600 mb-6">
+                  <p className="flex-auto text-base leading-7 text-muted-foreground mb-6">
                     {role.description}
                   </p>
                   <ul className="space-y-3">
                     {role.benefits.map(benefit => (
                       <li
                         key={benefit}
-                        className="flex gap-x-3 text-sm text-gray-600"
+                        className="flex gap-x-3 text-sm text-muted-foreground"
                       >
                         <svg
                           className={`h-6 w-5 flex-none ${role.iconColor}`}
@@ -105,7 +112,7 @@ export function RoleInfo() {
                     ))}
                   </ul>
                 </CardContent>
-              </Card>
+              </PlayfulCard>
             </motion.div>
           ))}
         </div>

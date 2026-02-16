@@ -20,7 +20,7 @@ export default async function ResultPage(props: Props) {
   const { userId } = await currentAuth();
   if (!userId) redirect('/sign-in');
 
-  const { id } =  params;
+  const { id } = params;
 
   await dbConnect();
   // @ts-ignore
@@ -55,11 +55,11 @@ export default async function ResultPage(props: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-5xl space-y-8">
         {/* Header / Score Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="bg-indigo-600 p-8 text-white text-center">
+        <div className="bg-card rounded-2xl shadow-sm border border-border overflow-hidden">
+          <div className="gradient-primary p-8 text-white text-center">
             <h1 className="text-3xl font-bold">{test.title}</h1>
             <p className="opacity-90">{test.subject} • Result Analysis</p>
 
@@ -67,25 +67,25 @@ export default async function ResultPage(props: Props) {
               <span className="text-6xl font-extrabold">{percentage}%</span>
               <span className="text-xl opacity-80 mb-2">Score</span>
             </div>
-            <p className="mt-2 text-indigo-100">
+            <p className="mt-2 text-white/70">
               {result.totalScore} / {result.maxScore} Marks
             </p>
           </div>
 
           <div className="p-8 grid md:grid-cols-2 gap-8">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                <span className="p-1 rounded bg-indigo-100 text-indigo-600">
+              <h3 className="text-lg font-semibold text-foreground mb-2 flex items-center gap-2">
+                <span className="p-1 rounded bg-violet-light text-primary">
                   ✨
                 </span>
                 AI Feedback
               </h3>
-              <p className="text-gray-600 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-200">
+              <p className="text-muted-foreground leading-relaxed bg-background p-4 rounded-xl border border-border">
                 {result.aiFeedback || 'No feedback generated.'}
               </p>
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground mb-2 flex items-center gap-2">
                 <span className="p-1 rounded bg-orange-100 text-orange-600">
                   ⚠️
                 </span>
@@ -103,7 +103,7 @@ export default async function ResultPage(props: Props) {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-500 italic">
+                <p className="text-muted-foreground italic">
                   None identified. Great job!
                 </p>
               )}
@@ -113,7 +113,7 @@ export default async function ResultPage(props: Props) {
 
         {/* Detailed Analysis */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-bold text-foreground">
             Detailed Analysis
           </h2>
 
@@ -124,12 +124,14 @@ export default async function ResultPage(props: Props) {
             return (
               <div
                 key={i}
-                className={`bg-white rounded-xl p-6 shadow-sm border-l-4 ${ans.isCorrect ? 'border-green-500' : 'border-red-500'}`}
+                className={`bg-card rounded-xl p-6 shadow-sm border-l-4 ${ans.isCorrect ? 'border-green-500' : 'border-red-500'}`}
               >
                 <div className="flex justify-between items-start mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">{qText}</h3>
+                  <h3 className="text-lg font-medium text-foreground">
+                    {qText}
+                  </h3>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-gray-900">
+                    <span className="font-bold text-foreground">
                       {ans.marksObtained} / {question?.marks || 1}
                     </span>
                     {ans.isCorrect ? (
@@ -141,11 +143,11 @@ export default async function ResultPage(props: Props) {
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-4 text-sm">
-                  <div className="bg-gray-50 p-3 rounded-lg">
-                    <span className="block text-xs uppercase tracking-wide text-gray-400 mb-1">
+                  <div className="bg-background p-3 rounded-lg">
+                    <span className="block text-xs uppercase tracking-wide text-muted-foreground mb-1">
                       Your Answer
                     </span>
-                    <p className="text-gray-800 font-medium">
+                    <p className="text-foreground font-medium">
                       {ans.answer?.toString() || 'Skipped'}
                     </p>
                   </div>
@@ -162,7 +164,7 @@ export default async function ResultPage(props: Props) {
                 </div>
 
                 {ans.feedback && (
-                  <div className="mt-4 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-100">
+                  <div className="mt-4 text-sm text-muted-foreground bg-blue-50 p-3 rounded-lg border border-blue-100">
                     <span className="font-semibold text-blue-700">
                       Feedback:{' '}
                     </span>
@@ -177,7 +179,7 @@ export default async function ResultPage(props: Props) {
         <div className="flex justify-center pt-8">
           <Link
             href="/student"
-            className="px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium"
+            className="px-6 py-3 gradient-primary text-white rounded-lg hover:brightness-110 transition-colors font-medium"
           >
             Back to Dashboard
           </Link>

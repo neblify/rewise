@@ -20,8 +20,9 @@ export async function GET(
     await dbConnect();
 
     // @ts-ignore
-    const test = await Test.findOne({ _id: id, createdBy: userId })
-      .populate('sections.questions');
+    const test = await Test.findOne({ _id: id, createdBy: userId }).populate(
+      'sections.questions'
+    );
 
     if (!test) {
       return NextResponse.json({ error: 'Test not found' }, { status: 404 });
