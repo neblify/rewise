@@ -23,7 +23,7 @@ export default function PrivacyPolicy() {
             <strong>Effective Date:</strong> January 28, 2026
           </p>
           <p className="mt-2 text-sm text-gray-500">
-            <strong>Website:</strong> https://nios-prep.vercel.app/ ("we", "us",
+            <strong>Website:</strong> https://rewise.vercel.app/ ("we", "us",
             "our", "ReWise")
           </p>
         </div>

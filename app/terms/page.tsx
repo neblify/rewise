@@ -23,7 +23,7 @@ export default function TermsOfService() {
             **Effective Date:** January 28, 2026
           </p>
           <p className="mt-2 text-sm text-gray-500">
-            **Website:** https://nios-prep.vercel.app/ ("we", "us", "our",
+            **Website:** https://rewise.vercel.app/ ("we", "us", "our",
             "ReWise", "the Service")
           </p>
         </div>
@@ -31,7 +31,7 @@ export default function TermsOfService() {
         <div className="prose prose-indigo max-w-none space-y-8">
           <p>
             Please read these Terms of Service ("Terms", "Agreement") carefully
-            before using the website https://nios-prep.vercel.app/ or any
+            before using the website https://rewise.vercel.app/ or any
             related services (collectively, the "Service").
           </p>
           <p>
