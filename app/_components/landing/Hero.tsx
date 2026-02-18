@@ -39,6 +39,14 @@ export function Hero() {
                         'radial-gradient(circle at 50% 50%, var(--sky-light) 0%, transparent 65%)',
                     }}
                   />
+                  {/* Bright center so the bulb looks lit */}
+                  <div
+                    className="absolute inset-0 rounded-full opacity-95 blur-xl"
+                    style={{
+                      background:
+                        'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0%, var(--sky-light) 25%, transparent 50%)',
+                    }}
+                  />
                 </div>
                 <div className="relative">
                   <Image
