@@ -24,7 +24,7 @@ const features = [
   {
     name: 'AI-Powered Grading',
     description:
-      'Instant evaluation for objective questions and smart AI analysis for subjective answers using advanced LLMs.',
+      'Instant evaluation for objective questions and smart AI analysis for subjective answers.',
     icon: Brain,
   },
   {
@@ -42,13 +42,13 @@ const features = [
   {
     name: 'Secure & Reliable',
     description:
-      'Enterprise-grade security powered by Clerk authentication to keep your data safe and accessible.',
+      'Enterprise-grade security to keep your data safe and accessible.',
     icon: ShieldCheck,
   },
   {
-    name: 'Fast & Responsive',
+    name: 'Device-agnostic',
     description:
-      'Built with Next.js and Tailwind CSS for a lightning-fast experience across all devices.',
+      'ReWise works with any device — desktop, tablet, or mobile — ensuring a seamless, device‑agnostic experience everywhere.',
     icon: Zap,
   },
   {
