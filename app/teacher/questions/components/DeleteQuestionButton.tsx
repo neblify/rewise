@@ -72,13 +72,15 @@ export default function DeleteQuestionButton({
             <AlertDialogTitle>Delete Question</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-4 text-sm">
-                <div className="text-gray-700">
+                <div className="text-muted-foreground">
                   Are you sure you want to delete this question?
                 </div>
-                <div className="bg-gray-50 p-3 rounded-md border border-gray-200 text-gray-800">
-                  &quot;{questionText.length > 120
+                <div className="bg-background p-3 rounded-md border border-border text-foreground">
+                  &quot;
+                  {questionText.length > 120
                     ? questionText.slice(0, 120) + '...'
-                    : questionText}&quot;
+                    : questionText}
+                  &quot;
                 </div>
                 <div className="text-red-700 font-semibold bg-red-50 p-3 rounded-md border border-red-200">
                   This action cannot be undone. The question will be permanently

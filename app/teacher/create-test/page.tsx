@@ -3,10 +3,7 @@
 import React, { useActionState, useState, useEffect } from 'react';
 import { createTest } from './actions';
 import { extractQuestionsFromPdf, generateQuestionsAI } from './ai-actions';
-import {
-  DEFAULT_SECTION_TITLE,
-  isEmptyDefaultSection,
-} from './lib/sections';
+import { DEFAULT_SECTION_TITLE, isEmptyDefaultSection } from './lib/sections';
 import {
   Plus,
   Trash2,
@@ -59,7 +56,12 @@ export default function CreateTestPage() {
 
   // Sections State
   const [sections, setSections] = useState<any[]>([
-    { id: Date.now(), title: DEFAULT_SECTION_TITLE, description: '', questions: [] },
+    {
+      id: Date.now(),
+      title: DEFAULT_SECTION_TITLE,
+      description: '',
+      questions: [],
+    },
   ]);
 
   // AI Modal State
@@ -180,7 +182,11 @@ export default function CreateTestPage() {
           description: `${aiDifficulty} - ${aiType}`,
           questions: res.data,
         };
-        setSections(isEmptyDefaultSection(sections) ? [newSection] : [...sections, newSection]);
+        setSections(
+          isEmptyDefaultSection(sections)
+            ? [newSection]
+            : [...sections, newSection]
+        );
         setIsAiModalOpen(false);
         setAiTopic('');
       } else {
@@ -225,22 +231,25 @@ export default function CreateTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 pb-32">
+    <div className="min-h-screen bg-background p-8 pb-32">
       <div className="mx-auto max-w-5xl space-y-8">
         <div className="flex justify-between items-end">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-foreground">
               Create New Test
             </h1>
-            <p className="text-gray-500">
+            <p className="text-muted-foreground">
               Configure your test structure, sections, and questions.
             </p>
           </div>
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => { setIsAiModalOpen(true); setAiTopic(testTitle); }}
-              className="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium animate-pulse hover:animate-none"
+              onClick={() => {
+                setIsAiModalOpen(true);
+                setAiTopic(testTitle);
+              }}
+              className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium animate-pulse hover:animate-none"
             >
               <Sparkles className="h-5 w-5" />
               AI Assistant
@@ -270,39 +279,43 @@ export default function CreateTestPage() {
 
         <form action={handleSubmit} className="space-y-8">
           {/* Metadata Card */}
-          <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-100 space-y-6">
-            <div className="flex items-center gap-2 border-b border-gray-100 pb-4 mb-4">
-              <Layers className="text-indigo-600 h-5 w-5" />
-              <h2 className="text-xl font-semibold text-gray-800">
+          <div className="rounded-xl bg-card p-6 shadow-sm border border-border space-y-6">
+            <div className="flex items-center gap-2 border-b border-border pb-4 mb-4">
+              <Layers className="text-primary h-5 w-5" />
+              <h2 className="text-xl font-semibold text-foreground">
                 Test Configuration
               </h2>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-muted-foreground">
                   Test Title
                 </label>
                 <input
                   name="title"
                   type="text"
                   value={testTitle}
-                  onChange={e => { setTestTitle(e.target.value); }}
+                  onChange={e => {
+                    setTestTitle(e.target.value);
+                  }}
                   required
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900"
+                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground"
                   placeholder="e.g. Science Mid-Term"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-muted-foreground">
                   Board
                 </label>
                 <select
                   name="board"
                   value={board}
-                  onChange={e => { setBoard(e.target.value); }}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+                  onChange={e => {
+                    setBoard(e.target.value);
+                  }}
+                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground bg-card"
                 >
                   {BOARDS.map(b => (
                     <option key={b} value={b}>
@@ -313,14 +326,16 @@ export default function CreateTestPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-muted-foreground">
                   Level / Class
                 </label>
                 <select
                   name="grade"
                   value={grade}
-                  onChange={e => { setGrade(e.target.value); }}
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+                  onChange={e => {
+                    setGrade(e.target.value);
+                  }}
+                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground bg-card"
                 >
                   {gradeOptions.map(option => (
                     <option key={option.value} value={option.value}>
@@ -331,25 +346,25 @@ export default function CreateTestPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-muted-foreground">
                   Subject
                 </label>
                 <input
                   name="subject"
                   type="text"
                   required
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900"
+                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground"
                   placeholder="e.g. Mathematics"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-muted-foreground">
                   Visibility
                 </label>
                 <select
                   name="visibility"
-                  className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 text-gray-900 bg-white"
+                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground bg-card"
                 >
                   <option value="public">Public (All Students)</option>
                   <option value="private">Private (Invite Only)</option>
@@ -365,40 +380,42 @@ export default function CreateTestPage() {
             {sections.map((section, secIndex) => (
               <div
                 key={section.id}
-                className="rounded-xl bg-white border border-indigo-100 shadow-md overflow-hidden"
+                className="rounded-xl bg-card border border-primary/20 shadow-md overflow-hidden"
               >
-                <div className="bg-indigo-50/50 p-6 border-b border-indigo-100 flex justify-between items-start">
+                <div className="bg-violet-light/50 p-6 border-b border-primary/20 flex justify-between items-start">
                   <div className="space-y-3 flex-1">
                     <input
                       type="text"
                       value={section.title}
-                      onChange={e =>
-                        { updateSection(secIndex, 'title', e.target.value); }
-                      }
-                      className="bg-transparent text-lg font-bold text-indigo-900 placeholder-indigo-600 focus:outline-none w-full"
+                      onChange={e => {
+                        updateSection(secIndex, 'title', e.target.value);
+                      }}
+                      className="bg-transparent text-lg font-bold text-primary placeholder-primary focus:outline-none w-full"
                       placeholder="Section Title"
                     />
                     <input
                       type="text"
                       value={section.description}
-                      onChange={e =>
-                        { updateSection(secIndex, 'description', e.target.value); }
-                      }
-                      className="bg-transparent text-sm text-indigo-700 placeholder-indigo-600 focus:outline-none w-full"
+                      onChange={e => {
+                        updateSection(secIndex, 'description', e.target.value);
+                      }}
+                      className="bg-transparent text-sm text-primary placeholder-primary focus:outline-none w-full"
                       placeholder="Section Description (Optional)"
                     />
                   </div>
                   <button
                     type="button"
-                    onClick={() => { removeSection(secIndex); }}
-                    className="text-indigo-400 hover:text-red-500 p-1"
+                    onClick={() => {
+                      removeSection(secIndex);
+                    }}
+                    className="text-primary/60 hover:text-red-500 p-1"
                   >
                     <Trash2 className="h-5 w-5" />
                   </button>
                 </div>
 
                 <div className="p-6 overflow-x-auto">
-                  <table className="min-w-full w-full table-fixed divide-y divide-gray-200">
+                  <table className="min-w-full w-full table-fixed divide-y divide-border">
                     <colgroup>
                       <col className="w-0" style={{ width: '2.5rem' }} />
                       <col />
@@ -406,26 +423,26 @@ export default function CreateTestPage() {
                       <col className="w-0" style={{ width: '4.5rem' }} />
                       <col className="w-0" style={{ width: '3.5rem' }} />
                     </colgroup>
-                    <thead className="bg-gray-50">
+                    <thead className="bg-background">
                       <tr>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           No.
                         </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Question
                         </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Type
                         </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Marks
                         </th>
-                        <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Actions
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-card divide-y divide-border">
                       {section.questions.map((q: any, qIndex: number) => {
                         const questionNo =
                           sections
@@ -436,7 +453,7 @@ export default function CreateTestPage() {
                         return (
                           <React.Fragment key={q.id}>
                             <tr className="group align-top">
-                              <td className="px-3 py-2 text-sm font-medium text-gray-500 whitespace-nowrap">
+                              <td className="px-3 py-2 text-sm font-medium text-muted-foreground whitespace-nowrap">
                                 {questionNo}
                               </td>
                               <td className="px-3 py-2">
@@ -450,7 +467,7 @@ export default function CreateTestPage() {
                                       e.target.value
                                     )
                                   }
-                                  className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 min-w-0"
+                                  className="block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-primary focus:ring-primary text-foreground min-w-0"
                                   placeholder={`Question ${questionNo}`}
                                   rows={2}
                                 />
@@ -473,12 +490,15 @@ export default function CreateTestPage() {
                                         { length: left.length },
                                         (_, i) =>
                                           Array.isArray(q.correctAnswer) &&
-                                          typeof (q.correctAnswer as number[])[i] === 'number'
+                                          typeof (q.correctAnswer as number[])[
+                                            i
+                                          ] === 'number'
                                             ? (q.correctAnswer as number[])[i]
                                             : Math.min(i, right.length - 1)
                                       );
                                       const newSecs = [...sections];
-                                      const qu = newSecs[secIndex].questions[qIndex];
+                                      const qu =
+                                        newSecs[secIndex].questions[qIndex];
                                       newSecs[secIndex].questions[qIndex] = {
                                         ...qu,
                                         type: newType,
@@ -496,7 +516,7 @@ export default function CreateTestPage() {
                                       );
                                     }
                                   }}
-                                  className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 bg-white min-w-0"
+                                  className="block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-primary focus:ring-primary text-foreground bg-card min-w-0"
                                 >
                                   {QUESTION_TYPES.map(t => (
                                     <option key={t.value} value={t.value}>
@@ -517,17 +537,17 @@ export default function CreateTestPage() {
                                       parseInt(e.target.value)
                                     )
                                   }
-                                  className="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-indigo-500 focus:ring-indigo-500 text-gray-900 w-16"
+                                  className="block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-primary focus:ring-primary text-foreground w-16"
                                   min={1}
                                 />
                               </td>
                               <td className="px-3 py-2 text-right">
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    { removeQuestionExp(secIndex, qIndex); }
-                                  }
-                                  className="text-gray-300 hover:text-red-500 transition-opacity"
+                                  onClick={() => {
+                                    removeQuestionExp(secIndex, qIndex);
+                                  }}
+                                  className="text-muted-foreground hover:text-red-500 transition-opacity"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </button>
@@ -537,7 +557,7 @@ export default function CreateTestPage() {
                               <tr>
                                 <td
                                   colSpan={5}
-                                  className="px-3 py-2 bg-gray-50"
+                                  className="px-3 py-2 bg-background"
                                 >
                                   <div className="grid grid-cols-2 gap-2">
                                     {q.options?.map(
@@ -558,7 +578,7 @@ export default function CreateTestPage() {
                                               newOpts
                                             );
                                           }}
-                                          className="block w-full rounded border border-gray-200 px-2 py-1.5 text-sm text-gray-900"
+                                          className="block w-full rounded border border-border px-2 py-1.5 text-sm text-foreground"
                                           placeholder={`Option ${optIndex + 1}`}
                                         />
                                       )
@@ -574,7 +594,7 @@ export default function CreateTestPage() {
                                           e.target.value
                                         )
                                       }
-                                      className="col-span-2 block w-full rounded border border-green-200 bg-green-50 px-2 py-1.5 text-sm placeholder-green-600 text-gray-900"
+                                      className="col-span-2 block w-full rounded border border-green-200 bg-green-50 px-2 py-1.5 text-sm placeholder-green-600 text-foreground"
                                       placeholder="Correct Option (Exact Match)"
                                     />
                                   </div>
@@ -585,56 +605,106 @@ export default function CreateTestPage() {
                               <tr>
                                 <td
                                   colSpan={5}
-                                  className="px-3 py-2 bg-gray-50"
+                                  className="px-3 py-2 bg-background"
                                 >
                                   <div className="space-y-4">
-                                    <p className="text-xs font-medium text-gray-600 uppercase tracking-wider">
-                                      Column A (Left) — Column B (Right) — Correct mapping
+                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                      Column A (Left) — Column B (Right) —
+                                      Correct mapping
                                     </p>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                       <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                                           Left column (keys)
                                         </label>
                                         {(q.leftColumn || ['', '']).map(
                                           (item: string, i: number) => (
-                                            <div key={i} className="flex gap-1 mb-1">
+                                            <div
+                                              key={i}
+                                              className="flex gap-1 mb-1"
+                                            >
                                               <input
                                                 type="text"
                                                 value={item}
                                                 onChange={e => {
-                                                  const arr = [...(q.leftColumn || ['', ''])];
+                                                  const arr = [
+                                                    ...(q.leftColumn || [
+                                                      '',
+                                                      '',
+                                                    ]),
+                                                  ];
                                                   arr[i] = e.target.value;
-                                                  updateQuestionExp(secIndex, qIndex, 'leftColumn', arr);
-                                                  const ans = (q.correctAnswer as number[]) || [];
-                                                  if (ans.length !== arr.length) {
+                                                  updateQuestionExp(
+                                                    secIndex,
+                                                    qIndex,
+                                                    'leftColumn',
+                                                    arr
+                                                  );
+                                                  const ans =
+                                                    (q.correctAnswer as number[]) ||
+                                                    [];
+                                                  if (
+                                                    ans.length !== arr.length
+                                                  ) {
                                                     updateQuestionExp(
                                                       secIndex,
                                                       qIndex,
                                                       'correctAnswer',
-                                                      arr.map((_, j) => ans[j] ?? 0)
+                                                      arr.map(
+                                                        (_, j) => ans[j] ?? 0
+                                                      )
                                                     );
                                                   }
                                                 }}
-                                                className="flex-1 rounded border border-gray-200 px-2 py-1.5 text-sm text-gray-900"
+                                                className="flex-1 rounded border border-border px-2 py-1.5 text-sm text-foreground"
                                                 placeholder={`Item ${i + 1}`}
                                               />
-                                              {(q.leftColumn?.length || 2) > 1 && (
+                                              {(q.leftColumn?.length || 2) >
+                                                1 && (
                                                 <button
                                                   type="button"
                                                   onClick={() => {
-                                                    const arr = (q.leftColumn || ['', '']).filter(
-                                                      (_: string, j: number) => j !== i
+                                                    const arr = (
+                                                      q.leftColumn || ['', '']
+                                                    ).filter(
+                                                      (_: string, j: number) =>
+                                                        j !== i
                                                     );
-                                                    const mapping = (q.correctAnswer as number[]) || [];
+                                                    const mapping =
+                                                      (q.correctAnswer as number[]) ||
+                                                      [];
                                                     const newMapping = mapping
-                                                      .filter((_: number, j: number) => j !== i)
-                                                      .map((v: number) => (v >= (q.options?.length || 0) ? 0 : v));
-                                                    const newSecs = [...sections];
-                                                    const qu = { ...(newSecs[secIndex].questions[qIndex] as any) };
-                                                    qu.leftColumn = arr.length ? arr : [''];
-                                                    qu.correctAnswer = newMapping.length ? newMapping : [0];
-                                                    newSecs[secIndex].questions[qIndex] = qu;
+                                                      .filter(
+                                                        (
+                                                          _: number,
+                                                          j: number
+                                                        ) => j !== i
+                                                      )
+                                                      .map((v: number) =>
+                                                        v >=
+                                                        (q.options?.length || 0)
+                                                          ? 0
+                                                          : v
+                                                      );
+                                                    const newSecs = [
+                                                      ...sections,
+                                                    ];
+                                                    const qu = {
+                                                      ...(newSecs[secIndex]
+                                                        .questions[
+                                                        qIndex
+                                                      ] as any),
+                                                    };
+                                                    qu.leftColumn = arr.length
+                                                      ? arr
+                                                      : [''];
+                                                    qu.correctAnswer =
+                                                      newMapping.length
+                                                        ? newMapping
+                                                        : [0];
+                                                    newSecs[secIndex].questions[
+                                                      qIndex
+                                                    ] = qu;
                                                     setSections(newSecs);
                                                   }}
                                                   className="text-red-500 hover:text-red-700"
@@ -648,49 +718,99 @@ export default function CreateTestPage() {
                                         <button
                                           type="button"
                                           onClick={() => {
-                                            const arr = [...(q.leftColumn || ['', '']), ''];
-                                            const mapping = [...((q.correctAnswer as number[]) || [0]), 0];
-                                            updateQuestionExp(secIndex, qIndex, 'leftColumn', arr);
-                                            updateQuestionExp(secIndex, qIndex, 'correctAnswer', mapping);
+                                            const arr = [
+                                              ...(q.leftColumn || ['', '']),
+                                              '',
+                                            ];
+                                            const mapping = [
+                                              ...((q.correctAnswer as number[]) || [
+                                                0,
+                                              ]),
+                                              0,
+                                            ];
+                                            updateQuestionExp(
+                                              secIndex,
+                                              qIndex,
+                                              'leftColumn',
+                                              arr
+                                            );
+                                            updateQuestionExp(
+                                              secIndex,
+                                              qIndex,
+                                              'correctAnswer',
+                                              mapping
+                                            );
                                           }}
-                                          className="text-xs text-indigo-600 hover:text-indigo-800"
+                                          className="text-xs text-primary hover:text-primary/90"
                                         >
                                           + Add left item
                                         </button>
                                       </div>
                                       <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-medium text-muted-foreground mb-1">
                                           Right column (values)
                                         </label>
                                         {(q.options || ['', '']).map(
                                           (opt: string, optIndex: number) => (
-                                            <div key={optIndex} className="flex gap-1 mb-1">
+                                            <div
+                                              key={optIndex}
+                                              className="flex gap-1 mb-1"
+                                            >
                                               <input
                                                 type="text"
                                                 value={opt}
                                                 onChange={e => {
-                                                  const arr = [...(q.options || ['', ''])];
-                                                  arr[optIndex] = e.target.value;
-                                                  updateQuestionExp(secIndex, qIndex, 'options', arr);
+                                                  const arr = [
+                                                    ...(q.options || ['', '']),
+                                                  ];
+                                                  arr[optIndex] =
+                                                    e.target.value;
+                                                  updateQuestionExp(
+                                                    secIndex,
+                                                    qIndex,
+                                                    'options',
+                                                    arr
+                                                  );
                                                 }}
-                                                className="flex-1 rounded border border-gray-200 px-2 py-1.5 text-sm text-gray-900"
+                                                className="flex-1 rounded border border-border px-2 py-1.5 text-sm text-foreground"
                                                 placeholder={`Option ${optIndex + 1}`}
                                               />
                                               {(q.options?.length || 2) > 1 && (
                                                 <button
                                                   type="button"
                                                   onClick={() => {
-                                                    const arr = (q.options || ['', '']).filter(
-                                                      (_: string, j: number) => j !== optIndex
+                                                    const arr = (
+                                                      q.options || ['', '']
+                                                    ).filter(
+                                                      (_: string, j: number) =>
+                                                        j !== optIndex
                                                     );
-                                                    const mapping = ((q.correctAnswer as number[]) || []).map(
-                                                      (v: number) => (v === optIndex ? 0 : v > optIndex ? v - 1 : v)
+                                                    const mapping = (
+                                                      (q.correctAnswer as number[]) ||
+                                                      []
+                                                    ).map((v: number) =>
+                                                      v === optIndex
+                                                        ? 0
+                                                        : v > optIndex
+                                                          ? v - 1
+                                                          : v
                                                     );
-                                                    const newSecs = [...sections];
-                                                    const qu = { ...(newSecs[secIndex].questions[qIndex] as any) };
-                                                    qu.options = arr.length ? arr : [''];
+                                                    const newSecs = [
+                                                      ...sections,
+                                                    ];
+                                                    const qu = {
+                                                      ...(newSecs[secIndex]
+                                                        .questions[
+                                                        qIndex
+                                                      ] as any),
+                                                    };
+                                                    qu.options = arr.length
+                                                      ? arr
+                                                      : [''];
                                                     qu.correctAnswer = mapping;
-                                                    newSecs[secIndex].questions[qIndex] = qu;
+                                                    newSecs[secIndex].questions[
+                                                      qIndex
+                                                    ] = qu;
                                                     setSections(newSecs);
                                                   }}
                                                   className="text-red-500 hover:text-red-700"
@@ -704,46 +824,81 @@ export default function CreateTestPage() {
                                         <button
                                           type="button"
                                           onClick={() => {
-                                            const arr = [...(q.options || ['', '']), ''];
-                                            updateQuestionExp(secIndex, qIndex, 'options', arr);
+                                            const arr = [
+                                              ...(q.options || ['', '']),
+                                              '',
+                                            ];
+                                            updateQuestionExp(
+                                              secIndex,
+                                              qIndex,
+                                              'options',
+                                              arr
+                                            );
                                           }}
-                                          className="text-xs text-indigo-600 hover:text-indigo-800"
+                                          className="text-xs text-primary hover:text-primary/90"
                                         >
                                           + Add right item
                                         </button>
                                       </div>
                                     </div>
                                     <div>
-                                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                                      <label className="block text-sm font-medium text-muted-foreground mb-1">
                                         Correct mapping (Column A → Column B)
                                       </label>
                                       <div className="flex flex-wrap gap-2">
-                                        {(q.leftColumn || ['', '']).map((_: string, leftIdx: number) => (
-                                          <div key={leftIdx} className="flex items-center gap-1">
-                                            <span className="text-xs text-gray-500">
-                                              {leftIdx + 1} →
-                                            </span>
-                                            <select
-                                              value={
-                                                Array.isArray(q.correctAnswer) && typeof (q.correctAnswer as number[])[leftIdx] === 'number'
-                                                  ? (q.correctAnswer as number[])[leftIdx]
-                                                  : 0
-                                              }
-                                              onChange={e => {
-                                                const mapping = [...((q.correctAnswer as number[]) || [0])];
-                                                mapping[leftIdx] = parseInt(e.target.value, 10);
-                                                updateQuestionExp(secIndex, qIndex, 'correctAnswer', mapping);
-                                              }}
-                                              className="rounded border border-green-200 bg-green-50 px-2 py-1 text-sm text-gray-900"
+                                        {(q.leftColumn || ['', '']).map(
+                                          (_: string, leftIdx: number) => (
+                                            <div
+                                              key={leftIdx}
+                                              className="flex items-center gap-1"
                                             >
-                                              {(q.options || ['', '']).map((opt: string, ri: number) => (
-                                                <option key={ri} value={ri}>
-                                                  {opt || `Option ${ri + 1}`}
-                                                </option>
-                                              ))}
-                                            </select>
-                                          </div>
-                                        ))}
+                                              <span className="text-xs text-muted-foreground">
+                                                {leftIdx + 1} →
+                                              </span>
+                                              <select
+                                                value={
+                                                  Array.isArray(
+                                                    q.correctAnswer
+                                                  ) &&
+                                                  typeof (
+                                                    q.correctAnswer as number[]
+                                                  )[leftIdx] === 'number'
+                                                    ? (
+                                                        q.correctAnswer as number[]
+                                                      )[leftIdx]
+                                                    : 0
+                                                }
+                                                onChange={e => {
+                                                  const mapping = [
+                                                    ...((q.correctAnswer as number[]) || [
+                                                      0,
+                                                    ]),
+                                                  ];
+                                                  mapping[leftIdx] = parseInt(
+                                                    e.target.value,
+                                                    10
+                                                  );
+                                                  updateQuestionExp(
+                                                    secIndex,
+                                                    qIndex,
+                                                    'correctAnswer',
+                                                    mapping
+                                                  );
+                                                }}
+                                                className="rounded border border-green-200 bg-green-50 px-2 py-1 text-sm text-foreground"
+                                              >
+                                                {(q.options || ['', '']).map(
+                                                  (opt: string, ri: number) => (
+                                                    <option key={ri} value={ri}>
+                                                      {opt ||
+                                                        `Option ${ri + 1}`}
+                                                    </option>
+                                                  )
+                                                )}
+                                              </select>
+                                            </div>
+                                          )
+                                        )}
                                       </div>
                                     </div>
                                   </div>
@@ -754,7 +909,7 @@ export default function CreateTestPage() {
                               <tr>
                                 <td
                                   colSpan={5}
-                                  className="px-3 py-2 bg-gray-50"
+                                  className="px-3 py-2 bg-background"
                                 >
                                   <input
                                     type="text"
@@ -767,7 +922,7 @@ export default function CreateTestPage() {
                                         e.target.value
                                       )
                                     }
-                                    className="block w-full rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm focus:border-green-500 focus:ring-green-500 text-gray-900"
+                                    className="block w-full rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm focus:border-green-500 focus:ring-green-500 text-foreground"
                                     placeholder="Expected Answer / Key"
                                   />
                                 </td>
@@ -781,8 +936,10 @@ export default function CreateTestPage() {
                   <div className="mt-4">
                     <button
                       type="button"
-                      onClick={() => { addQuestionExp(secIndex); }}
-                      className="w-full py-3 border-2 border-dashed border-gray-200 rounded-lg text-gray-400 hover:border-indigo-400 hover:text-indigo-500 transition-colors flex items-center justify-center gap-2 font-medium"
+                      onClick={() => {
+                        addQuestionExp(secIndex);
+                      }}
+                      className="w-full py-3 border-2 border-dashed border-border rounded-lg text-muted-foreground hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2 font-medium"
                     >
                       <Plus className="h-4 w-4" /> Add Question to{' '}
                       {section.title}
@@ -797,14 +954,14 @@ export default function CreateTestPage() {
             <button
               type="button"
               onClick={addSection}
-              className="flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-medium"
+              className="flex items-center gap-2 text-primary hover:text-primary/90 font-medium"
             >
               <Layers className="h-4 w-4" /> Add New Section
             </button>
 
             <button
               type="submit"
-              className="flex items-center gap-2 rounded-lg bg-indigo-600 px-8 py-3 text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 hover:shadow-xl transition-all font-medium"
+              className="flex items-center gap-2 rounded-lg gradient-primary px-8 py-3 text-white shadow-lg shadow-primary/20 hover:brightness-110 hover:shadow-xl transition-all font-medium"
             >
               <Save className="h-5 w-5" /> Publish Test
             </button>
@@ -815,19 +972,21 @@ export default function CreateTestPage() {
       {/* AI Assistant Modal */}
       {isAiModalOpen && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="bg-gradient-to-r from-violet-600 to-indigo-600 p-6 text-white flex justify-between items-start">
+          <div className="bg-card rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="gradient-primary p-6 text-white flex justify-between items-start">
               <div>
                 <h3 className="text-xl font-bold flex items-center gap-2">
                   <Sparkles className="h-5 w-5" />
                   AI Question Generator
                 </h3>
-                <p className="text-indigo-100 text-sm mt-1">
+                <p className="text-white/80 text-sm mt-1">
                   Autogenerate questions for {board} - {grade}
                 </p>
               </div>
               <button
-                onClick={() => { setIsAiModalOpen(false); }}
+                onClick={() => {
+                  setIsAiModalOpen(false);
+                }}
                 className="text-white/80 hover:text-white"
               >
                 <X className="h-6 w-6" />
@@ -836,14 +995,16 @@ export default function CreateTestPage() {
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
                   Topic / Chapter
                 </label>
                 <input
                   type="text"
                   value={aiTopic}
-                  onChange={e => { setAiTopic(e.target.value); }}
-                  className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900"
+                  onChange={e => {
+                    setAiTopic(e.target.value);
+                  }}
+                  className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground"
                   placeholder="e.g. Newton's Laws of Motion"
                   autoFocus
                 />
@@ -851,13 +1012,15 @@ export default function CreateTestPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Type
                   </label>
                   <select
                     value={aiType}
-                    onChange={e => { setAiType(e.target.value); }}
-                    className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 bg-white"
+                    onChange={e => {
+                      setAiType(e.target.value);
+                    }}
+                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground bg-card"
                   >
                     <option value="mixed">Mixed Types</option>
                     {QUESTION_TYPES.map(t => (
@@ -868,13 +1031,15 @@ export default function CreateTestPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
                     Difficulty
                   </label>
                   <select
                     value={aiDifficulty}
-                    onChange={e => { setAiDifficulty(e.target.value); }}
-                    className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 bg-white"
+                    onChange={e => {
+                      setAiDifficulty(e.target.value);
+                    }}
+                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground bg-card"
                   >
                     <option>Easy</option>
                     <option>Medium</option>
@@ -884,7 +1049,7 @@ export default function CreateTestPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-muted-foreground mb-1">
                   Number of Questions: {aiCount}
                 </label>
                 <input
@@ -892,15 +1057,17 @@ export default function CreateTestPage() {
                   min="1"
                   max="10"
                   value={aiCount}
-                  onChange={e => { setAiCount(parseInt(e.target.value)); }}
-                  className="w-full accent-indigo-600"
+                  onChange={e => {
+                    setAiCount(parseInt(e.target.value));
+                  }}
+                  className="w-full accent-primary"
                 />
               </div>
 
               <button
                 onClick={handleAiGenerate}
                 disabled={isGenerating || !aiTopic}
-                className="w-full mt-4 flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full mt-4 flex items-center justify-center gap-2 gradient-primary text-white py-3 rounded-lg hover:brightness-110 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isGenerating ? (
                   <>

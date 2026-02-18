@@ -42,8 +42,10 @@ export default async function StudentDashboard() {
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Student Dashboard</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-3xl font-bold text-foreground">
+          Student Dashboard
+        </h1>
+        <p className="text-muted-foreground mt-1">
           Available tests for you to attempt.
         </p>
         {(!user?.board || !user?.grade) && (
@@ -74,18 +76,18 @@ export default async function StudentDashboard() {
         {tests.map((test: any) => (
           <Card
             key={test._id}
-            className="hover:shadow-md transition-shadow group border-gray-100"
+            className="hover:shadow-md transition-shadow group border-border"
           >
             <CardHeader className="pb-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="font-semibold text-lg text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  <CardTitle className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
                     {test.title}
                   </CardTitle>
                   <div className="flex flex-wrap gap-2 mt-2">
                     <Badge
                       variant="secondary"
-                      className="bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                      className="bg-violet-light text-primary hover:bg-violet-light/80"
                     >
                       {test.subject}
                     </Badge>
@@ -105,7 +107,7 @@ export default async function StudentDashboard() {
               </div>
             </CardHeader>
             <CardContent className="pb-4">
-              <div className="text-sm text-gray-500 space-y-2">
+              <div className="text-sm text-muted-foreground space-y-2">
                 <p>
                   {(test.questions?.length || 0) +
                     (test.sections?.reduce(
@@ -119,7 +121,7 @@ export default async function StudentDashboard() {
               </div>
             </CardContent>
             <CardFooter className="pt-0">
-              <Button asChild variant="indigo" className="w-full">
+              <Button asChild variant="gradient" className="w-full">
                 <Link href={`/student/test/${test._id}`}>
                   <Play className="h-4 w-4 mr-2" />
                   Start Test
@@ -130,7 +132,7 @@ export default async function StudentDashboard() {
         ))}
 
         {tests.length === 0 && (
-          <div className="col-span-full text-center py-12 bg-white rounded-xl border border-dashed border-gray-300 text-gray-500">
+          <div className="col-span-full text-center py-12 bg-card rounded-xl border border-dashed border-border text-muted-foreground">
             No tests available at the moment.
           </div>
         )}

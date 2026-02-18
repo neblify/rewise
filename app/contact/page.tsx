@@ -19,19 +19,19 @@ export default function ContactPage() {
   );
 
   return (
-    <div className="bg-white px-6 py-24 sm:py-32 lg:px-8">
+    <div className="bg-card px-6 py-24 sm:py-32 lg:px-8">
       <div className="mx-auto max-w-2xl text-center">
         <Link
           href="/"
-          className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 mb-6"
+          className="inline-flex items-center text-sm text-primary hover:text-primary/90 mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Home
         </Link>
-        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+        <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
           Contact Us
         </h2>
-        <p className="mt-2 text-lg leading-8 text-gray-600">
+        <p className="mt-2 text-lg leading-8 text-muted-foreground">
           Have feedback, found an issue, or want to request a feature? We'd love
           to hear from you.
         </p>
@@ -42,7 +42,7 @@ export default function ContactPage() {
           <div className="sm:col-span-2">
             <label
               htmlFor="email"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-foreground"
             >
               Email (Optional)
             </label>
@@ -53,7 +53,7 @@ export default function ContactPage() {
                 id="email"
                 autoComplete="email"
                 placeholder="you@example.com (if you want a reply)"
-                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-foreground shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
               />
               {state.errors?.email && (
                 <p className="mt-1 text-sm text-red-600">
@@ -66,7 +66,7 @@ export default function ContactPage() {
           <div className="sm:col-span-2">
             <label
               htmlFor="subject"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-foreground"
             >
               Subject
             </label>
@@ -76,7 +76,7 @@ export default function ContactPage() {
                 name="subject"
                 id="subject"
                 placeholder="Feature Request / Bug Report"
-                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-foreground shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
               />
               {state.errors?.subject && (
                 <p className="mt-1 text-sm text-red-600">
@@ -89,7 +89,7 @@ export default function ContactPage() {
           <div className="sm:col-span-2">
             <label
               htmlFor="message"
-              className="block text-sm font-semibold leading-6 text-gray-900"
+              className="block text-sm font-semibold leading-6 text-foreground"
             >
               Message <span className="text-red-500">*</span>
             </label>
@@ -100,7 +100,7 @@ export default function ContactPage() {
                 rows={4}
                 required
                 placeholder="Tell us what's on your mind..."
-                className="block w-full rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 px-3.5 py-2 text-foreground shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
               />
               {state.errors?.message && (
                 <p className="mt-1 text-sm text-red-600">
@@ -140,7 +140,7 @@ export default function ContactPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+              className="block w-full rounded-md gradient-primary px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:brightness-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
             >
               {isPending ? (
                 <>

@@ -103,9 +103,9 @@ export default function DeleteTestButton({
             <AlertDialogTitle>Delete Test</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-4 text-sm">
-                <div className="text-gray-700">
+                <div className="text-muted-foreground">
                   Are you sure you want to delete{' '}
-                  <span className="font-semibold text-gray-900">
+                  <span className="font-semibold text-foreground">
                     &quot;{testTitle}&quot;
                   </span>
                   ?
@@ -125,9 +125,9 @@ export default function DeleteTestButton({
                       <Checkbox
                         id="delete-results"
                         checked={deleteResults}
-                        onCheckedChange={(checked: boolean) =>
-                          { setDeleteResults(checked); }
-                        }
+                        onCheckedChange={(checked: boolean) => {
+                          setDeleteResults(checked);
+                        }}
                         className="mt-1"
                       />
                       <label

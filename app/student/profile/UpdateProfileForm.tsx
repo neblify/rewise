@@ -38,7 +38,7 @@ export default function UpdateProfileForm({
       <div>
         <label
           htmlFor="board"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-medium text-foreground"
         >
           Board
         </label>
@@ -47,8 +47,10 @@ export default function UpdateProfileForm({
           id="board"
           required
           value={board}
-          onChange={e => { setBoard(e.target.value); }}
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+          onChange={e => {
+            setBoard(e.target.value);
+          }}
+          className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary"
         >
           <option value="">Select Board</option>
           {BOARDS.map(b => (
@@ -62,7 +64,7 @@ export default function UpdateProfileForm({
       <div>
         <label
           htmlFor="grade"
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-medium text-foreground"
         >
           Grade / Class
         </label>
@@ -72,7 +74,7 @@ export default function UpdateProfileForm({
           required
           defaultValue={initialGrade}
           key={board} // Reset when board changes
-          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500"
+          className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary"
         >
           <option value="">Select Grade</option>
           {gradeOptions.map(option => (
@@ -87,7 +89,7 @@ export default function UpdateProfileForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white gradient-primary hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
         >
           {isSubmitting ? 'Saving...' : 'Save Profile'}
         </button>

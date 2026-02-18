@@ -91,8 +91,7 @@ export async function deleteQuestion(questionId: string) {
   if (!result) {
     return {
       success: false,
-      message:
-        'Question not found or you do not have permission to delete it',
+      message: 'Question not found or you do not have permission to delete it',
     };
   }
 

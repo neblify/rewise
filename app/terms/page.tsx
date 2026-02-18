@@ -3,32 +3,32 @@ import { ArrowLeft } from 'lucide-react';
 
 export default function TermsOfService() {
   return (
-    <div className="bg-white px-6 py-32 lg:px-8">
-      <div className="mx-auto max-w-3xl text-base leading-7 text-gray-700">
+    <div className="bg-card px-6 py-32 lg:px-8">
+      <div className="mx-auto max-w-3xl text-base leading-7 text-muted-foreground">
         <div className="mb-8">
           <Link
             href="/"
-            className="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-500 mb-6"
+            className="inline-flex items-center text-sm text-primary hover:text-primary/90 mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Home
           </Link>
-          <p className="text-base font-semibold leading-7 text-indigo-600">
+          <p className="text-base font-semibold leading-7 text-primary">
             Legal
           </p>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Terms of Service
           </h1>
-          <p className="mt-6 text-xl leading-8 text-gray-700">
+          <p className="mt-6 text-xl leading-8 text-muted-foreground">
             **Effective Date:** January 28, 2026
           </p>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-muted-foreground">
             **Website:** https://rewise.vercel.app/ ("we", "us", "our",
             "ReWise", "the Service")
           </p>
         </div>
 
-        <div className="prose prose-indigo max-w-none space-y-8">
+        <div className="prose max-w-none space-y-8">
           <p>
             Please read these Terms of Service ("Terms", "Agreement") carefully
             before using the website https://rewise.vercel.app/ or any
@@ -40,7 +40,7 @@ export default function TermsOfService() {
             not use the Service.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             1. Acceptance of Terms
           </h2>
           <p>
@@ -50,14 +50,13 @@ export default function TermsOfService() {
             the Service, you represent that you meet this age requirement.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             2. Description of the Service
           </h2>
           <p>
-            ReWise is a free educational platform that provides study
-            materials, notes, practice questions, mock tests, and other
-            resources intended to help students prepare for their
-            examinations.
+            ReWise is a free educational platform that provides study materials,
+            notes, practice questions, mock tests, and other resources intended
+            to help students prepare for their examinations.
           </p>
           <p>
             <strong>
@@ -66,7 +65,7 @@ export default function TermsOfService() {
             </strong>
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             3. User Conduct
           </h2>
           <p>
@@ -108,7 +107,7 @@ export default function TermsOfService() {
             </li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             4. Intellectual Property
           </h2>
           <p>
@@ -148,7 +147,7 @@ export default function TermsOfService() {
             Any unauthorized use terminates the license granted herein.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             5. User-Generated Content (if applicable)
           </h2>
           <p>
@@ -167,7 +166,7 @@ export default function TermsOfService() {
             discretion.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             6. Accuracy of Information
           </h2>
           <p>
@@ -197,7 +196,7 @@ export default function TermsOfService() {
             official sources.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             7. Third-Party Links & Resources
           </h2>
           <p>
@@ -207,7 +206,7 @@ export default function TermsOfService() {
             these external sites.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             8. Disclaimer of Warranties
           </h2>
           <p>
@@ -217,7 +216,7 @@ export default function TermsOfService() {
             PURPOSE, NON-INFRINGEMENT, ACCURACY, RELIABILITY, OR AVAILABILITY.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             9. Limitation of Liability
           </h2>
           <p>
@@ -240,7 +239,7 @@ export default function TermsOfService() {
             <li>ANY ERRORS OR OMISSIONS IN ANY CONTENT</li>
           </ul>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             10. Termination
           </h2>
           <p>
@@ -249,7 +248,7 @@ export default function TermsOfService() {
             of these Terms.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             11. Changes to the Terms
           </h2>
           <p>
@@ -260,7 +259,7 @@ export default function TermsOfService() {
             acceptance of the new Terms.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             12. Governing Law
           </h2>
           <p>
@@ -273,7 +272,7 @@ export default function TermsOfService() {
             <strong>Mumbai, Maharashtra, India</strong>.
           </p>
 
-          <h2 className="text-2xl font-bold text-gray-900 mt-10">
+          <h2 className="text-2xl font-bold text-foreground mt-10">
             13. Contact Us
           </h2>
           <p>
@@ -281,8 +280,8 @@ export default function TermsOfService() {
             <strong> support@neblify.com </strong>
           </p>
 
-          <hr className="my-10 border-gray-200" />
-          <p className="text-sm text-gray-500">
+          <hr className="my-10 border-border" />
+          <p className="text-sm text-muted-foreground">
             Last updated: January 28, 2026
           </p>
         </div>

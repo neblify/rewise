@@ -11,7 +11,10 @@ const onboardingSchema = z.object({
   role: z.enum(['student', 'teacher', 'parent']),
 });
 
-export async function completeOnboarding(prevState: unknown, formData: FormData) {
+export async function completeOnboarding(
+  prevState: unknown,
+  formData: FormData
+) {
   const { userId } = await currentAuth();
 
   if (!userId) {

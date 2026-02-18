@@ -10,7 +10,7 @@ interface NavbarProps {
 
 export default function Navbar({ variant = 'student' }: NavbarProps) {
   return (
-    <nav className="sticky top-0 z-50 bg-white border-b border-gray-200">
+    <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b-2 border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center gap-8">
@@ -27,60 +27,22 @@ export default function Navbar({ variant = 'student' }: NavbarProps) {
             <div className="hidden md:flex items-center gap-4">
               {variant === 'student' ? (
                 <>
-                  <Link
-                    href="/student"
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/student/results"
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                  >
-                    My Results
-                  </Link>
-                  <Link
-                    href="/student/profile"
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                  >
-                    Profile
-                  </Link>
+                  <NavLink href="/student">Dashboard</NavLink>
+                  <NavLink href="/student/results">My Results</NavLink>
+                  <NavLink href="/student/profile">Profile</NavLink>
                 </>
               ) : variant === 'teacher' ? (
                 <>
-                  <Link
-                    href="/dashboard"
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/teacher"
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                  >
-                    All Tests
-                  </Link>
-                  <Link
-                    href="/teacher/questions"
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                  >
-                    Question Bank
-                  </Link>
-                  <Link
-                    href="/teacher/create-test"
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                  >
-                    Create Test
-                  </Link>
+                  <NavLink href="/dashboard">Dashboard</NavLink>
+                  <NavLink href="/teacher">All Tests</NavLink>
+                  <NavLink href="/teacher/questions">Question Bank</NavLink>
+                  <NavLink href="/teacher/create-test">Create Test</NavLink>
                 </>
               ) : (
                 <>
-                  <Link
-                    href={variant === 'parent' ? '/parent' : '/admin'}
-                    className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                  >
+                  <NavLink href={variant === 'parent' ? '/parent' : '/admin'}>
                     {variant === 'parent' ? 'Dashboard' : 'Overview'}
-                  </Link>
+                  </NavLink>
                 </>
               )}
             </div>
@@ -98,5 +60,22 @@ export default function Navbar({ variant = 'student' }: NavbarProps) {
         </div>
       </div>
     </nav>
+  );
+}
+
+function NavLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className="relative text-sm font-semibold text-muted-foreground hover:text-primary transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full"
+    >
+      {children}
+    </Link>
   );
 }

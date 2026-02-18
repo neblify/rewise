@@ -18,10 +18,10 @@ export function DevTools() {
   if (!isDev) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-[100] p-4 bg-white/90 backdrop-blur shadow-xl rounded-lg border border-indigo-200 w-64">
-      <div className="text-xs font-bold text-indigo-600 mb-2 uppercase tracking-wider flex justify-between items-center">
+    <div className="fixed bottom-4 right-4 z-[100] p-4 bg-card/90 backdrop-blur shadow-xl rounded-lg border border-border w-64">
+      <div className="text-xs font-bold text-primary mb-2 uppercase tracking-wider flex justify-between items-center">
         <span>Dev Tools</span>
-        <span className="text-[10px] bg-indigo-100 px-1.5 py-0.5 rounded">
+        <span className="text-[10px] bg-violet-light px-1.5 py-0.5 rounded">
           Local
         </span>
       </div>
@@ -32,7 +32,7 @@ export function DevTools() {
             await loginAsRole('teacher');
           }}
         >
-          <button className="w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 rounded-md text-gray-700 hover:text-indigo-700 font-medium transition-colors border border-transparent hover:border-indigo-100 flex items-center gap-2">
+          <button className="w-full text-left px-3 py-2 text-sm hover:bg-violet-light rounded-md text-muted-foreground hover:text-primary font-medium transition-colors border border-transparent hover:border-border flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-500"></span>
             Login as Teacher
           </button>
@@ -43,7 +43,7 @@ export function DevTools() {
             await loginAsRole('student');
           }}
         >
-          <button className="w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 rounded-md text-gray-700 hover:text-indigo-700 font-medium transition-colors border border-transparent hover:border-indigo-100 flex items-center gap-2">
+          <button className="w-full text-left px-3 py-2 text-sm hover:bg-violet-light rounded-md text-muted-foreground hover:text-primary font-medium transition-colors border border-transparent hover:border-border flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-green-500"></span>
             Login as Student
           </button>
@@ -54,7 +54,7 @@ export function DevTools() {
             await loginAsRole('parent');
           }}
         >
-          <button className="w-full text-left px-3 py-2 text-sm hover:bg-indigo-50 rounded-md text-gray-700 hover:text-indigo-700 font-medium transition-colors border border-transparent hover:border-indigo-100 flex items-center gap-2">
+          <button className="w-full text-left px-3 py-2 text-sm hover:bg-violet-light rounded-md text-muted-foreground hover:text-primary font-medium transition-colors border border-transparent hover:border-border flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-purple-500"></span>
             Login as Parent
           </button>
@@ -66,7 +66,7 @@ export function DevTools() {
             await clearMockSession();
           }}
         >
-          <button className="w-full text-left px-3 py-2 text-sm hover:bg-red-50 rounded-md text-red-600 hover:text-red-700 font-medium border-t border-gray-100 mt-1 pt-2 transition-colors flex items-center gap-2">
+          <button className="w-full text-left px-3 py-2 text-sm hover:bg-red-50 rounded-md text-red-600 hover:text-red-700 font-medium border-t border-border mt-1 pt-2 transition-colors flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-red-500"></span>
             Clear Session
           </button>

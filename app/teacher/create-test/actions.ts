@@ -80,7 +80,8 @@ export async function createTest(prevState: unknown, formData: FormData) {
     // Check approximate size (rough estimate: JSON string length in bytes)
     if (sectionsString && sectionsString.length > 4.5 * 1024 * 1024) {
       return {
-        message: 'Test data is too large. Please reduce the number of questions, remove large images, or shorten question text.',
+        message:
+          'Test data is too large. Please reduce the number of questions, remove large images, or shorten question text.',
       };
     }
 
@@ -169,7 +170,8 @@ export async function updateTest(prevState: unknown, formData: FormData) {
     // Check approximate size (rough estimate: JSON string length in bytes)
     if (sectionsString && sectionsString.length > 4.5 * 1024 * 1024) {
       return {
-        message: 'Test data is too large. Please reduce the number of questions, remove large images, or shorten question text.',
+        message:
+          'Test data is too large. Please reduce the number of questions, remove large images, or shorten question text.',
       };
     }
 

@@ -110,32 +110,32 @@ export default async function QuestionBankPage(props: Props) {
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Question Bank</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-foreground">Question Bank</h1>
+          <p className="text-muted-foreground mt-1">
             Browse, filter, and edit questions across all tests.
           </p>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-card rounded-xl shadow-sm border border-border overflow-hidden">
         {/* Filters Toolbar */}
-        <div className="p-4 border-b border-gray-200 bg-gray-50/50">
+        <div className="p-4 border-b border-border bg-background">
           <form className="flex flex-col md:flex-row gap-4 flex-wrap">
             <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 z-10" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
               <Input
                 type="text"
                 name="query"
                 placeholder="Search questions..."
                 defaultValue={query}
-                className="pl-10 bg-white"
+                className="pl-10 bg-card"
               />
             </div>
 
             <select
               name="subject"
               defaultValue={subject}
-              className="px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white h-10 min-w-[140px]"
+              className="px-3 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-card h-10 min-w-[140px]"
             >
               <option value="">All Subjects</option>
               {subjects.filter(Boolean).map((s: string) => (
@@ -148,7 +148,7 @@ export default async function QuestionBankPage(props: Props) {
             <select
               name="board"
               defaultValue={board}
-              className="px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white h-10 min-w-[140px]"
+              className="px-3 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-card h-10 min-w-[140px]"
             >
               <option value="">All Boards</option>
               {boards.filter(Boolean).map((b: string) => (
@@ -161,7 +161,7 @@ export default async function QuestionBankPage(props: Props) {
             <select
               name="grade"
               defaultValue={grade}
-              className="px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white h-10 min-w-[140px]"
+              className="px-3 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-card h-10 min-w-[140px]"
             >
               <option value="">All Grades</option>
               {grades.filter(Boolean).map((g: string) => (
@@ -174,7 +174,7 @@ export default async function QuestionBankPage(props: Props) {
             <select
               name="type"
               defaultValue={type}
-              className="px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white h-10 min-w-[140px]"
+              className="px-3 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-card h-10 min-w-[140px]"
             >
               <option value="">All Types</option>
               {types.filter(Boolean).map((t: string) => (
@@ -187,7 +187,7 @@ export default async function QuestionBankPage(props: Props) {
             <select
               name="sort"
               defaultValue={sort}
-              className="px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm bg-white h-10 min-w-[160px]"
+              className="px-3 py-2 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:border-primary text-sm bg-card h-10 min-w-[160px]"
             >
               <option value="createdAt_desc">Newest First</option>
               <option value="createdAt_asc">Oldest First</option>
@@ -198,14 +198,14 @@ export default async function QuestionBankPage(props: Props) {
             <Button
               type="submit"
               variant="secondary"
-              className="border border-gray-200 bg-white hover:bg-gray-50 text-gray-700"
+              className="border border-border bg-card hover:bg-muted text-foreground"
             >
               Apply
             </Button>
             <Button
               asChild
               variant="ghost"
-              className="text-gray-500 hover:text-gray-700"
+              className="text-muted-foreground hover:text-foreground"
             >
               <Link href="/teacher/questions">Clear</Link>
             </Button>
@@ -221,8 +221,8 @@ export default async function QuestionBankPage(props: Props) {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-gray-600">
-            <thead className="bg-gray-50 text-xs uppercase font-medium text-gray-500">
+          <table className="w-full text-left text-sm text-muted-foreground">
+            <thead className="bg-background text-xs uppercase font-medium text-muted-foreground">
               <tr>
                 <th className="px-6 py-4">Question Text</th>
                 <th className="px-6 py-4">Type</th>
@@ -234,12 +234,12 @@ export default async function QuestionBankPage(props: Props) {
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-border">
               {displayQuestions.length === 0 ? (
                 <tr>
                   <td
                     colSpan={8}
-                    className="px-6 py-12 text-center text-gray-500"
+                    className="px-6 py-12 text-center text-muted-foreground"
                   >
                     No questions found matching your filters.
                   </td>
@@ -252,9 +252,9 @@ export default async function QuestionBankPage(props: Props) {
                   return (
                     <tr
                       key={q._id.toString()}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-muted transition-colors"
                     >
-                      <td className="px-6 py-4 font-medium text-gray-900 max-w-xs">
+                      <td className="px-6 py-4 font-medium text-foreground max-w-xs">
                         <span title={q.text}>
                           {q.text.length > 80
                             ? q.text.slice(0, 80) + '...'
@@ -264,7 +264,7 @@ export default async function QuestionBankPage(props: Props) {
                       <td className="px-6 py-4">
                         <Badge
                           variant="outline"
-                          className="font-medium text-gray-700 bg-white whitespace-nowrap"
+                          className="font-medium text-foreground bg-card whitespace-nowrap"
                         >
                           {q.type
                             .replace(/_/g, ' ')
@@ -276,7 +276,7 @@ export default async function QuestionBankPage(props: Props) {
                         <div className="flex flex-col gap-0.5">
                           <span>{q.board || '-'}</span>
                           {q.grade && (
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-muted-foreground">
                               {formatGrade(q.board, q.grade)}
                             </span>
                           )}
@@ -289,7 +289,7 @@ export default async function QuestionBankPage(props: Props) {
                             variant="outline"
                             className={
                               DIFFICULTY_COLORS[q.difficulty] ||
-                              'bg-gray-100 text-gray-700 border-gray-200'
+                              'bg-muted text-foreground border-border'
                             }
                           >
                             {q.difficulty.charAt(0).toUpperCase() +
@@ -299,7 +299,7 @@ export default async function QuestionBankPage(props: Props) {
                           '-'
                         )}
                       </td>
-                      <td className="px-6 py-4 text-xs text-gray-500 whitespace-nowrap">
+                      <td className="px-6 py-4 text-xs text-muted-foreground whitespace-nowrap">
                         {formatDate(q.createdAt)}
                       </td>
                       <td className="px-6 py-4 text-right">

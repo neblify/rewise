@@ -21,39 +21,39 @@ export default async function StudentResults() {
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">My Results</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-3xl font-bold text-foreground">My Results</h1>
+        <p className="text-muted-foreground mt-1">
           History of your test attempts and performance.
         </p>
       </div>
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
         {results.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-border">
+              <thead className="bg-background">
                 <tr>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Test Name
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Date
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Score
                   </th>
                   <th
                     scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
                   >
                     Performance
                   </th>
@@ -62,14 +62,14 @@ export default async function StudentResults() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-card divide-y divide-border">
                 {results.map((result: any) => {
                   const percentage =
                     result.maxScore > 0
                       ? Math.round((result.totalScore / result.maxScore) * 100)
                       : 0;
 
-                  let gradeColor = 'bg-gray-100 text-gray-800';
+                  let gradeColor = 'bg-muted text-muted-foreground';
                   if (percentage >= 80)
                     gradeColor = 'bg-green-100 text-green-800';
                   else if (percentage >= 60)
@@ -81,33 +81,35 @@ export default async function StudentResults() {
                   return (
                     <tr
                       key={result._id}
-                      className="hover:bg-gray-50 transition-colors"
+                      className="hover:bg-muted transition-colors"
                     >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 bg-indigo-50 rounded-lg flex items-center justify-center text-indigo-600">
+                          <div className="flex-shrink-0 h-10 w-10 bg-violet-light rounded-lg flex items-center justify-center text-primary">
                             <FileText className="h-5 w-5" />
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-foreground">
                               {result.testId?.title || 'Unknown Test'}
                             </div>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm text-muted-foreground">
                               {result.testId?.subject || 'Subject'}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-foreground">
                           {formatDate(result.createdAt)}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900 font-medium">
+                        <div className="text-sm text-foreground font-medium">
                           {result.totalScore} / {result.maxScore}
                         </div>
-                        <div className="text-xs text-gray-500">Marks</div>
+                        <div className="text-xs text-muted-foreground">
+                          Marks
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
@@ -119,7 +121,7 @@ export default async function StudentResults() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link
                           href={`/student/result/${result._id}`}
-                          className="text-indigo-600 hover:text-indigo-900 flex items-center justify-end gap-1 hover:gap-2 transition-all"
+                          className="text-primary hover:text-primary/90 flex items-center justify-end gap-1 hover:gap-2 transition-all"
                         >
                           View <ArrowRight className="h-4 w-4" />
                         </Link>
@@ -132,16 +134,16 @@ export default async function StudentResults() {
           </div>
         ) : (
           <div className="text-center py-12 px-4">
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
+            <h3 className="mt-2 text-sm font-medium text-foreground">
               No results found
             </h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="mt-1 text-sm text-muted-foreground">
               You haven't taken any tests yet.
             </p>
             <div className="mt-6">
               <Link
                 href="/student"
-                className="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 Go to Dashboard
               </Link>

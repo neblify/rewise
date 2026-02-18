@@ -113,14 +113,14 @@ export default async function Dashboard() {
     .slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-gray-50/50 p-8">
+    <div className="min-h-screen bg-background/50 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-foreground">
             Teacher Dashboard
           </h1>
-          <p className="text-gray-500">
+          <p className="text-muted-foreground">
             Overview of your assessments, student engagement, and performance
             metrics.
           </p>
@@ -131,9 +131,9 @@ export default async function Dashboard() {
           <MetricCard
             title="Total Tests"
             value={inventoryCount}
-            icon={<BookOpen className="w-5 h-5 text-indigo-600" />}
+            icon={<BookOpen className="w-5 h-5 text-primary" />}
             subtext="Authored by you"
-            color="bg-indigo-50"
+            color="bg-violet-light"
           />
           <MetricCard
             title="Total Attempts"
@@ -164,10 +164,10 @@ export default async function Dashboard() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Chart Area: Attempts over time */}
-          <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+          <div className="lg:col-span-2 bg-card p-6 rounded-xl shadow-sm border border-border">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-gray-400" />
+              <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-muted-foreground" />
                 Activity Trend (Last 7 Days)
               </h3>
             </div>
@@ -182,19 +182,19 @@ export default async function Dashboard() {
                     className="flex flex-col items-center gap-2 flex-1 group"
                   >
                     <div
-                      className="relative w-full bg-indigo-50 rounded-t-lg hover:bg-indigo-100 transition-colors flex items-end justify-center"
+                      className="relative w-full bg-violet-light rounded-t-lg hover:bg-violet-light/80 transition-colors flex items-end justify-center"
                       style={{ height: '100%' }}
                     >
                       <div
-                        className="w-full mx-1 bg-indigo-600 rounded-t-sm opacity-80 group-hover:opacity-100 transition-all relative"
+                        className="w-full mx-1 bg-primary rounded-t-sm opacity-80 group-hover:opacity-100 transition-all relative"
                         style={{ height: `${height}%`, minHeight: '4px' }}
                       >
-                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                           {d.count} Attempts
                         </div>
                       </div>
                     </div>
-                    <span className="text-xs text-gray-500 font-medium rotate-0 truncate w-full text-center">
+                    <span className="text-xs text-muted-foreground font-medium rotate-0 truncate w-full text-center">
                       {new Date(d.date).toLocaleDateString(undefined, {
                         weekday: 'short',
                       })}
@@ -206,12 +206,12 @@ export default async function Dashboard() {
           </div>
 
           {/* Side Panel: Difficulty Index */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="bg-card p-6 rounded-xl shadow-sm border border-border flex flex-col">
+            <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-amber-500" />
               Fields of Focus
             </h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               Tests with the lowest average scores, indicating areas where
               students struggle.
             </p>
@@ -222,18 +222,18 @@ export default async function Dashboard() {
                   {difficultyList.map((test, i) => (
                     <div
                       key={i}
-                      className="p-3 rounded-lg border border-gray-100 bg-gray-50 hover:bg-gray-100 transition-colors"
+                      className="p-3 rounded-lg border border-border bg-background hover:bg-muted transition-colors"
                     >
                       <div className="flex justify-between items-start mb-2">
                         <h4
-                          className="font-medium text-gray-900 text-sm line-clamp-1"
+                          className="font-medium text-foreground text-sm line-clamp-1"
                           title={test.title}
                         >
                           {test.title}
                         </h4>
                       </div>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-500">
+                        <span className="text-muted-foreground">
                           {test.attempts} attempts
                         </span>
                         <span
@@ -247,7 +247,7 @@ export default async function Dashboard() {
                         </span>
                       </div>
                       {/* Mini progress bar */}
-                      <div className="w-full bg-gray-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                      <div className="w-full bg-border h-1.5 rounded-full mt-2 overflow-hidden">
                         <div
                           className={`h-full rounded-full ${test.avg < 40 ? 'bg-red-500' : 'bg-amber-500'}`}
                           style={{ width: `${test.avg}%` }}
@@ -257,16 +257,16 @@ export default async function Dashboard() {
                   ))}
                 </div>
               ) : (
-                <div className="h-full flex flex-col items-center justify-center text-center text-gray-400 italic">
+                <div className="h-full flex flex-col items-center justify-center text-center text-muted-foreground italic">
                   <p>No attempts recorded yet.</p>
                 </div>
               )}
             </div>
 
-            <div className="mt-4 pt-4 border-t border-gray-100">
+            <div className="mt-4 pt-4 border-t border-border">
               <Link
                 href="/teacher"
-                className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center justify-center"
+                className="text-sm text-primary hover:text-primary/90 font-medium flex items-center justify-center"
               >
                 View All Tests &rarr;
               </Link>
@@ -288,16 +288,18 @@ interface MetricCardProps {
 
 function MetricCard({ title, value, icon, subtext, color }: MetricCardProps) {
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 transition-all hover:shadow-md">
+    <div className="bg-card p-6 rounded-xl shadow-sm border border-border transition-all hover:shadow-md">
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-500">{title}</p>
-          <h3 className="text-2xl font-bold text-gray-900 mt-1">{value}</h3>
+          <p className="text-sm font-medium text-muted-foreground">{title}</p>
+          <h3 className="text-2xl font-bold text-foreground mt-1">{value}</h3>
         </div>
         <div className={`p-2 rounded-lg ${color}`}>{icon}</div>
       </div>
       {subtext && (
-        <p className="text-xs text-gray-500 mt-3 font-medium">{subtext}</p>
+        <p className="text-xs text-muted-foreground mt-3 font-medium">
+          {subtext}
+        </p>
       )}
     </div>
   );

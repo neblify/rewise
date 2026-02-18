@@ -117,7 +117,7 @@ export default function EditQuestionButton({
         onClick={() => setOpen(true)}
         variant="ghost"
         size="sm"
-        className="text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 font-medium"
+        className="text-primary hover:text-primary/90 hover:bg-violet-light font-medium"
       >
         <Pencil className="h-3.5 w-3.5 mr-1" />
         Edit
@@ -137,7 +137,7 @@ export default function EditQuestionButton({
                 value={text}
                 onChange={e => setText(e.target.value)}
                 rows={3}
-                className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
               />
             </div>
 
@@ -148,7 +148,7 @@ export default function EditQuestionButton({
                   id="type"
                   value={type}
                   onChange={e => setType(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-10"
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary h-10"
                 >
                   {Object.values(QuestionType).map(t => (
                     <option key={t} value={t}>
@@ -231,7 +231,7 @@ export default function EditQuestionButton({
                   id="board"
                   value={board}
                   onChange={e => handleBoardChange(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-10"
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary h-10"
                 >
                   <option value="">Select Board</option>
                   {BOARDS.map(b => (
@@ -248,7 +248,7 @@ export default function EditQuestionButton({
                   id="grade"
                   value={grade}
                   onChange={e => setGrade(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-10"
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary h-10"
                   disabled={!board}
                 >
                   <option value="">Select Grade</option>
@@ -266,7 +266,7 @@ export default function EditQuestionButton({
                   id="difficulty"
                   value={difficulty}
                   onChange={e => setDifficulty(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-gray-200 px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-10"
+                  className="mt-1 w-full rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-primary focus:border-primary h-10"
                 >
                   <option value="easy">Easy</option>
                   <option value="medium">Medium</option>
@@ -301,7 +301,11 @@ export default function EditQuestionButton({
             >
               Cancel
             </Button>
-            <Button onClick={handleSave} disabled={isPending} variant="indigo">
+            <Button
+              onClick={handleSave}
+              disabled={isPending}
+              variant="gradient"
+            >
               {isPending ? 'Saving...' : 'Save Changes'}
             </Button>
           </DialogFooter>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Nunito, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -9,13 +9,13 @@ import { Footer } from './_components/landing/Footer';
 
 import { DevTools } from './_components/DevTools';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const nunito = Nunito({
+  variable: '--font-nunito',
   subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-jetbrains-mono',
   subsets: ['latin'],
 });
 
@@ -30,14 +30,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: '#7A1FC9',
+          borderRadius: '1rem',
+          fontFamily: 'Nunito, system-ui, sans-serif',
+        },
+      }}
+    >
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${nunito.variable} ${jetbrainsMono.variable} antialiased`}
         >
           <a
             href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-white focus:text-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-white focus:text-primary focus:outline-none focus:ring-2 focus:ring-primary"
           >
             Skip to main content
           </a>
