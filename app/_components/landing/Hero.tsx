@@ -19,22 +19,46 @@ export function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
             >
-              <div className="mb-6">
-                <Image
-                  src="/logo.png"
-                  alt="ReWise"
-                  width={240}
-                  height={240}
-                  priority
-                  className="h-60 w-auto"
-                />
+              <div className="relative mb-6 inline-block">
+                {/* Light-compatible halo: whole glow shifted up above the bulb */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 -m-12 -translate-y-[18%]"
+                >
+                  <div
+                    className="absolute inset-0 rounded-full opacity-90 blur-3xl"
+                    style={{
+                      background:
+                        'radial-gradient(ellipse 80% 70% at 50% 50%, var(--sky) 0%, var(--coral) 45%, transparent 70%)',
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 rounded-full opacity-75 blur-[40px]"
+                    style={{
+                      background:
+                        'radial-gradient(circle at 50% 50%, var(--sky-light) 0%, transparent 65%)',
+                    }}
+                  />
+                  {/* Bright center so the bulb looks lit */}
+                  <div
+                    className="absolute inset-0 rounded-full opacity-95 blur-xl"
+                    style={{
+                      background:
+                        'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.9) 0%, var(--sky-light) 25%, transparent 50%)',
+                    }}
+                  />
+                </div>
+                <div className="relative">
+                  <Image
+                    src="/logo.png"
+                    alt="ReWise"
+                    width={240}
+                    height={240}
+                    priority
+                    className="h-60 w-auto"
+                  />
+                </div>
               </div>
-              <Badge
-                variant="outline"
-                className="px-3 py-1 text-sm font-semibold text-sunshine bg-white/10 border-sunshine/30 hover:bg-white/20 mb-4 w-fit"
-              >
-                🚀 Smart Prep for Your Exams
-              </Badge>
               <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
                 Master Your Exams with{' '}
                 <GradientText
@@ -44,7 +68,7 @@ export function Hero() {
                   AI-Powered Intelligence
                 </GradientText>
               </h1>
-              <p className="mt-4 text-xl text-white/70">
+              <p className="mt-6 text-xl text-white/70">
                 Personalized learning for Students, smart tools for Teachers,
                 and insights for Parents. The all-in-one platform for exam
                 success.
@@ -87,18 +111,6 @@ export function Hero() {
               transition={{ duration: 0.7, type: 'spring', stiffness: 80 }}
               className="relative h-full w-full lg:h-full"
             >
-              {/* Abstract decorative shapes */}
-              <div
-                aria-hidden="true"
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-30"
-                style={{ background: 'var(--violet)' }}
-              />
-              <div
-                aria-hidden="true"
-                className="absolute top-1/4 right-1/4 w-[400px] h-[400px] rounded-full blur-3xl opacity-20 animate-float"
-                style={{ background: 'var(--coral)' }}
-              />
-
               <div className="relative flex justify-center items-center h-full">
                 <Card className="relative bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-2xl border-white/10 max-w-md w-full mx-4">
                   <div className="flex items-center border-b border-white/10 pb-4 mb-4">

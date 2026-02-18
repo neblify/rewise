@@ -33,7 +33,7 @@ export default function RootLayout({
     <ClerkProvider
       appearance={{
         variables: {
-          colorPrimary: '#7A1FC9',
+          colorPrimary: '#19b7cf',
           borderRadius: '1rem',
           fontFamily: 'Nunito, system-ui, sans-serif',
         },

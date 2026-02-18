@@ -54,7 +54,7 @@ GROQ_API_KEY=your_groq_api_key
 
    ```bash
    git clone <repository-url>
-   cd nios-prep
+   cd rewise
    ```
 
 2. **Install dependencies**:

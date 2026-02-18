@@ -142,72 +142,91 @@
 }
 
 :root {
-  --background: hsl(250 30% 98%);
-  --foreground: hsl(240 30% 15%);
+  /* Very light cream base within the existing teal–indigo theme */
+  --background: hsl(40 33% 97%);
+  --foreground: hsl(222 40% 16%);
   --card: hsl(0 0% 100%);
-  --card-foreground: hsl(240 30% 15%);
+  --card-foreground: hsl(222 40% 16%);
   --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(240 30% 15%);
-  --primary: hsl(272 73% 45%);
+  --popover-foreground: hsl(222 40% 16%);
+
+  /* Primary actions: bright teal */
+  --primary: hsl(188 85% 45%);
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(355 100% 69%);
+
+  /* Secondary accent: warm coral/peach for contrast */
+  --secondary: hsl(16 92% 64%);
   --secondary-foreground: hsl(0 0% 100%);
-  --muted: hsl(250 30% 94%);
-  --muted-foreground: hsl(240 10% 45%);
-  --accent: hsl(195 80% 75%);
-  --accent-foreground: hsl(240 30% 15%);
+
+  /* Muted surfaces and text (warm, cream-consistent) */
+  --muted: hsl(40 25% 94%);
+  --muted-foreground: hsl(222 15% 45%);
+
+  /* Additional accent: soft indigo for depth */
+  --accent: hsl(248 74% 72%);
+  --accent-foreground: hsl(222 40% 16%);
+
   --destructive: hsl(0 84.2% 60.2%);
   --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(250 20% 90%);
-  --input: hsl(250 20% 90%);
-  --ring: hsl(272 73% 45%);
-  --chart-1: hsl(272 73% 45%);
-  --chart-2: hsl(355 100% 69%);
-  --chart-3: hsl(195 80% 75%);
-  --chart-4: hsl(160 60% 45%);
-  --chart-5: hsl(45 100% 60%);
+  --border: hsl(40 18% 91%);
+  --input: hsl(40 18% 91%);
+  --ring: hsl(188 85% 45%);
+
+  /* Charts follow the new palette */
+  --chart-1: hsl(188 85% 45%);
+  --chart-2: hsl(16 92% 64%);
+  --chart-3: hsl(248 74% 72%);
+  --chart-4: hsl(160 60% 46%);
+  --chart-5: hsl(44 96% 60%);
+
   --radius: 1rem;
 
-  /* Extended playful palette */
-  --violet: #7a1fc9;
-  --violet-light: #f0e5fa;
-  --coral: #ff5f6d;
-  --coral-light: #ffe5e7;
-  --sky: #9be8ff;
-  --sky-light: #e5f7ff;
-  --mint: #4caf82;
-  --mint-light: #e5f5ed;
-  --sunshine: #ffd93d;
-  --sunshine-light: #fff8e1;
-  --navy: #1a1735;
-  --navy-mid: #2d2a4a;
+  /* Extended playful palette, remapped to the new scheme */
+  --violet: #4b5ae0; /* indigo */
+  --violet-light: #e4e7ff;
+  --coral: #ff8a65;
+  --coral-light: #ffe5db;
+  --sky: #27c4e8;
+  --sky-light: #e0f7ff;
+  --mint: #26c29f;
+  --mint-light: #e1f7f0;
+  --sunshine: #ffc857;
+  --sunshine-light: #fff4d9;
+  --navy: #0b1534;
+  --navy-mid: #15244d;
 }
 
 .dark {
-  --background: hsl(240 10% 3.9%);
+  --background: hsl(222 40% 6%);
   --foreground: hsl(0 0% 98%);
-  --card: hsl(240 10% 3.9%);
+  --card: hsl(222 40% 8%);
   --card-foreground: hsl(0 0% 98%);
-  --popover: hsl(240 10% 3.9%);
+  --popover: hsl(222 40% 8%);
   --popover-foreground: hsl(0 0% 98%);
-  --primary: hsl(272 73% 65%);
-  --primary-foreground: hsl(0 0% 98%);
-  --secondary: hsl(355 100% 75%);
-  --secondary-foreground: hsl(0 0% 98%);
-  --muted: hsl(240 3.7% 15.9%);
-  --muted-foreground: hsl(240 5% 64.9%);
-  --accent: hsl(240 3.7% 15.9%);
-  --accent-foreground: hsl(0 0% 98%);
+
+  --primary: hsl(188 85% 60%);
+  --primary-foreground: hsl(0 0% 8%);
+
+  --secondary: hsl(16 92% 68%);
+  --secondary-foreground: hsl(0 0% 8%);
+
+  --muted: hsl(222 25% 16%);
+  --muted-foreground: hsl(220 10% 70%);
+
+  --accent: hsl(248 74% 72%);
+  --accent-foreground: hsl(0 0% 8%);
+
   --destructive: hsl(0 62.8% 30.6%);
   --destructive-foreground: hsl(0 0% 98%);
-  --border: hsl(240 3.7% 15.9%);
-  --input: hsl(240 3.7% 15.9%);
-  --ring: hsl(272 73% 65%);
-  --chart-1: hsl(220 70% 50%);
-  --chart-2: hsl(160 60% 45%);
-  --chart-3: hsl(30 80% 55%);
-  --chart-4: hsl(280 65% 60%);
-  --chart-5: hsl(340 75% 55%);
+  --border: hsl(222 25% 18%);
+  --input: hsl(222 25% 18%);
+  --ring: hsl(188 85% 60%);
+
+  --chart-1: hsl(188 85% 60%);
+  --chart-2: hsl(160 60% 48%);
+  --chart-3: hsl(30 80% 60%);
+  --chart-4: hsl(248 74% 72%);
+  --chart-5: hsl(340 75% 60%);
 }
 
 @layer base {
@@ -222,10 +241,10 @@
 
 @layer utilities {
   .gradient-primary {
-    background: linear-gradient(135deg, var(--violet), var(--coral));
+    background: linear-gradient(135deg, var(--sky), var(--coral));
   }
   .gradient-text {
-    background: linear-gradient(135deg, var(--violet), var(--coral));
+    background: linear-gradient(135deg, var(--sky), var(--coral));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -233,7 +252,7 @@
   .gradient-navy {
     background: radial-gradient(
       ellipse at 20% 50%,
-      var(--navy-mid) 0%,
+      color-mix(in srgb, var(--navy-mid) 60%, var(--sky) 40%) 0%,
       var(--navy) 100%
     );
   }
