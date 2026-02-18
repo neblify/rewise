@@ -88,7 +88,7 @@ export function Hero() {
               <GradientButton
                 asChild
                 size="xl"
-                className="px-8 py-6 text-base font-medium md:text-lg"
+                className="px-8 py-6 text-base font-bold md:text-lg"
               >
                 <Link href="/sign-up">
                   Start Learning Free
@@ -98,7 +98,7 @@ export function Hero() {
               <GradientButton
                 asChild
                 size="xl"
-                className="px-8 py-6 text-base font-medium md:text-lg bg-white/10 hover:bg-white/20 border border-white/20 shadow-none hover:shadow-none [background-image:none] hover:brightness-100"
+                className="px-8 py-6 text-base font-bold md:text-lg bg-white/10 hover:bg-white/20 border border-white/20 shadow-none hover:shadow-none [background-image:none] hover:brightness-100"
               >
                 <Link href="/sign-in">Welcome Back</Link>
               </GradientButton>
