@@ -356,7 +356,7 @@ function CreateTestPageContent() {
 
               <div>
                 <label className="block text-sm font-medium text-muted-foreground">
-                  Level / Class
+                  Grade / Level
                 </label>
                 <select
                   name="grade"
