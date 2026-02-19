@@ -28,31 +28,16 @@ export default async function Home() {
     if (dbUser) {
       role = dbUser.role;
     }
-    if (!role || role === 'pending') {
-      if (role === 'pending') {
-        redirect('/onboarding');
-      }
-      const step = dbUser?.onboardingStep;
-      if (step === 'role') {
-        redirect('/onboarding');
-      }
-      redirect('/onboarding/school');
-    }
   } else {
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
     role = user.publicMetadata.role as string | undefined;
-    if (!role) {
-      const onboardingStep = user.publicMetadata.onboardingStep as string | undefined;
-      if (onboardingStep === 'role') {
-        redirect('/onboarding');
-      }
-      redirect('/onboarding/school');
-    }
   }
 
-  if (!role || role === 'pending') {
-    redirect(role === 'pending' ? '/onboarding' : '/onboarding/school');
+  console.log('Root Page: Role found:', role);
+
+  if (!role) {
+    redirect('/onboarding');
   }
 
   if (role === 'teacher') {

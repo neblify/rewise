@@ -1,7 +1,7 @@
 'use client';
 
 import { useUser, useSession } from '@clerk/nextjs';
-import { completeOnboarding, getOnboardingStep } from '@/app/actions/onboarding';
+import { completeOnboarding } from '@/app/actions/onboarding';
 import { useRouter } from 'next/navigation';
 import { useLayoutEffect, useActionState, useState } from 'react';
 
@@ -14,32 +14,19 @@ export default function OnboardingPage() {
   const { session } = useSession();
 
   useLayoutEffect(() => {
-    if (state?.success) {
-      if (session) {
-        session.reload().then(() => router.push('/'));
-      } else {
+    if (state?.success && session) {
+      session.reload().then(() => {
         router.push('/');
-      }
+      });
     }
   }, [state?.success, session, router]);
 
-  // Redirect if already has role
+  // Cleanup old redirect logic that might conflict or be redundant if we rely on state
   useLayoutEffect(() => {
     if (isLoaded && user?.publicMetadata?.role && !state?.success) {
       router.push('/');
     }
   }, [isLoaded, user, router, state?.success]);
-
-  // Must complete school step before role selection (works for Clerk and mock users)
-  useLayoutEffect(() => {
-    if (!isLoaded) return;
-    if (user?.publicMetadata?.role) return;
-    getOnboardingStep().then((step) => {
-      if (step !== 'role') {
-        router.replace('/onboarding/school');
-      }
-    });
-  }, [isLoaded, user?.publicMetadata?.role, router]);
 
   if (!isLoaded) {
     return (

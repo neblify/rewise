@@ -20,7 +20,6 @@ vi.mock('next/navigation', () => ({
 // Mock Models
 vi.mock('@/lib/db/models/User', () => ({
   default: {
-    findOne: vi.fn().mockResolvedValue(null),
     findOneAndUpdate: vi.fn(),
   },
 }));
@@ -32,14 +31,14 @@ describe('Onboarding Actions', () => {
 
   describe('completeOnboarding', () => {
     it('should fail if user is not authenticated', async () => {
-      vi.mocked(auth).mockResolvedValue({ userId: null });
+      (auth as any).mockResolvedValue({ userId: null });
       const formData = new FormData();
       const result = await completeOnboarding({}, formData);
       expect(result.message).toBe('No Logged In User');
     });
 
     it('should fail if role validation fails', async () => {
-      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' });
+      (auth as any).mockResolvedValue({ userId: 'user_123' });
       const formData = new FormData();
       formData.append('role', 'invalid_role');
 
@@ -48,7 +47,7 @@ describe('Onboarding Actions', () => {
     });
 
     it('should complete onboarding successfully', async () => {
-      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' });
+      (auth as any).mockResolvedValue({ userId: 'user_123' });
 
       const mockUser = {
         emailAddresses: [{ emailAddress: 'test@example.com' }],
@@ -92,7 +91,7 @@ describe('Onboarding Actions', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      vi.mocked(auth).mockResolvedValue({ userId: 'user_123' });
+      (auth as any).mockResolvedValue({ userId: 'user_123' });
 
       // Mock Clerk client failure
       (clerkClient as any).mockRejectedValue(new Error('Clerk Error'));
