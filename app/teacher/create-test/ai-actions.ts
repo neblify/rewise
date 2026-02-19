@@ -184,7 +184,19 @@ export async function generateQuestionsAI(
     Generate ${count} ${difficulty} questions on the topic: "${topic}".
     
     Question Type: ${type}
+
+    When 'IGCSE' is selected as the Board, lookup to the website https://www.cie.org.uk/ and https://www.cambridge.org/to generate the questions.
     
+    When 'CBSE' is selected as the Board, lookup to the sources endorsed by NCERT syllabuses available on the website https://ncert.nic.in/ to generate the questions.
+    
+    When 'IB' is selected as the Board, lookup to the website https://www.ibo.org/ to generate the questions.
+
+    When 'ICSE' is selected as the Board and the selected grade or class is 10th or 12th, then lookup to the website https://www.icse.org/ and https://www.cisce.org/ to generate the questions.
+
+    When 'SSC' is selected as the Board, lookup to the website https://ssc.nic.in/ to generate the questions.
+
+    When 'NIOS' is selected as the Board, lookup to the website https://nios.ac.in/ to generate the questions.
+
     Output must be a strictly valid JSON array of question objects matching this TypeScript interface:
     
     interface Question {

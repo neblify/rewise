@@ -28,7 +28,11 @@ const QUESTION_TYPES = [
   { value: 'difference', label: 'Difference Between' },
 ];
 
-import { BOARDS } from '@/lib/constants/boards';
+import {
+  BOARDS,
+  BOARD_PLACEHOLDER_LABEL,
+  BOARD_PLACEHOLDER_VALUE,
+} from '@/lib/constants/boards';
 import { getGradesForBoard } from '@/lib/constants/levels';
 import { defaultTimedState, appendTimedToFormData } from './lib/timed';
 import { TestTimeLimitField } from './components/TestTimeLimitField';
@@ -62,8 +66,8 @@ function CreateTestPageContent() {
 
   // Test Metadata State
   const [testTitle, setTestTitle] = useState('');
-  const [board, setBoard] = useState('NIOS');
-  const [grade, setGrade] = useState('A');
+  const [board, setBoard] = useState(BOARD_PLACEHOLDER_VALUE);
+  const [grade, setGrade] = useState('1');
   const [timedState, setTimedState] = useState(defaultTimedState);
 
   const gradeOptions = getGradesForBoard(board);
@@ -209,7 +213,7 @@ function CreateTestPageContent() {
             : [...sections, newSection]
         );
         setIsAiModalOpen(false);
-        setAiTopic('');
+        if (mode !== 'ai') setAiTopic('');
       } else {
         alert(res.error || 'Failed to generate');
       }
@@ -317,26 +321,34 @@ function CreateTestPageContent() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-muted-foreground">
-                  Test Title
-                </label>
+              {mode === 'ai' ? (
                 <input
+                  type="hidden"
                   name="title"
-                  type="text"
-                  value={testTitle}
-                  onChange={e => {
-                    setTestTitle(e.target.value);
-                  }}
-                  required
-                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground"
-                  placeholder="e.g. Science Mid-Term"
+                  value={aiTopic}
                 />
-              </div>
+              ) : (
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-muted-foreground">
+                    Test Title
+                  </label>
+                  <input
+                    name="title"
+                    type="text"
+                    value={testTitle}
+                    onChange={e => {
+                      setTestTitle(e.target.value);
+                    }}
+                    required
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground"
+                    placeholder="e.g. Science Mid-Term"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-muted-foreground">
-                  Board
+                  Board <span className="text-destructive">*</span>
                 </label>
                 <select
                   name="board"
@@ -344,8 +356,12 @@ function CreateTestPageContent() {
                   onChange={e => {
                     setBoard(e.target.value);
                   }}
+                  required
                   className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground bg-card"
                 >
+                  <option value={BOARD_PLACEHOLDER_VALUE}>
+                    {BOARD_PLACEHOLDER_LABEL}
+                  </option>
                   {BOARDS.map(b => (
                     <option key={b} value={b}>
                       {b}

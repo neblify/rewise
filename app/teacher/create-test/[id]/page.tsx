@@ -19,7 +19,11 @@ const QUESTION_TYPES = [
   { value: 'difference', label: 'Difference Between' },
 ];
 
-import { BOARDS } from '@/lib/constants/boards';
+import {
+  BOARDS,
+  BOARD_PLACEHOLDER_LABEL,
+  BOARD_PLACEHOLDER_VALUE,
+} from '@/lib/constants/boards';
 import {
   NIOS_LEVELS,
   STANDARD_LEVELS,
@@ -86,8 +90,8 @@ export default function CreateOrEditTestPage() {
   // Test Metadata State
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState('');
-  const [board, setBoard] = useState('NIOS');
-  const [grade, setGrade] = useState('A');
+  const [board, setBoard] = useState(BOARD_PLACEHOLDER_VALUE);
+  const [grade, setGrade] = useState('1');
   const [visibility, setVisibility] = useState('public');
   const [timedState, setTimedState] = useState(defaultTimedState);
 
@@ -119,8 +123,12 @@ export default function CreateOrEditTestPage() {
           if (data.test) {
             setTitle(data.test.title);
             setSubject(data.test.subject);
-            setBoard(data.test.board || 'NIOS');
-            setGrade(data.test.grade || 'A');
+            const loadedBoard = data.test.board ?? BOARD_PLACEHOLDER_VALUE;
+            setBoard(loadedBoard);
+            setGrade(
+              data.test.grade ||
+                (loadedBoard === BOARD_PLACEHOLDER_VALUE ? '1' : 'A')
+            );
             setVisibility(data.test.visibility || 'public');
             setTimedState(parseTimedFromTest(data.test));
 
@@ -408,7 +416,7 @@ export default function CreateOrEditTestPage() {
 
               <div>
                 <label className="block text-sm font-medium text-muted-foreground">
-                  Board
+                  Board <span className="text-destructive">*</span>
                 </label>
                 <select
                   name="board"
@@ -416,8 +424,12 @@ export default function CreateOrEditTestPage() {
                   onChange={e => {
                     setBoard(e.target.value);
                   }}
+                  required
                   className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground bg-card"
                 >
+                  <option value={BOARD_PLACEHOLDER_VALUE}>
+                    {BOARD_PLACEHOLDER_LABEL}
+                  </option>
                   {BOARDS?.map(b => (
                     <option key={b} value={b}>
                       {b}
