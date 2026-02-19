@@ -264,7 +264,7 @@ export default function CreateTestPage() {
               />
               <button
                 type="button"
-                className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-full shadow-lg hover:bg-emerald-700 hover:shadow-xl transition-all font-medium disabled:opacity-50"
+                className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isUploading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
