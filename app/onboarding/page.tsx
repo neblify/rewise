@@ -4,6 +4,8 @@ import { useUser, useSession } from '@clerk/nextjs';
 import { completeOnboarding } from '@/app/actions/onboarding';
 import { useRouter } from 'next/navigation';
 import { useLayoutEffect, useActionState, useState } from 'react';
+import { motion } from 'framer-motion';
+import { GradientButton, GradientText } from '@/components/playful';
 
 export default function OnboardingPage() {
   const { user, isLoaded } = useUser();
@@ -21,7 +23,6 @@ export default function OnboardingPage() {
     }
   }, [state?.success, session, router]);
 
-  // Cleanup old redirect logic that might conflict or be redundant if we rely on state
   useLayoutEffect(() => {
     if (isLoaded && user?.publicMetadata?.role && !state?.success) {
       router.push('/');
@@ -30,20 +31,25 @@ export default function OnboardingPage() {
 
   if (!isLoaded) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="text-muted-foreground">Loading...</div>
+      <div className="flex min-h-screen items-center justify-center gradient-navy text-white">
+        <div className="text-white/70 font-medium">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md space-y-8 rounded-2xl bg-card p-8 shadow-xl">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden gradient-navy text-white p-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
+        className="w-full max-w-md space-y-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 shadow-2xl p-8"
+      >
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-extrabold text-foreground">
-            Welcome to ReWise
+          <h2 className="mt-2 text-4xl font-bold tracking-tight text-white">
+            Welcome to <GradientText as="span" className="text-4xl font-bold">ReWise</GradientText>
           </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-base text-white/70">
             Tell us who you are to get started
           </p>
         </div>
@@ -53,14 +59,12 @@ export default function OnboardingPage() {
             {['student', 'teacher', 'parent'].map(role => (
               <label
                 key={role}
-                className={`relative flex cursor-pointer rounded-lg border p-4 shadow-sm focus:outline-none hover:border-primary hover:ring-1 hover:ring-primary ${
+                className={`relative flex cursor-pointer rounded-xl border p-4 focus:outline-none transition-colors ${
                   selectedRole === role
-                    ? 'border-primary ring-2 ring-primary'
-                    : 'border-border'
+                    ? 'border-[var(--sky)] ring-2 ring-[var(--sky)] bg-white/10'
+                    : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                 }`}
-                onClick={() => {
-                  setSelectedRole(role);
-                }}
+                onClick={() => setSelectedRole(role)}
               >
                 <input
                   type="radio"
@@ -69,22 +73,20 @@ export default function OnboardingPage() {
                   className="sr-only"
                   required
                   checked={selectedRole === role}
-                  onChange={() => {
-                    setSelectedRole(role);
-                  }}
+                  onChange={() => setSelectedRole(role)}
                 />
                 <span className="flex flex-1">
                   <span className="flex flex-col">
-                    <span className="block text-sm font-medium text-foreground capitalize">
+                    <span className="block text-sm font-semibold text-white capitalize">
                       {role}
                     </span>
-                    <span className="mt-1 flex items-center text-sm text-muted-foreground">
+                    <span className="mt-1 text-sm text-white/70">
                       I am a {role}
                     </span>
                   </span>
                 </span>
                 <svg
-                  className={`h-5 w-5 text-primary ${selectedRole === role ? 'block' : 'hidden'}`}
+                  className={`h-5 w-5 shrink-0 text-[var(--sky)] ${selectedRole === role ? 'block' : 'hidden'}`}
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 20 20"
                   fill="currentColor"
@@ -101,20 +103,20 @@ export default function OnboardingPage() {
           </div>
 
           <div>
-            <button
+            <GradientButton
               type="submit"
-              className="group relative flex w-full justify-center rounded-md border border-transparent gradient-primary px-4 py-2 text-sm font-medium text-white hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              className="w-full rounded-xl font-bold text-base py-6"
             >
               Get Started
-            </button>
+            </GradientButton>
           </div>
           {state?.message && (
-            <p className="text-center text-red-500 text-sm mt-2">
+            <p className="text-center text-red-400 text-sm mt-2">
               {state.message}
             </p>
           )}
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 }
