@@ -32,6 +32,7 @@ export default function RootLayout({
   return (
     <ClerkProvider
       appearance={{
+        cssLayerName: 'clerk',
         variables: {
           colorPrimary: '#19b7cf',
           borderRadius: '1rem',
