@@ -94,7 +94,7 @@ export default async function TeacherDashboard(props: Props) {
           </p>
         </div>
         <Button asChild variant="gradient">
-          <Link href="/teacher/create-test">
+          <Link href="/teacher/create-test/choose">
             <Plus className="h-4 w-4 mr-2" />
             Create New Test
           </Link>

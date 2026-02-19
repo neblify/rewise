@@ -36,7 +36,7 @@ export default function Navbar({ variant = 'student' }: NavbarProps) {
                   <NavLink href="/dashboard">Dashboard</NavLink>
                   <NavLink href="/teacher">All Tests</NavLink>
                   <NavLink href="/teacher/questions">Question Bank</NavLink>
-                  <NavLink href="/teacher/create-test">Create Test</NavLink>
+                  <NavLink href="/teacher/create-test/choose">Create Test</NavLink>
                 </>
               ) : (
                 <>

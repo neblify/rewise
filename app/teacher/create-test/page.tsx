@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useActionState, useState, useEffect } from 'react';
+import React, { useActionState, useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { createTest } from './actions';
 import { extractQuestionsFromPdf, generateQuestionsAI } from './ai-actions';
 import { DEFAULT_SECTION_TITLE, isEmptyDefaultSection } from './lib/sections';
@@ -32,8 +33,21 @@ import { getGradesForBoard } from '@/lib/constants/levels';
 import { defaultTimedState, appendTimedToFormData } from './lib/timed';
 import { TestTimeLimitField } from './components/TestTimeLimitField';
 
-export default function CreateTestPage() {
+type CreateMode = 'ai' | 'manual' | 'pdf';
+
+function CreateTestPageContent() {
+  const searchParams = useSearchParams();
+  const mode: CreateMode = (searchParams.get('mode') as CreateMode) || 'manual';
+
   const [state, formAction] = useActionState(createTest, null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+
+  useEffect(() => {
+    if (mode === 'pdf' && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  }, [mode]);
 
   useEffect(() => {
     if (state?.message) {
@@ -72,6 +86,13 @@ export default function CreateTestPage() {
   const [aiDifficulty, setAiDifficulty] = useState('Medium');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+
+  const showAiAssistant = mode === 'ai';
+  const hasGeneratedContent = sections.some((s) => (s.questions?.length ?? 0) > 0);
+  const showSectionsList =
+    mode === 'manual' ||
+    mode === 'pdf' ||
+    (mode === 'ai' && hasGeneratedContent);
 
   // ... (Existing helper functions kept same, but re-included for completeness)
   const addSection = () => {
@@ -243,37 +264,45 @@ export default function CreateTestPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                setIsAiModalOpen(true);
-                setAiTopic(testTitle);
-              }}
-              className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium animate-pulse hover:animate-none"
-            >
-              <Sparkles className="h-5 w-5" />
-              AI Assistant
-            </button>
-            <div className="relative">
-              <input
-                type="file"
-                accept=".pdf"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                onChange={handleFileUpload}
-                disabled={isUploading}
-              />
+            {showAiAssistant && (
               <button
                 type="button"
+                onClick={handleAiGenerate}
+                disabled={isGenerating || !aiTopic}
                 className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isUploading ? (
+                {isGenerating ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
-                  <FileUp className="h-5 w-5" />
+                  <Sparkles className="h-5 w-5" />
                 )}
-                {isUploading ? 'Parsing...' : 'Upload PDF'}
+                Generate Test
               </button>
-            </div>
+            )}
+            {mode !== 'ai' && (
+              <div className="relative">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  onChange={handleFileUpload}
+                  disabled={isUploading}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isUploading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <FileUp className="h-5 w-5" />
+                  )}
+                  {isUploading ? 'Parsing...' : 'Upload PDF'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -375,7 +404,81 @@ export default function CreateTestPage() {
             </div>
           </div>
 
-          {/* Sections Loop - (Same as before, abbreviated here, but full code provided in tool call) */}
+          {/* Inline AI generator fields when mode=ai (no popup) */}
+          {mode === 'ai' && (
+            <div className="rounded-xl bg-card p-6 shadow-sm border border-border space-y-6">
+              <div className="flex items-center gap-2 border-b border-border pb-4 mb-4">
+                <Sparkles className="text-primary h-5 w-5" />
+                <h2 className="text-xl font-semibold text-foreground">
+                  Generate test with AI
+                </h2>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Set topic and options below, then click <strong>Generate Test</strong> above to create questions.
+              </p>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    Topic / Chapter
+                  </label>
+                  <input
+                    type="text"
+                    value={aiTopic}
+                    onChange={e => setAiTopic(e.target.value)}
+                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground"
+                    placeholder="e.g. Newton's Laws of Motion"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    Type
+                  </label>
+                  <select
+                    value={aiType}
+                    onChange={e => setAiType(e.target.value)}
+                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground bg-card"
+                  >
+                    <option value="mixed">Mixed Types</option>
+                    {QUESTION_TYPES.map(t => (
+                      <option key={t.value} value={t.value}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    Difficulty
+                  </label>
+                  <select
+                    value={aiDifficulty}
+                    onChange={e => setAiDifficulty(e.target.value)}
+                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground bg-card"
+                  >
+                    <option>Easy</option>
+                    <option>Medium</option>
+                    <option>Hard</option>
+                  </select>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    Number of Questions: {aiCount}
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={aiCount}
+                    onChange={e => setAiCount(parseInt(e.target.value))}
+                    className="w-full accent-primary"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Sections Loop - hidden for mode=ai until AI has generated content */}
+          {showSectionsList && (
           <div className="space-y-8">
             {sections.map((section, secIndex) => (
               <div
@@ -949,7 +1052,9 @@ export default function CreateTestPage() {
               </div>
             ))}
           </div>
+          )}
 
+          {showSectionsList && (
           <div className="flex justify-between items-center pt-8">
             <button
               type="button"
@@ -966,11 +1071,17 @@ export default function CreateTestPage() {
               <Save className="h-5 w-5" /> Publish Test
             </button>
           </div>
+          )}
+          {mode === 'ai' && !hasGeneratedContent && (
+            <p className="text-muted-foreground text-sm pt-4">
+              Fill in the &quot;Generate test with AI&quot; section above and click <strong>Generate Test</strong>, then review and publish below.
+            </p>
+          )}
         </form>
       </div>
 
-      {/* AI Assistant Modal */}
-      {isAiModalOpen && (
+      {/* AI Assistant Modal - only for non-AI mode (manual/pdf) if ever opened */}
+      {isAiModalOpen && mode !== 'ai' && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-card rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="gradient-primary p-6 text-white flex justify-between items-start">
@@ -1086,5 +1197,19 @@ export default function CreateTestPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function CreateTestPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      }
+    >
+      <CreateTestPageContent />
+    </React.Suspense>
   );
 }
