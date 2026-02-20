@@ -23,7 +23,9 @@ test.describe('Teacher Flow - Create and Publish Test', () => {
     await page.getByRole('link', { name: 'Create New Test' }).click();
 
     // Wait for the choose-test-type page
-    await page.waitForURL(/.*\/teacher\/create-test\/choose.*/, { timeout: 10000 });
+    await page.waitForURL(/.*\/teacher\/create-test\/choose.*/, {
+      timeout: 10000,
+    });
 
     // Step 2b: Choose "Create my own test" and continue
     await page.getByRole('radio', { name: /Create my own test/ }).click();

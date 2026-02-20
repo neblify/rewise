@@ -1,6 +1,6 @@
 'use client';
 
-import { UserButton } from '@clerk/nextjs';
+import { UserButton, useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -9,6 +9,8 @@ interface NavbarProps {
 }
 
 export default function Navbar({ variant = 'student' }: NavbarProps) {
+  const { isSignedIn } = useUser();
+
   return (
     <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b-2 border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,7 +41,9 @@ export default function Navbar({ variant = 'student' }: NavbarProps) {
                   <NavLink href="/dashboard">Dashboard</NavLink>
                   <NavLink href="/teacher">All Tests</NavLink>
                   <NavLink href="/teacher/questions">Question Bank</NavLink>
-                  <NavLink href="/teacher/create-test/choose">Create Test</NavLink>
+                  <NavLink href="/teacher/create-test/choose">
+                    Create Test
+                  </NavLink>
                 </>
               ) : variant === 'admin' ? (
                 <>
@@ -56,14 +60,20 @@ export default function Navbar({ variant = 'student' }: NavbarProps) {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <UserButton
-              afterSignOutUrl="/"
-              appearance={{
-                elements: {
-                  avatarBox: 'h-10 w-10',
-                },
-              }}
-            />
+            {isSignedIn ? (
+              <UserButton
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    avatarBox: 'h-10 w-10',
+                  },
+                }}
+              />
+            ) : (
+              <span className="text-xs bg-violet-light text-primary px-2 py-1 rounded font-medium">
+                Mock Session
+              </span>
+            )}
           </div>
         </div>
       </div>

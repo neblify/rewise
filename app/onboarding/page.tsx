@@ -49,7 +49,10 @@ export default function OnboardingPage() {
       >
         <div className="text-center">
           <h2 className="mt-2 text-4xl font-bold tracking-tight text-white">
-            Welcome to <GradientText as="span" className="text-4xl font-bold">ReWise</GradientText>
+            Welcome to{' '}
+            <GradientText as="span" className="text-4xl font-bold">
+              ReWise
+            </GradientText>
           </h2>
           <p className="mt-2 text-base text-white/70">
             Tell us who you are to get started

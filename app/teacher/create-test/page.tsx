@@ -78,7 +78,6 @@ function CreateTestPageContent() {
   const [state, formAction] = useActionState(createTest, null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-
   useEffect(() => {
     if (mode === 'pdf' && fileInputRef.current) {
       fileInputRef.current.click();
@@ -124,7 +123,9 @@ function CreateTestPageContent() {
   const [isUploading, setIsUploading] = useState(false);
   const [showOverwriteConfirm, setShowOverwriteConfirm] = useState(false);
 
-  const hasGeneratedContent = sections.some((s) => (s.questions?.length ?? 0) > 0);
+  const hasGeneratedContent = sections.some(
+    s => (s.questions?.length ?? 0) > 0
+  );
   const showSectionsList =
     mode === 'manual' ||
     mode === 'pdf' ||
@@ -347,11 +348,7 @@ function CreateTestPageContent() {
 
             <div className="grid gap-6 md:grid-cols-2">
               {mode === 'ai' ? (
-                <input
-                  type="hidden"
-                  name="title"
-                  value={aiTopic}
-                />
+                <input type="hidden" name="title" value={aiTopic} />
               ) : (
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-muted-foreground">
@@ -455,7 +452,8 @@ function CreateTestPageContent() {
                 </h2>
               </div>
               <p className="text-sm text-muted-foreground">
-                Set topic and options below, then click <strong>Generate Test</strong> to create questions.
+                Set topic and options below, then click{' '}
+                <strong>Generate Test</strong> to create questions.
               </p>
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="col-span-2">
@@ -463,7 +461,13 @@ function CreateTestPageContent() {
                     Topic / Chapter
                   </label>
                   <input
-                  <input\n                    type="text"\n                    required\n                    value={aiTopic}\n                    onChange={e => setAiTopic(e.target.value)}\n                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground"\n                    placeholder="e.g. Newton's Laws of Motion"\n                  />
+                    type="text"
+                    required
+                    value={aiTopic}
+                    onChange={e => setAiTopic(e.target.value)}
+                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground"
+                    placeholder="e.g. Newton's Laws of Motion"
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-muted-foreground mb-1">
@@ -530,215 +534,591 @@ function CreateTestPageContent() {
 
           {/* Sections Loop - hidden for mode=ai until AI has generated content */}
           {showSectionsList && (
-          <div className="space-y-8">
-            {sections.map((section, secIndex) => (
-              <div
-                key={section.id}
-                className="rounded-xl bg-card border border-primary/20 shadow-md overflow-hidden"
-              >
-                <div className="bg-violet-light/50 p-6 border-b border-primary/20 flex justify-between items-start">
-                  <div className="space-y-3 flex-1">
-                    <input
-                      type="text"
-                      value={section.title}
-                      onChange={e => {
-                        updateSection(secIndex, 'title', e.target.value);
+            <div className="space-y-8">
+              {sections.map((section, secIndex) => (
+                <div
+                  key={section.id}
+                  className="rounded-xl bg-card border border-primary/20 shadow-md overflow-hidden"
+                >
+                  <div className="bg-violet-light/50 p-6 border-b border-primary/20 flex justify-between items-start">
+                    <div className="space-y-3 flex-1">
+                      <input
+                        type="text"
+                        value={section.title}
+                        onChange={e => {
+                          updateSection(secIndex, 'title', e.target.value);
+                        }}
+                        className="bg-transparent text-lg font-bold text-primary placeholder-primary focus:outline-none w-full"
+                        placeholder="Section Title"
+                      />
+                      <input
+                        type="text"
+                        value={section.description}
+                        onChange={e => {
+                          updateSection(
+                            secIndex,
+                            'description',
+                            e.target.value
+                          );
+                        }}
+                        className="bg-transparent text-sm text-primary placeholder-primary focus:outline-none w-full"
+                        placeholder="Section Description (Optional)"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        removeSection(secIndex);
                       }}
-                      className="bg-transparent text-lg font-bold text-primary placeholder-primary focus:outline-none w-full"
-                      placeholder="Section Title"
-                    />
-                    <input
-                      type="text"
-                      value={section.description}
-                      onChange={e => {
-                        updateSection(secIndex, 'description', e.target.value);
-                      }}
-                      className="bg-transparent text-sm text-primary placeholder-primary focus:outline-none w-full"
-                      placeholder="Section Description (Optional)"
-                    />
+                      className="text-primary/60 hover:text-red-500 p-1"
+                    >
+                      <Trash2 className="h-5 w-5" />
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      removeSection(secIndex);
-                    }}
-                    className="text-primary/60 hover:text-red-500 p-1"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
 
-                <div className="p-6 overflow-x-auto">
-                  <table className="min-w-full w-full table-fixed divide-y divide-border">
-                    <colgroup>
-                      <col className="w-0" style={{ width: '2.5rem' }} />
-                      <col />
-                      <col className="w-0" style={{ width: '10rem' }} />
-                      <col className="w-0" style={{ width: '4.5rem' }} />
-                      <col className="w-0" style={{ width: '3.5rem' }} />
-                    </colgroup>
-                    <thead className="bg-background">
-                      <tr>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          No.
-                        </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Question
-                        </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Type
-                        </th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Marks
-                        </th>
-                        <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-card divide-y divide-border">
-                      {section.questions.map(
-                        (q: QuestionState, qIndex: number) => {
-                          const questionNo =
-                            sections
-                              .slice(0, secIndex)
-                              .reduce((acc, s) => acc + s.questions.length, 0) +
-                            qIndex +
-                            1;
-                          return (
-                            <React.Fragment key={q.id}>
-                              <tr className="group align-top">
-                                <td className="px-3 py-2 text-sm font-medium text-muted-foreground whitespace-nowrap">
-                                  {questionNo}
-                                </td>
-                                <td className="px-3 py-2">
-                                  <textarea
-                                    value={q.text}
-                                    onChange={e =>
-                                      updateQuestionExp(
-                                        secIndex,
-                                        qIndex,
-                                        'text',
-                                        e.target.value
-                                      )
-                                    }
-                                    className="block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-primary focus:ring-primary text-foreground min-w-0"
-                                    placeholder={`Question ${questionNo}`}
-                                    rows={2}
-                                  />
-                                </td>
-                                <td className="px-3 py-2 whitespace-nowrap">
-                                  <select
-                                    value={q.type}
-                                    onChange={e => {
-                                      const newType = e.target.value;
-                                      if (newType === 'match_columns') {
-                                        const left =
-                                          (q.leftColumn?.length ?? 0) > 0
-                                            ? [...(q.leftColumn || [])]
-                                            : ['', ''];
-                                        const right =
-                                          (q.options?.length ?? 0) > 0
-                                            ? [...(q.options || [])]
-                                            : ['', ''];
-                                        const mapping = Array.from(
-                                          { length: left.length },
-                                          (_, i) =>
-                                            Array.isArray(q.correctAnswer) &&
-                                            typeof (
-                                              q.correctAnswer as number[]
-                                            )[i] === 'number'
-                                              ? (q.correctAnswer as number[])[i]
-                                              : Math.min(i, right.length - 1)
-                                        );
-                                        const newSecs = [...sections];
-                                        const qu =
-                                          newSecs[secIndex].questions[qIndex];
-                                        newSecs[secIndex].questions[qIndex] = {
-                                          ...qu,
-                                          type: newType,
-                                          leftColumn: left,
-                                          options: right,
-                                          correctAnswer: mapping,
-                                        };
-                                        setSections(newSecs);
-                                      } else {
+                  <div className="p-6 overflow-x-auto">
+                    <table className="min-w-full w-full table-fixed divide-y divide-border">
+                      <colgroup>
+                        <col className="w-0" style={{ width: '2.5rem' }} />
+                        <col />
+                        <col className="w-0" style={{ width: '10rem' }} />
+                        <col className="w-0" style={{ width: '4.5rem' }} />
+                        <col className="w-0" style={{ width: '3.5rem' }} />
+                      </colgroup>
+                      <thead className="bg-background">
+                        <tr>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            No.
+                          </th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            Question
+                          </th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            Type
+                          </th>
+                          <th className="px-3 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            Marks
+                          </th>
+                          <th className="px-3 py-2 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                            Actions
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-card divide-y divide-border">
+                        {section.questions.map(
+                          (q: QuestionState, qIndex: number) => {
+                            const questionNo =
+                              sections
+                                .slice(0, secIndex)
+                                .reduce(
+                                  (acc, s) => acc + s.questions.length,
+                                  0
+                                ) +
+                              qIndex +
+                              1;
+                            return (
+                              <React.Fragment key={q.id}>
+                                <tr className="group align-top">
+                                  <td className="px-3 py-2 text-sm font-medium text-muted-foreground whitespace-nowrap">
+                                    {questionNo}
+                                  </td>
+                                  <td className="px-3 py-2">
+                                    <textarea
+                                      value={q.text}
+                                      onChange={e =>
                                         updateQuestionExp(
                                           secIndex,
                                           qIndex,
-                                          'type',
-                                          newType
-                                        );
-                                      }
-                                    }}
-                                    className="block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-primary focus:ring-primary text-foreground bg-card min-w-0"
-                                  >
-                                    {QUESTION_TYPES.map(t => (
-                                      <option key={t.value} value={t.value}>
-                                        {t.label}
-                                      </option>
-                                    ))}
-                                  </select>
-                                </td>
-                                <td className="px-3 py-2 whitespace-nowrap">
-                                  <input
-                                    type="number"
-                                    value={q.marks}
-                                    onChange={e =>
-                                      updateQuestionExp(
-                                        secIndex,
-                                        qIndex,
-                                        'marks',
-                                        parseInt(e.target.value)
-                                      )
-                                    }
-                                    className="block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-primary focus:ring-primary text-foreground w-16"
-                                    min={1}
-                                  />
-                                </td>
-                                <td className="px-3 py-2 text-right">
-                                  <button
-                                    type="button"
-                                    onClick={() => {
-                                      removeQuestionExp(secIndex, qIndex);
-                                    }}
-                                    className="text-muted-foreground hover:text-red-500 transition-opacity"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </button>
-                                </td>
-                              </tr>
-                              {q.type === 'mcq' && (
-                                <tr>
-                                  <td
-                                    colSpan={5}
-                                    className="px-3 py-2 bg-background"
-                                  >
-                                    <div className="grid grid-cols-2 gap-2">
-                                      {q.options?.map(
-                                        (opt: string, optIndex: number) => (
-                                          <input
-                                            key={optIndex}
-                                            type="text"
-                                            value={opt}
-                                            onChange={e => {
-                                              const newOpts = [
-                                                ...(q.options || []),
-                                              ];
-                                              newOpts[optIndex] =
-                                                e.target.value;
-                                              updateQuestionExp(
-                                                secIndex,
-                                                qIndex,
-                                                'options',
-                                                newOpts
-                                              );
-                                            }}
-                                            className="block w-full rounded border border-border px-2 py-1.5 text-sm text-foreground"
-                                            placeholder={`Option ${optIndex + 1}`}
-                                          />
+                                          'text',
+                                          e.target.value
                                         )
-                                      )}
+                                      }
+                                      className="block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-primary focus:ring-primary text-foreground min-w-0"
+                                      placeholder={`Question ${questionNo}`}
+                                      rows={2}
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2 whitespace-nowrap">
+                                    <select
+                                      value={q.type}
+                                      onChange={e => {
+                                        const newType = e.target.value;
+                                        if (newType === 'match_columns') {
+                                          const left =
+                                            (q.leftColumn?.length ?? 0) > 0
+                                              ? [...(q.leftColumn || [])]
+                                              : ['', ''];
+                                          const right =
+                                            (q.options?.length ?? 0) > 0
+                                              ? [...(q.options || [])]
+                                              : ['', ''];
+                                          const mapping = Array.from(
+                                            { length: left.length },
+                                            (_, i) =>
+                                              Array.isArray(q.correctAnswer) &&
+                                              typeof (
+                                                q.correctAnswer as number[]
+                                              )[i] === 'number'
+                                                ? (q.correctAnswer as number[])[
+                                                    i
+                                                  ]
+                                                : Math.min(i, right.length - 1)
+                                          );
+                                          const newSecs = [...sections];
+                                          const qu =
+                                            newSecs[secIndex].questions[qIndex];
+                                          newSecs[secIndex].questions[qIndex] =
+                                            {
+                                              ...qu,
+                                              type: newType,
+                                              leftColumn: left,
+                                              options: right,
+                                              correctAnswer: mapping,
+                                            };
+                                          setSections(newSecs);
+                                        } else {
+                                          updateQuestionExp(
+                                            secIndex,
+                                            qIndex,
+                                            'type',
+                                            newType
+                                          );
+                                        }
+                                      }}
+                                      className="block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-primary focus:ring-primary text-foreground bg-card min-w-0"
+                                    >
+                                      {QUESTION_TYPES.map(t => (
+                                        <option key={t.value} value={t.value}>
+                                          {t.label}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </td>
+                                  <td className="px-3 py-2 whitespace-nowrap">
+                                    <input
+                                      type="number"
+                                      value={q.marks}
+                                      onChange={e =>
+                                        updateQuestionExp(
+                                          secIndex,
+                                          qIndex,
+                                          'marks',
+                                          parseInt(e.target.value)
+                                        )
+                                      }
+                                      className="block w-full rounded-md border border-border px-3 py-2 text-sm focus:border-primary focus:ring-primary text-foreground w-16"
+                                      min={1}
+                                    />
+                                  </td>
+                                  <td className="px-3 py-2 text-right">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        removeQuestionExp(secIndex, qIndex);
+                                      }}
+                                      className="text-muted-foreground hover:text-red-500 transition-opacity"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </td>
+                                </tr>
+                                {q.type === 'mcq' && (
+                                  <tr>
+                                    <td
+                                      colSpan={5}
+                                      className="px-3 py-2 bg-background"
+                                    >
+                                      <div className="grid grid-cols-2 gap-2">
+                                        {q.options?.map(
+                                          (opt: string, optIndex: number) => (
+                                            <input
+                                              key={optIndex}
+                                              type="text"
+                                              value={opt}
+                                              onChange={e => {
+                                                const newOpts = [
+                                                  ...(q.options || []),
+                                                ];
+                                                newOpts[optIndex] =
+                                                  e.target.value;
+                                                updateQuestionExp(
+                                                  secIndex,
+                                                  qIndex,
+                                                  'options',
+                                                  newOpts
+                                                );
+                                              }}
+                                              className="block w-full rounded border border-border px-2 py-1.5 text-sm text-foreground"
+                                              placeholder={`Option ${optIndex + 1}`}
+                                            />
+                                          )
+                                        )}
+                                        <input
+                                          type="text"
+                                          value={
+                                            (q.correctAnswer as
+                                              | string
+                                              | undefined) ?? ''
+                                          }
+                                          onChange={e =>
+                                            updateQuestionExp(
+                                              secIndex,
+                                              qIndex,
+                                              'correctAnswer',
+                                              e.target.value
+                                            )
+                                          }
+                                          className="col-span-2 block w-full rounded border border-green-200 bg-green-50 px-2 py-1.5 text-sm placeholder-green-600 text-foreground"
+                                          placeholder="Correct Option (Exact Match)"
+                                        />
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                                {q.type === 'match_columns' && (
+                                  <tr>
+                                    <td
+                                      colSpan={5}
+                                      className="px-3 py-2 bg-background"
+                                    >
+                                      <div className="space-y-4">
+                                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                          Column A (Left) — Column B (Right) —
+                                          Correct mapping
+                                        </p>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                          <div>
+                                            <label className="block text-sm font-medium text-muted-foreground mb-1">
+                                              Left column (keys)
+                                            </label>
+                                            {(q.leftColumn || ['', '']).map(
+                                              (item: string, i: number) => (
+                                                <div
+                                                  key={i}
+                                                  className="flex gap-1 mb-1"
+                                                >
+                                                  <input
+                                                    type="text"
+                                                    value={item}
+                                                    onChange={e => {
+                                                      const arr = [
+                                                        ...(q.leftColumn || [
+                                                          '',
+                                                          '',
+                                                        ]),
+                                                      ];
+                                                      arr[i] = e.target.value;
+                                                      updateQuestionExp(
+                                                        secIndex,
+                                                        qIndex,
+                                                        'leftColumn',
+                                                        arr
+                                                      );
+                                                      const ans =
+                                                        (q.correctAnswer as number[]) ||
+                                                        [];
+                                                      if (
+                                                        ans.length !==
+                                                        arr.length
+                                                      ) {
+                                                        updateQuestionExp(
+                                                          secIndex,
+                                                          qIndex,
+                                                          'correctAnswer',
+                                                          arr.map(
+                                                            (_, j) =>
+                                                              ans[j] ?? 0
+                                                          )
+                                                        );
+                                                      }
+                                                    }}
+                                                    className="flex-1 rounded border border-border px-2 py-1.5 text-sm text-foreground"
+                                                    placeholder={`Item ${i + 1}`}
+                                                  />
+                                                  {(q.leftColumn?.length || 2) >
+                                                    1 && (
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => {
+                                                        const arr = (
+                                                          q.leftColumn || [
+                                                            '',
+                                                            '',
+                                                          ]
+                                                        ).filter(
+                                                          (
+                                                            _: string,
+                                                            j: number
+                                                          ) => j !== i
+                                                        );
+                                                        const mapping =
+                                                          (q.correctAnswer as number[]) ||
+                                                          [];
+                                                        const newMapping =
+                                                          mapping
+                                                            .filter(
+                                                              (
+                                                                _: number,
+                                                                j: number
+                                                              ) => j !== i
+                                                            )
+                                                            .map((v: number) =>
+                                                              v >=
+                                                              (q.options
+                                                                ?.length || 0)
+                                                                ? 0
+                                                                : v
+                                                            );
+                                                        const newSecs = [
+                                                          ...sections,
+                                                        ];
+                                                        const qu: QuestionState =
+                                                          {
+                                                            ...newSecs[secIndex]
+                                                              .questions[
+                                                              qIndex
+                                                            ],
+                                                          };
+                                                        qu.leftColumn =
+                                                          arr.length
+                                                            ? arr
+                                                            : [''];
+                                                        qu.correctAnswer =
+                                                          newMapping.length
+                                                            ? newMapping
+                                                            : [0];
+                                                        newSecs[
+                                                          secIndex
+                                                        ].questions[qIndex] =
+                                                          qu;
+                                                        setSections(newSecs);
+                                                      }}
+                                                      className="text-red-500 hover:text-red-700"
+                                                    >
+                                                      <X className="h-4 w-4" />
+                                                    </button>
+                                                  )}
+                                                </div>
+                                              )
+                                            )}
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                const arr = [
+                                                  ...(q.leftColumn || ['', '']),
+                                                  '',
+                                                ];
+                                                const mapping = [
+                                                  ...((q.correctAnswer as number[]) || [
+                                                    0,
+                                                  ]),
+                                                  0,
+                                                ];
+                                                updateQuestionExp(
+                                                  secIndex,
+                                                  qIndex,
+                                                  'leftColumn',
+                                                  arr
+                                                );
+                                                updateQuestionExp(
+                                                  secIndex,
+                                                  qIndex,
+                                                  'correctAnswer',
+                                                  mapping
+                                                );
+                                              }}
+                                              className="text-xs text-primary hover:text-primary/90"
+                                            >
+                                              + Add left item
+                                            </button>
+                                          </div>
+                                          <div>
+                                            <label className="block text-sm font-medium text-muted-foreground mb-1">
+                                              Right column (values)
+                                            </label>
+                                            {(q.options || ['', '']).map(
+                                              (
+                                                opt: string,
+                                                optIndex: number
+                                              ) => (
+                                                <div
+                                                  key={optIndex}
+                                                  className="flex gap-1 mb-1"
+                                                >
+                                                  <input
+                                                    type="text"
+                                                    value={opt}
+                                                    onChange={e => {
+                                                      const arr = [
+                                                        ...(q.options || [
+                                                          '',
+                                                          '',
+                                                        ]),
+                                                      ];
+                                                      arr[optIndex] =
+                                                        e.target.value;
+                                                      updateQuestionExp(
+                                                        secIndex,
+                                                        qIndex,
+                                                        'options',
+                                                        arr
+                                                      );
+                                                    }}
+                                                    className="flex-1 rounded border border-border px-2 py-1.5 text-sm text-foreground"
+                                                    placeholder={`Option ${optIndex + 1}`}
+                                                  />
+                                                  {(q.options?.length || 2) >
+                                                    1 && (
+                                                    <button
+                                                      type="button"
+                                                      onClick={() => {
+                                                        const arr = (
+                                                          q.options || ['', '']
+                                                        ).filter(
+                                                          (
+                                                            _: string,
+                                                            j: number
+                                                          ) => j !== optIndex
+                                                        );
+                                                        const mapping = (
+                                                          (q.correctAnswer as number[]) ||
+                                                          []
+                                                        ).map((v: number) =>
+                                                          v === optIndex
+                                                            ? 0
+                                                            : v > optIndex
+                                                              ? v - 1
+                                                              : v
+                                                        );
+                                                        const newSecs = [
+                                                          ...sections,
+                                                        ];
+                                                        const qu: QuestionState =
+                                                          {
+                                                            ...newSecs[secIndex]
+                                                              .questions[
+                                                              qIndex
+                                                            ],
+                                                          };
+                                                        qu.options = arr.length
+                                                          ? arr
+                                                          : [''];
+                                                        qu.correctAnswer =
+                                                          mapping;
+                                                        newSecs[
+                                                          secIndex
+                                                        ].questions[qIndex] =
+                                                          qu;
+                                                        setSections(newSecs);
+                                                      }}
+                                                      className="text-red-500 hover:text-red-700"
+                                                    >
+                                                      <X className="h-4 w-4" />
+                                                    </button>
+                                                  )}
+                                                </div>
+                                              )
+                                            )}
+                                            <button
+                                              type="button"
+                                              onClick={() => {
+                                                const arr = [
+                                                  ...(q.options || ['', '']),
+                                                  '',
+                                                ];
+                                                updateQuestionExp(
+                                                  secIndex,
+                                                  qIndex,
+                                                  'options',
+                                                  arr
+                                                );
+                                              }}
+                                              className="text-xs text-primary hover:text-primary/90"
+                                            >
+                                              + Add right item
+                                            </button>
+                                          </div>
+                                        </div>
+                                        <div>
+                                          <label className="block text-sm font-medium text-muted-foreground mb-1">
+                                            Correct mapping (Column A → Column
+                                            B)
+                                          </label>
+                                          <div className="flex flex-wrap gap-2">
+                                            {(q.leftColumn || ['', '']).map(
+                                              (_: string, leftIdx: number) => (
+                                                <div
+                                                  key={leftIdx}
+                                                  className="flex items-center gap-1"
+                                                >
+                                                  <span className="text-xs text-muted-foreground">
+                                                    {leftIdx + 1} →
+                                                  </span>
+                                                  <select
+                                                    value={
+                                                      Array.isArray(
+                                                        q.correctAnswer
+                                                      ) &&
+                                                      typeof (
+                                                        q.correctAnswer as number[]
+                                                      )[leftIdx] === 'number'
+                                                        ? (
+                                                            q.correctAnswer as number[]
+                                                          )[leftIdx]
+                                                        : 0
+                                                    }
+                                                    onChange={e => {
+                                                      const mapping = [
+                                                        ...((q.correctAnswer as number[]) || [
+                                                          0,
+                                                        ]),
+                                                      ];
+                                                      mapping[leftIdx] =
+                                                        parseInt(
+                                                          e.target.value,
+                                                          10
+                                                        );
+                                                      updateQuestionExp(
+                                                        secIndex,
+                                                        qIndex,
+                                                        'correctAnswer',
+                                                        mapping
+                                                      );
+                                                    }}
+                                                    className="rounded border border-green-200 bg-green-50 px-2 py-1 text-sm text-foreground"
+                                                  >
+                                                    {(
+                                                      q.options || ['', '']
+                                                    ).map(
+                                                      (
+                                                        opt: string,
+                                                        ri: number
+                                                      ) => (
+                                                        <option
+                                                          key={ri}
+                                                          value={ri}
+                                                        >
+                                                          {opt ||
+                                                            `Option ${ri + 1}`}
+                                                        </option>
+                                                      )
+                                                    )}
+                                                  </select>
+                                                </div>
+                                              )
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )}
+                                {!['mcq', 'match_columns'].includes(q.type) && (
+                                  <tr>
+                                    <td
+                                      colSpan={5}
+                                      className="px-3 py-2 bg-background"
+                                    >
                                       <input
                                         type="text"
                                         value={
@@ -754,414 +1134,74 @@ function CreateTestPageContent() {
                                             e.target.value
                                           )
                                         }
-                                        className="col-span-2 block w-full rounded border border-green-200 bg-green-50 px-2 py-1.5 text-sm placeholder-green-600 text-foreground"
-                                        placeholder="Correct Option (Exact Match)"
+                                        className="block w-full rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm focus:border-green-500 focus:ring-green-500 text-foreground"
+                                        placeholder="Expected Answer / Key"
                                       />
-                                    </div>
-                                  </td>
-                                </tr>
-                              )}
-                              {q.type === 'match_columns' && (
-                                <tr>
-                                  <td
-                                    colSpan={5}
-                                    className="px-3 py-2 bg-background"
-                                  >
-                                    <div className="space-y-4">
-                                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                                        Column A (Left) — Column B (Right) —
-                                        Correct mapping
-                                      </p>
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                          <label className="block text-sm font-medium text-muted-foreground mb-1">
-                                            Left column (keys)
-                                          </label>
-                                          {(q.leftColumn || ['', '']).map(
-                                            (item: string, i: number) => (
-                                              <div
-                                                key={i}
-                                                className="flex gap-1 mb-1"
-                                              >
-                                                <input
-                                                  type="text"
-                                                  value={item}
-                                                  onChange={e => {
-                                                    const arr = [
-                                                      ...(q.leftColumn || [
-                                                        '',
-                                                        '',
-                                                      ]),
-                                                    ];
-                                                    arr[i] = e.target.value;
-                                                    updateQuestionExp(
-                                                      secIndex,
-                                                      qIndex,
-                                                      'leftColumn',
-                                                      arr
-                                                    );
-                                                    const ans =
-                                                      (q.correctAnswer as number[]) ||
-                                                      [];
-                                                    if (
-                                                      ans.length !== arr.length
-                                                    ) {
-                                                      updateQuestionExp(
-                                                        secIndex,
-                                                        qIndex,
-                                                        'correctAnswer',
-                                                        arr.map(
-                                                          (_, j) => ans[j] ?? 0
-                                                        )
-                                                      );
-                                                    }
-                                                  }}
-                                                  className="flex-1 rounded border border-border px-2 py-1.5 text-sm text-foreground"
-                                                  placeholder={`Item ${i + 1}`}
-                                                />
-                                                {(q.leftColumn?.length || 2) >
-                                                  1 && (
-                                                  <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                      const arr = (
-                                                        q.leftColumn || ['', '']
-                                                      ).filter(
-                                                        (
-                                                          _: string,
-                                                          j: number
-                                                        ) => j !== i
-                                                      );
-                                                      const mapping =
-                                                        (q.correctAnswer as number[]) ||
-                                                        [];
-                                                      const newMapping = mapping
-                                                        .filter(
-                                                          (
-                                                            _: number,
-                                                            j: number
-                                                          ) => j !== i
-                                                        )
-                                                        .map((v: number) =>
-                                                          v >=
-                                                          (q.options?.length ||
-                                                            0)
-                                                            ? 0
-                                                            : v
-                                                        );
-                                                      const newSecs = [
-                                                        ...sections,
-                                                      ];
-                                                      const qu: QuestionState =
-                                                        {
-                                                          ...newSecs[secIndex]
-                                                            .questions[qIndex],
-                                                        };
-                                                      qu.leftColumn = arr.length
-                                                        ? arr
-                                                        : [''];
-                                                      qu.correctAnswer =
-                                                        newMapping.length
-                                                          ? newMapping
-                                                          : [0];
-                                                      newSecs[
-                                                        secIndex
-                                                      ].questions[qIndex] = qu;
-                                                      setSections(newSecs);
-                                                    }}
-                                                    className="text-red-500 hover:text-red-700"
-                                                  >
-                                                    <X className="h-4 w-4" />
-                                                  </button>
-                                                )}
-                                              </div>
-                                            )
-                                          )}
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              const arr = [
-                                                ...(q.leftColumn || ['', '']),
-                                                '',
-                                              ];
-                                              const mapping = [
-                                                ...((q.correctAnswer as number[]) || [
-                                                  0,
-                                                ]),
-                                                0,
-                                              ];
-                                              updateQuestionExp(
-                                                secIndex,
-                                                qIndex,
-                                                'leftColumn',
-                                                arr
-                                              );
-                                              updateQuestionExp(
-                                                secIndex,
-                                                qIndex,
-                                                'correctAnswer',
-                                                mapping
-                                              );
-                                            }}
-                                            className="text-xs text-primary hover:text-primary/90"
-                                          >
-                                            + Add left item
-                                          </button>
-                                        </div>
-                                        <div>
-                                          <label className="block text-sm font-medium text-muted-foreground mb-1">
-                                            Right column (values)
-                                          </label>
-                                          {(q.options || ['', '']).map(
-                                            (opt: string, optIndex: number) => (
-                                              <div
-                                                key={optIndex}
-                                                className="flex gap-1 mb-1"
-                                              >
-                                                <input
-                                                  type="text"
-                                                  value={opt}
-                                                  onChange={e => {
-                                                    const arr = [
-                                                      ...(q.options || [
-                                                        '',
-                                                        '',
-                                                      ]),
-                                                    ];
-                                                    arr[optIndex] =
-                                                      e.target.value;
-                                                    updateQuestionExp(
-                                                      secIndex,
-                                                      qIndex,
-                                                      'options',
-                                                      arr
-                                                    );
-                                                  }}
-                                                  className="flex-1 rounded border border-border px-2 py-1.5 text-sm text-foreground"
-                                                  placeholder={`Option ${optIndex + 1}`}
-                                                />
-                                                {(q.options?.length || 2) >
-                                                  1 && (
-                                                  <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                      const arr = (
-                                                        q.options || ['', '']
-                                                      ).filter(
-                                                        (
-                                                          _: string,
-                                                          j: number
-                                                        ) => j !== optIndex
-                                                      );
-                                                      const mapping = (
-                                                        (q.correctAnswer as number[]) ||
-                                                        []
-                                                      ).map((v: number) =>
-                                                        v === optIndex
-                                                          ? 0
-                                                          : v > optIndex
-                                                            ? v - 1
-                                                            : v
-                                                      );
-                                                      const newSecs = [
-                                                        ...sections,
-                                                      ];
-                                                      const qu: QuestionState =
-                                                        {
-                                                          ...newSecs[secIndex]
-                                                            .questions[qIndex],
-                                                        };
-                                                      qu.options = arr.length
-                                                        ? arr
-                                                        : [''];
-                                                      qu.correctAnswer =
-                                                        mapping;
-                                                      newSecs[
-                                                        secIndex
-                                                      ].questions[qIndex] = qu;
-                                                      setSections(newSecs);
-                                                    }}
-                                                    className="text-red-500 hover:text-red-700"
-                                                  >
-                                                    <X className="h-4 w-4" />
-                                                  </button>
-                                                )}
-                                              </div>
-                                            )
-                                          )}
-                                          <button
-                                            type="button"
-                                            onClick={() => {
-                                              const arr = [
-                                                ...(q.options || ['', '']),
-                                                '',
-                                              ];
-                                              updateQuestionExp(
-                                                secIndex,
-                                                qIndex,
-                                                'options',
-                                                arr
-                                              );
-                                            }}
-                                            className="text-xs text-primary hover:text-primary/90"
-                                          >
-                                            + Add right item
-                                          </button>
-                                        </div>
-                                      </div>
-                                      <div>
-                                        <label className="block text-sm font-medium text-muted-foreground mb-1">
-                                          Correct mapping (Column A → Column B)
-                                        </label>
-                                        <div className="flex flex-wrap gap-2">
-                                          {(q.leftColumn || ['', '']).map(
-                                            (_: string, leftIdx: number) => (
-                                              <div
-                                                key={leftIdx}
-                                                className="flex items-center gap-1"
-                                              >
-                                                <span className="text-xs text-muted-foreground">
-                                                  {leftIdx + 1} →
-                                                </span>
-                                                <select
-                                                  value={
-                                                    Array.isArray(
-                                                      q.correctAnswer
-                                                    ) &&
-                                                    typeof (
-                                                      q.correctAnswer as number[]
-                                                    )[leftIdx] === 'number'
-                                                      ? (
-                                                          q.correctAnswer as number[]
-                                                        )[leftIdx]
-                                                      : 0
-                                                  }
-                                                  onChange={e => {
-                                                    const mapping = [
-                                                      ...((q.correctAnswer as number[]) || [
-                                                        0,
-                                                      ]),
-                                                    ];
-                                                    mapping[leftIdx] = parseInt(
-                                                      e.target.value,
-                                                      10
-                                                    );
-                                                    updateQuestionExp(
-                                                      secIndex,
-                                                      qIndex,
-                                                      'correctAnswer',
-                                                      mapping
-                                                    );
-                                                  }}
-                                                  className="rounded border border-green-200 bg-green-50 px-2 py-1 text-sm text-foreground"
-                                                >
-                                                  {(q.options || ['', '']).map(
-                                                    (
-                                                      opt: string,
-                                                      ri: number
-                                                    ) => (
-                                                      <option
-                                                        key={ri}
-                                                        value={ri}
-                                                      >
-                                                        {opt ||
-                                                          `Option ${ri + 1}`}
-                                                      </option>
-                                                    )
-                                                  )}
-                                                </select>
-                                              </div>
-                                            )
-                                          )}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </td>
-                                </tr>
-                              )}
-                              {!['mcq', 'match_columns'].includes(q.type) && (
-                                <tr>
-                                  <td
-                                    colSpan={5}
-                                    className="px-3 py-2 bg-background"
-                                  >
-                                    <input
-                                      type="text"
-                                      value={
-                                        (q.correctAnswer as
-                                          | string
-                                          | undefined) ?? ''
-                                      }
-                                      onChange={e =>
-                                        updateQuestionExp(
-                                          secIndex,
-                                          qIndex,
-                                          'correctAnswer',
-                                          e.target.value
-                                        )
-                                      }
-                                      className="block w-full rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm focus:border-green-500 focus:ring-green-500 text-foreground"
-                                      placeholder="Expected Answer / Key"
-                                    />
-                                  </td>
-                                </tr>
-                              )}
-                            </React.Fragment>
-                          );
-                        }
-                      )}
-                    </tbody>
-                  </table>
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        addQuestionExp(secIndex);
-                      }}
-                      className="w-full py-3 border-2 border-dashed border-border rounded-lg text-muted-foreground hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2 font-medium"
-                    >
-                      <Plus className="h-4 w-4" /> Add Question to{' '}
-                      {section.title}
-                    </button>
+                                    </td>
+                                  </tr>
+                                )}
+                              </React.Fragment>
+                            );
+                          }
+                        )}
+                      </tbody>
+                    </table>
+                    <div className="mt-4">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          addQuestionExp(secIndex);
+                        }}
+                        className="w-full py-3 border-2 border-dashed border-border rounded-lg text-muted-foreground hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2 font-medium"
+                      >
+                        <Plus className="h-4 w-4" /> Add Question to{' '}
+                        {section.title}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
           )}
 
           {showSectionsList && (
-          <div className="flex justify-between items-center pt-8">
-            <button
-              type="button"
-              onClick={addSection}
-              className="flex items-center gap-2 text-primary hover:text-primary/90 font-medium"
-            >
-              <Layers className="h-4 w-4" /> Add New Section
-            </button>
+            <div className="flex justify-between items-center pt-8">
+              <button
+                type="button"
+                onClick={addSection}
+                className="flex items-center gap-2 text-primary hover:text-primary/90 font-medium"
+              >
+                <Layers className="h-4 w-4" /> Add New Section
+              </button>
 
-            <button
-              type="submit"
-              className="flex items-center gap-2 rounded-lg gradient-primary px-8 py-3 text-white shadow-lg shadow-primary/20 hover:brightness-110 hover:shadow-xl transition-all font-medium"
-            >
-              <Save className="h-5 w-5" /> Publish Test
-            </button>
-          </div>
+              <button
+                type="submit"
+                className="flex items-center gap-2 rounded-lg gradient-primary px-8 py-3 text-white shadow-lg shadow-primary/20 hover:brightness-110 hover:shadow-xl transition-all font-medium"
+              >
+                <Save className="h-5 w-5" /> Publish Test
+              </button>
+            </div>
           )}
           {mode === 'ai' && !hasGeneratedContent && (
             <p className="text-muted-foreground text-sm pt-4">
-              Fill in the &quot;Generate test with AI&quot; section above and click <strong>Generate Test</strong>, then review and publish below.
+              Fill in the &quot;Generate test with AI&quot; section above and
+              click <strong>Generate Test</strong>, then review and publish
+              below.
             </p>
           )}
         </form>
       </div>
 
-      <AlertDialog open={showOverwriteConfirm} onOpenChange={setShowOverwriteConfirm}>
+      <AlertDialog
+        open={showOverwriteConfirm}
+        onOpenChange={setShowOverwriteConfirm}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Replace existing test?</AlertDialogTitle>
             <AlertDialogDescription>
-              The previously generated test will be lost and a new test will be generated if you proceed.
+              The previously generated test will be lost and a new test will be
+              generated if you proceed.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
