@@ -198,7 +198,9 @@ export async function generateQuestionsAI(
     When 'NIOS' is selected as the Board, lookup to the website https://nios.ac.in/ to generate the questions.
 
     Output must be a strictly valid JSON array of question objects matching this TypeScript interface:
-    
+
+    When the subject is mentioned as 'Math' or 'Maths' or 'Mathematics', then show some questions which involve mathematical concepts and operations where the assess needs to calculate the answer.
+  
     interface Question {
         text: string;
         type: string; // Must be one of: 'mcq', 'fill_in_blanks', 'true_false', 'match_columns', 'single_word', 'brief_answer'

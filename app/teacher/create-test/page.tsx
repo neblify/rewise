@@ -15,6 +15,16 @@ import {
   Loader2,
   FileUp,
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const QUESTION_TYPES = [
   { value: 'fill_in_blanks', label: 'Fill in the blanks' },
@@ -90,6 +100,7 @@ function CreateTestPageContent() {
   const [aiDifficulty, setAiDifficulty] = useState('Medium');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showOverwriteConfirm, setShowOverwriteConfirm] = useState(false);
 
   const showAiAssistant = mode === 'ai';
   const hasGeneratedContent = sections.some((s) => (s.questions?.length ?? 0) > 0);
@@ -182,8 +193,9 @@ function CreateTestPageContent() {
   };
 
   // AI Handler
-  const handleAiGenerate = async () => {
+  const handleAiGenerate = async (replaceExisting?: boolean) => {
     if (!aiTopic) return;
+    setShowOverwriteConfirm(false);
     setIsGenerating(true);
 
     try {
@@ -208,7 +220,7 @@ function CreateTestPageContent() {
           questions: res.data,
         };
         setSections(
-          isEmptyDefaultSection(sections)
+          replaceExisting || isEmptyDefaultSection(sections)
             ? [newSection]
             : [...sections, newSection]
         );
@@ -221,6 +233,14 @@ function CreateTestPageContent() {
       alert('Something went wrong');
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const onGenerateTestClick = () => {
+    if (hasGeneratedContent) {
+      setShowOverwriteConfirm(true);
+    } else {
+      handleAiGenerate();
     }
   };
 
@@ -268,21 +288,6 @@ function CreateTestPageContent() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            {showAiAssistant && (
-              <button
-                type="button"
-                onClick={handleAiGenerate}
-                disabled={isGenerating || !aiTopic}
-                className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isGenerating ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <Sparkles className="h-5 w-5" />
-                )}
-                Generate Test
-              </button>
-            )}
             {mode !== 'ai' && (
               <div className="relative">
                 <input
@@ -430,7 +435,7 @@ function CreateTestPageContent() {
                 </h2>
               </div>
               <p className="text-sm text-muted-foreground">
-                Set topic and options below, then click <strong>Generate Test</strong> above to create questions.
+                Set topic and options below, then click <strong>Generate Test</strong> to create questions.
               </p>
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="col-span-2">
@@ -489,6 +494,21 @@ function CreateTestPageContent() {
                     className="w-full accent-primary"
                   />
                 </div>
+              </div>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={onGenerateTestClick}
+                  disabled={isGenerating || !aiTopic}
+                  className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-5 w-5" />
+                  )}
+                  {hasGeneratedContent ? 'Generate new test' : 'Generate Test'}
+                </button>
               </div>
             </div>
           )}
@@ -1096,6 +1116,26 @@ function CreateTestPageContent() {
         </form>
       </div>
 
+      <AlertDialog open={showOverwriteConfirm} onOpenChange={setShowOverwriteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Replace existing test?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The previously generated test will be lost and a new test will be generated if you proceed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleAiGenerate(true)}
+              className="gradient-primary text-white border-0"
+            >
+              Proceed
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* AI Assistant Modal - only for non-AI mode (manual/pdf) if ever opened */}
       {isAiModalOpen && mode !== 'ai' && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
@@ -1192,7 +1232,7 @@ function CreateTestPageContent() {
               </div>
 
               <button
-                onClick={handleAiGenerate}
+                onClick={() => handleAiGenerate()}
                 disabled={isGenerating || !aiTopic}
                 className="w-full mt-4 flex items-center justify-center gap-2 gradient-primary text-white py-3 rounded-lg hover:brightness-110 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
