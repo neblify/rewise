@@ -102,7 +102,6 @@ function CreateTestPageContent() {
   const [isUploading, setIsUploading] = useState(false);
   const [showOverwriteConfirm, setShowOverwriteConfirm] = useState(false);
 
-  const showAiAssistant = mode === 'ai';
   const hasGeneratedContent = sections.some((s) => (s.questions?.length ?? 0) > 0);
   const showSectionsList =
     mode === 'manual' ||
