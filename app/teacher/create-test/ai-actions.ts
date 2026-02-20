@@ -199,7 +199,7 @@ export async function generateQuestionsAI(
 
     Output must be a strictly valid JSON array of question objects matching this TypeScript interface:
 
-    When the subject is mentioned as 'Math' or 'Maths' or 'Mathematics', then show some questions which involve mathematical concepts and operations where the assess needs to calculate the answer.
+    When the subject is mentioned as 'Math' or 'Maths' or 'Mathematics', then show some questions which involve mathematical concepts and operations where the candidate needs to calculate the answer.
   
     interface Question {
         text: string;
