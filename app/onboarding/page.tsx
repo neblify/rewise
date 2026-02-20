@@ -64,7 +64,6 @@ export default function OnboardingPage() {
                     ? 'border-[var(--sky)] ring-2 ring-[var(--sky)] bg-white/10'
                     : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                 }`}
-                onClick={() => setSelectedRole(role)}
               >
                 <input
                   type="radio"
