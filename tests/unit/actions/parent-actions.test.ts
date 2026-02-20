@@ -39,34 +39,42 @@ describe('Parent Actions', () => {
 
   describe('getStudentResults', () => {
     it('should fail if user is not authenticated', async () => {
-      (auth as any).mockResolvedValue({ userId: null });
+      vi.mocked(auth).mockResolvedValue({
+        userId: null,
+      } as unknown as Awaited<ReturnType<typeof auth>>);
       const result = await getStudentResults('student@example.com');
       expect(result.error).toBe('Unauthorized');
     });
 
     it('should return error if student not found', async () => {
-      (auth as any).mockResolvedValue({ userId: 'parent_123' });
-      (User.findOne as any).mockResolvedValue(null);
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'parent_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
+      vi.mocked(User.findOne).mockResolvedValue(null as never);
 
       const result = await getStudentResults('unknown@example.com');
       expect(result.error).toBe('Student not found with this email.');
     });
 
     it('should link student and return results successfully', async () => {
-      (auth as any).mockResolvedValue({ userId: 'parent_123' });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'parent_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
 
       const mockStudent = {
         clerkId: 'student_123',
         email: 'student@example.com',
       };
-      (User.findOne as any).mockResolvedValue(mockStudent);
+      vi.mocked(User.findOne).mockResolvedValue(mockStudent as never);
 
       const mockResults = [{ score: 10, testId: { title: 'Math Test' } }];
 
       // Mock Result chain: find -> populate -> sort
       const mockSort = vi.fn().mockResolvedValue(mockResults);
       const mockPopulate = vi.fn().mockReturnValue({ sort: mockSort });
-      (Result.find as any).mockReturnValue({ populate: mockPopulate });
+      vi.mocked(Result.find).mockReturnValue({
+        populate: mockPopulate,
+      } as unknown as ReturnType<typeof Result.find>);
 
       const result = await getStudentResults('student@example.com');
 
@@ -85,23 +93,29 @@ describe('Parent Actions', () => {
 
   describe('getLinkedStudents', () => {
     it('should fail if user is not authenticated', async () => {
-      (auth as any).mockResolvedValue({ userId: null });
+      vi.mocked(auth).mockResolvedValue({
+        userId: null,
+      } as unknown as Awaited<ReturnType<typeof auth>>);
       const result = await getLinkedStudents();
       expect(result.error).toBe('Unauthorized');
     });
 
     it('should return empty list if parent has no children', async () => {
-      (auth as any).mockResolvedValue({ userId: 'parent_NO_KIDS' });
-      (User.findOne as any).mockResolvedValue({ children: [] });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'parent_NO_KIDS',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
+      vi.mocked(User.findOne).mockResolvedValue({ children: [] } as never);
 
       const result = await getLinkedStudents();
       expect(result.data).toEqual([]);
     });
 
     it('should return linked students details', async () => {
-      (auth as any).mockResolvedValue({ userId: 'parent_123' });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'parent_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
       const mockParent = { children: ['child_1', 'child_2'] };
-      (User.findOne as any).mockResolvedValue(mockParent);
+      vi.mocked(User.findOne).mockResolvedValue(mockParent as never);
 
       const mockChildrenDetails = [
         { firstName: 'A', clerkId: 'child_1' },
@@ -110,7 +124,9 @@ describe('Parent Actions', () => {
 
       // Mock User.find chain
       const mockSelect = vi.fn().mockResolvedValue(mockChildrenDetails);
-      (User.find as any).mockReturnValue({ select: mockSelect });
+      vi.mocked(User.find).mockReturnValue({
+        select: mockSelect,
+      } as unknown as ReturnType<typeof User.find>);
 
       const result = await getLinkedStudents();
 

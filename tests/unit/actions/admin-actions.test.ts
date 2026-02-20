@@ -50,15 +50,16 @@ describe('Admin Actions', () => {
 
   describe('getAdminStats', () => {
     it('should return correct counts', async () => {
-      (User.countDocuments as any).mockImplementation((query: any) => {
-        if (query.role === 'teacher') return Promise.resolve(10);
-        if (query.role === 'student') return Promise.resolve(100);
-        if (query.role === 'parent') return Promise.resolve(50);
-        return Promise.resolve(0);
+      vi.mocked(User.countDocuments).mockImplementation((query: unknown) => {
+        const q = query as { role?: string };
+        if (q.role === 'teacher') return Promise.resolve(10) as never;
+        if (q.role === 'student') return Promise.resolve(100) as never;
+        if (q.role === 'parent') return Promise.resolve(50) as never;
+        return Promise.resolve(0) as never;
       });
-      (Test.countDocuments as any).mockResolvedValue(5);
-      (Question.countDocuments as any).mockResolvedValue(50);
-      (Result.countDocuments as any).mockResolvedValue(200);
+      vi.mocked(Test.countDocuments).mockResolvedValue(5 as never);
+      vi.mocked(Question.countDocuments).mockResolvedValue(50 as never);
+      vi.mocked(Result.countDocuments).mockResolvedValue(200 as never);
 
       const stats = await getAdminStats();
 
@@ -77,7 +78,9 @@ describe('Admin Actions', () => {
     it('should fetch all users sorted by date', async () => {
       const mockUsers = [{ firstName: 'John' }];
       const mockSort = vi.fn().mockResolvedValue(mockUsers);
-      (User.find as any).mockReturnValue({ sort: mockSort });
+      vi.mocked(User.find).mockReturnValue({
+        sort: mockSort,
+      } as unknown as ReturnType<typeof User.find>);
 
       const result = await getUsers();
 
@@ -89,7 +92,9 @@ describe('Admin Actions', () => {
     it('should fetch users filtered by role', async () => {
       const mockUsers = [{ firstName: 'John', role: 'teacher' }];
       const mockSort = vi.fn().mockResolvedValue(mockUsers);
-      (User.find as any).mockReturnValue({ sort: mockSort });
+      vi.mocked(User.find).mockReturnValue({
+        sort: mockSort,
+      } as unknown as ReturnType<typeof User.find>);
 
       const result = await getUsers('teacher');
 
@@ -102,7 +107,9 @@ describe('Admin Actions', () => {
     it('should fetch all tests sorted by date', async () => {
       const mockTests = [{ title: 'Math Test' }];
       const mockSort = vi.fn().mockResolvedValue(mockTests);
-      (Test.find as any).mockReturnValue({ sort: mockSort });
+      vi.mocked(Test.find).mockReturnValue({
+        sort: mockSort,
+      } as unknown as ReturnType<typeof Test.find>);
 
       const result = await getTests();
 
@@ -117,7 +124,9 @@ describe('Admin Actions', () => {
       const mockQuestions = [{ text: 'Q1' }];
       const mockLimit = vi.fn().mockResolvedValue(mockQuestions);
       const mockSort = vi.fn().mockReturnValue({ limit: mockLimit });
-      (Question.find as any).mockReturnValue({ sort: mockSort });
+      vi.mocked(Question.find).mockReturnValue({
+        sort: mockSort,
+      } as unknown as ReturnType<typeof Question.find>);
 
       const result = await getQuestions();
 

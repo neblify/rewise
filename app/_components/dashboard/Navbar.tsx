@@ -28,6 +28,9 @@ export default function Navbar({ variant = 'student' }: NavbarProps) {
               {variant === 'student' ? (
                 <>
                   <NavLink href="/student">Dashboard</NavLink>
+                  <NavLink href="/student/study-material">
+                    Study Material
+                  </NavLink>
                   <NavLink href="/student/results">My Results</NavLink>
                   <NavLink href="/student/profile">Profile</NavLink>
                 </>
@@ -38,11 +41,16 @@ export default function Navbar({ variant = 'student' }: NavbarProps) {
                   <NavLink href="/teacher/questions">Question Bank</NavLink>
                   <NavLink href="/teacher/create-test/choose">Create Test</NavLink>
                 </>
+              ) : variant === 'admin' ? (
+                <>
+                  <NavLink href="/admin">Overview</NavLink>
+                  <NavLink href="/admin/course-material">
+                    Course Material
+                  </NavLink>
+                </>
               ) : (
                 <>
-                  <NavLink href={variant === 'parent' ? '/parent' : '/admin'}>
-                    {variant === 'parent' ? 'Dashboard' : 'Overview'}
-                  </NavLink>
+                  <NavLink href="/parent">Dashboard</NavLink>
                 </>
               )}
             </div>

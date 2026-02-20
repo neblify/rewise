@@ -32,8 +32,8 @@ export default function ContactPage() {
           Contact Us
         </h2>
         <p className="mt-2 text-lg leading-8 text-muted-foreground">
-          Have feedback, found an issue, or want to request a feature? We'd love
-          to hear from you.
+          Have feedback, found an issue, or want to request a feature? We&apos;d
+          love to hear from you.
         </p>
       </div>
 

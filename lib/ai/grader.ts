@@ -1,17 +1,43 @@
 import Groq from 'groq-sdk';
+import { ITest, ISection, IQuestion } from '@/lib/db/models/Test';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+interface FlatQuestion {
+  id: string;
+  text: string;
+  type: string;
+  correctAnswer: string | string[] | number[] | undefined;
+  marks: number;
+  studentAnswer: string | number[] | undefined;
+  sectionTitle?: string;
+}
+
+interface GradingResultItem {
+  questionId: string;
+  isCorrect: boolean;
+  marksObtained: number;
+  feedback: string;
+}
+
+interface GradingResponse {
+  results: GradingResultItem[];
+  totalMarksObtained: number;
+  maxMarks: number;
+  weakAreas: string[];
+  overallFeedback: string;
+}
+
 export async function gradeTestWithAI(
-  test: any,
-  studentAnswers: Record<string, any>
+  test: ITest,
+  studentAnswers: Record<string, string | number[] | undefined>
 ) {
   // Flatten sections to a single list of questions for grading context
-  let flatQuestions: any[] = [];
+  let flatQuestions: FlatQuestion[] = [];
 
   if (test.sections && test.sections.length > 0) {
-    test.sections.forEach((sec: any, sIndex: number) => {
-      sec.questions.forEach((q: any, qIndex: number) => {
+    test.sections.forEach((sec: ISection, sIndex: number) => {
+      (sec.questions as IQuestion[]).forEach((q: IQuestion, qIndex: number) => {
         const normalize = (str: string) =>
           str ? str.toString().trim().toLowerCase() : '';
 
@@ -22,15 +48,14 @@ export async function gradeTestWithAI(
 
         // Special handling for Fill in the Blanks to ignore strict case/space issues
         if (q.type === 'fill_in_blanks') {
-          if (
-            normalize(processedStudentAnswer) ===
-            normalize(processedCorrectAnswer)
-          ) {
+          const studentStr = String(processedStudentAnswer ?? '');
+          const correctStr = String(processedCorrectAnswer ?? '');
+          if (normalize(studentStr) === normalize(correctStr)) {
             // If they match loosely, send the EXACT correct answer to AI so it doesn't complain
-            processedStudentAnswer = processedCorrectAnswer;
+            processedStudentAnswer = correctStr;
           } else {
             // Otherwise just trim it
-            processedStudentAnswer = processedStudentAnswer.toString().trim();
+            processedStudentAnswer = studentStr.trim();
           }
         }
 
@@ -47,32 +72,33 @@ export async function gradeTestWithAI(
     });
   } else if (test.questions) {
     // Legacy fallback
-    flatQuestions = test.questions.map((q: any, i: number) => {
-      const normalize = (str: string) =>
-        str ? str.toString().trim().toLowerCase() : '';
-      let processedStudentAnswer = studentAnswers[i] || 'No Answer';
-      const processedCorrectAnswer = q.correctAnswer;
+    flatQuestions = (test.questions as IQuestion[]).map(
+      (q: IQuestion, i: number) => {
+        const normalize = (str: string) =>
+          str ? str.toString().trim().toLowerCase() : '';
+        let processedStudentAnswer = studentAnswers[i] || 'No Answer';
+        const processedCorrectAnswer = q.correctAnswer;
 
-      if (q.type === 'fill_in_blanks') {
-        if (
-          normalize(processedStudentAnswer) ===
-          normalize(processedCorrectAnswer)
-        ) {
-          processedStudentAnswer = processedCorrectAnswer;
-        } else {
-          processedStudentAnswer = processedStudentAnswer.toString().trim();
+        if (q.type === 'fill_in_blanks') {
+          const studentStr = String(processedStudentAnswer ?? '');
+          const correctStr = String(processedCorrectAnswer ?? '');
+          if (normalize(studentStr) === normalize(correctStr)) {
+            processedStudentAnswer = correctStr;
+          } else {
+            processedStudentAnswer = studentStr.trim();
+          }
         }
-      }
 
-      return {
-        id: i.toString(),
-        text: q.text,
-        type: q.type,
-        correctAnswer: q.correctAnswer,
-        marks: q.marks,
-        studentAnswer: processedStudentAnswer,
-      };
-    });
+        return {
+          id: i.toString(),
+          text: q.text,
+          type: q.type,
+          correctAnswer: q.correctAnswer,
+          marks: q.marks,
+          studentAnswer: processedStudentAnswer,
+        };
+      }
+    );
   }
 
   const prompt = `
@@ -133,7 +159,7 @@ export async function gradeTestWithAI(
     const content = completion.choices[0]?.message?.content;
     if (!content) throw new Error('No content from AI');
 
-    const parsed = JSON.parse(content);
+    const parsed = JSON.parse(content) as GradingResponse;
 
     // Deterministic scoring for match_columns: partial marks per correct pair
     for (const item of flatQuestions) {
@@ -156,7 +182,9 @@ export async function gradeTestWithAI(
       }
       const marksPerPair = (item.marks || 1) / totalPairs;
       const marksObtained = Math.round(marksPerPair * correctPairs * 100) / 100;
-      const res = parsed.results?.find((r: any) => r.questionId === item.id);
+      const res = parsed.results?.find(
+        (r: GradingResultItem) => r.questionId === item.id
+      );
       if (res) {
         res.marksObtained = marksObtained;
         res.isCorrect = marksObtained > 0;
@@ -168,11 +196,11 @@ export async function gradeTestWithAI(
     }
     if (parsed.results?.length) {
       parsed.totalMarksObtained = parsed.results.reduce(
-        (sum: number, r: any) => sum + (r.marksObtained ?? 0),
+        (sum: number, r: GradingResultItem) => sum + (r.marksObtained ?? 0),
         0
       );
       parsed.maxMarks = flatQuestions.reduce(
-        (sum: number, q: any) => sum + (q.marks ?? 1),
+        (sum: number, q: FlatQuestion) => sum + (q.marks ?? 1),
         0
       );
     }

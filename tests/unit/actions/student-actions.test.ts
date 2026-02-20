@@ -47,32 +47,42 @@ describe('Student Actions', () => {
 
   describe('submitTest', () => {
     it('should fail if user is not authenticated', async () => {
-      (auth as any).mockResolvedValue({ userId: null });
+      vi.mocked(auth).mockResolvedValue({
+        userId: null,
+      } as unknown as Awaited<ReturnType<typeof auth>>);
       const result = await submitTest('test_123', {});
       expect(result.message).toBe('Unauthorized');
     });
 
     it('should fail if test is not found', async () => {
-      (auth as any).mockResolvedValue({ userId: 'student_123' });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'student_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
 
       const mockPopulate = vi
         .fn()
         .mockReturnValue({ populate: vi.fn().mockResolvedValue(null) });
-      (Test.findById as any).mockReturnValue({ populate: mockPopulate });
+      vi.mocked(Test.findById).mockReturnValue({
+        populate: mockPopulate,
+      } as unknown as ReturnType<typeof Test.findById>);
 
       const result = await submitTest('test_invalid', {});
       expect(result.message).toBe('Test not found');
     });
 
     it('should submit and grade test successfully', async () => {
-      (auth as any).mockResolvedValue({ userId: 'student_123' });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'student_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
 
       const mockTest = { _id: 'test_123', title: 'Math Test' };
       const mockPopulate2 = vi.fn().mockResolvedValue(mockTest);
       const mockPopulate1 = vi
         .fn()
         .mockReturnValue({ populate: mockPopulate2 });
-      (Test.findById as any).mockReturnValue({ populate: mockPopulate1 });
+      vi.mocked(Test.findById).mockReturnValue({
+        populate: mockPopulate1,
+      } as unknown as ReturnType<typeof Test.findById>);
 
       // Mock grading result
       const mockGradingResult = {
@@ -89,9 +99,11 @@ describe('Student Actions', () => {
         weakAreas: [],
         overallFeedback: 'Good',
       };
-      (gradeTestWithAI as any).mockResolvedValue(mockGradingResult);
+      vi.mocked(gradeTestWithAI).mockResolvedValue(mockGradingResult);
 
-      (Result.create as any).mockResolvedValue({ _id: 'result_123' });
+      vi.mocked(Result.create).mockResolvedValue({
+        _id: 'result_123',
+      } as never);
 
       const result = await submitTest('test_123', { q1: 'Answer' });
 
@@ -101,23 +113,27 @@ describe('Student Actions', () => {
       expect(result.resultId).toBe('result_123');
 
       // Verify what was saved to Result
-      const saveCall = (Result.create as any).mock.calls[0][0];
+      const saveCall = vi.mocked(Result.create).mock.calls[0][0];
       expect(saveCall.studentId).toBe('student_123');
       expect(saveCall.totalScore).toBe(1);
       expect(saveCall.answers[0].questionId).toBe('q1');
     });
 
     it('should return error if grading fails', async () => {
-      (auth as any).mockResolvedValue({ userId: 'student_123' });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'student_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
 
       const mockTest = { _id: 'test_123' };
       const mockPopulate2 = vi.fn().mockResolvedValue(mockTest);
       const mockPopulate1 = vi
         .fn()
         .mockReturnValue({ populate: mockPopulate2 });
-      (Test.findById as any).mockReturnValue({ populate: mockPopulate1 });
+      vi.mocked(Test.findById).mockReturnValue({
+        populate: mockPopulate1,
+      } as unknown as ReturnType<typeof Test.findById>);
 
-      (gradeTestWithAI as any).mockResolvedValue(null);
+      vi.mocked(gradeTestWithAI).mockResolvedValue(null);
 
       const result = await submitTest('test_123', {});
       expect(result.message).toBe('Grading failed');

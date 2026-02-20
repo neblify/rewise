@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { GET } from '@/app/api/test/[id]/route';
 import { currentAuth } from '@/lib/auth-wrapper';
 import Test from '@/lib/db/models/Test';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 // Mock Dependencies
 vi.mock('@/lib/auth-wrapper', () => ({
@@ -35,7 +35,9 @@ describe('API Route: GET /api/test/[id]', () => {
   });
 
   it('should return 401 if user is not authenticated', async () => {
-    (currentAuth as any).mockResolvedValue({ userId: null });
+    vi.mocked(currentAuth).mockResolvedValue({
+      userId: null,
+    } as unknown as Awaited<ReturnType<typeof currentAuth>>);
     const req = createMockRequest('http://localhost/api/test/123');
     const params = Promise.resolve({ id: '123' });
 
@@ -47,10 +49,12 @@ describe('API Route: GET /api/test/[id]', () => {
   });
 
   it('should return 404 if test is not found', async () => {
-    (currentAuth as any).mockResolvedValue({ userId: 'user_123' });
-    (Test.findOne as any).mockReturnValue({
+    vi.mocked(currentAuth).mockResolvedValue({
+      userId: 'user_123',
+    } as unknown as Awaited<ReturnType<typeof currentAuth>>);
+    vi.mocked(Test.findOne).mockReturnValue({
       populate: vi.fn().mockResolvedValue(null),
-    });
+    } as unknown as ReturnType<typeof Test.findOne>);
 
     const req = createMockRequest('http://localhost/api/test/123');
     const params = Promise.resolve({ id: '123' });
@@ -63,16 +67,18 @@ describe('API Route: GET /api/test/[id]', () => {
   });
 
   it('should return test data if found', async () => {
-    (currentAuth as any).mockResolvedValue({ userId: 'user_123' });
+    vi.mocked(currentAuth).mockResolvedValue({
+      userId: 'user_123',
+    } as unknown as Awaited<ReturnType<typeof currentAuth>>);
 
     const mockTest = {
       _id: '123',
       title: 'Sample Test',
       createdBy: 'user_123',
     };
-    (Test.findOne as any).mockReturnValue({
+    vi.mocked(Test.findOne).mockReturnValue({
       populate: vi.fn().mockResolvedValue(mockTest),
-    });
+    } as unknown as ReturnType<typeof Test.findOne>);
 
     const req = createMockRequest('http://localhost/api/test/123');
     const params = Promise.resolve({ id: '123' });

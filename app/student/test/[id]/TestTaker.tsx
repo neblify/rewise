@@ -141,12 +141,12 @@ function MatchColumnQuestion({
 
 export default function TestTaker({
   test,
-  userId,
+  userId: _userId,
 }: {
   test: ITest;
   userId: string;
 }) {
-  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [answers, setAnswers] = useState<Record<string, string | number[]>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
@@ -156,8 +156,14 @@ export default function TestTaker({
   const answersRef = useRef(answers);
   const hasAutoSubmitted = useRef(false);
   const setSubmittingRef = useRef(setIsSubmitting);
-  answersRef.current = answers;
-  setSubmittingRef.current = setIsSubmitting;
+
+  useEffect(() => {
+    answersRef.current = answers;
+  }, [answers]);
+
+  useEffect(() => {
+    setSubmittingRef.current = setIsSubmitting;
+  }, [setIsSubmitting]);
 
   useEffect(() => {
     if (!test.isTimed || totalSeconds <= 0) return;
@@ -191,7 +197,7 @@ export default function TestTaker({
     return () => clearInterval(id);
   }, [test.isTimed, test._id, totalSeconds, router]);
 
-  const handleAnswerChange = (questionId: string, value: any) => {
+  const handleAnswerChange = (questionId: string, value: string | number[]) => {
     setAnswers(prev => ({
       ...prev,
       [questionId]: value,
@@ -236,6 +242,7 @@ export default function TestTaker({
               </span>
             </div>
             {q.mediaUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={q.mediaUrl}
                 alt="Question Image"
@@ -296,7 +303,7 @@ export default function TestTaker({
             'difference',
           ].includes(q.type) && (
             <textarea
-              value={answers[uniqueId] || ''}
+              value={(answers[uniqueId] as string) || ''}
               onChange={e => handleAnswerChange(uniqueId, e.target.value)}
               className="block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary"
               rows={

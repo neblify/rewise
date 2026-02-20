@@ -1,13 +1,30 @@
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Result from '@/lib/db/models/Result';
-import Test from '@/lib/db/models/Test';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
-import { formatDate } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { ChevronLeft, CheckCircle, XCircle } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { CheckCircle, XCircle } from 'lucide-react';
+import { ITest, IQuestion } from '@/lib/db/models/Test';
+
+interface ResultAnswer {
+  questionId: string;
+  answer?: string | number[];
+  isCorrect?: boolean;
+  marksObtained?: number;
+  feedback?: string;
+}
+
+interface PopulatedResult {
+  _id: string;
+  testId: ITest;
+  studentId: string;
+  answers: ResultAnswer[];
+  totalScore: number;
+  maxScore: number;
+  aiFeedback?: string;
+  weakAreas?: string[];
+  createdAt: Date;
+}
 
 interface Props {
   params: Promise<{
@@ -23,8 +40,7 @@ export default async function ResultPage(props: Props) {
   const { id } = params;
 
   await dbConnect();
-  // @ts-ignore
-  const result: any = await Result.findById(id).populate({
+  const result = await Result.findById(id).populate({
     path: 'testId',
     populate: [
       {
@@ -38,19 +54,24 @@ export default async function ResultPage(props: Props) {
 
   if (!result) notFound();
 
-  const test = result.testId;
+  const populatedResult = result as unknown as PopulatedResult;
+  const test = populatedResult.testId;
   const percentage =
-    result.maxScore > 0
-      ? Math.round((result.totalScore / result.maxScore) * 100)
+    populatedResult.maxScore > 0
+      ? Math.round(
+          (populatedResult.totalScore / populatedResult.maxScore) * 100
+        )
       : 0;
 
   // Helper to find question text by ID (which is "sIndex-qIndex" or just "index")
-  const findQuestion = (id: string) => {
+  const findQuestion = (id: string): IQuestion | undefined => {
     if (id.includes('-')) {
       const [sIndex, qIndex] = id.split('-').map(Number);
-      return test.sections?.[sIndex]?.questions?.[qIndex];
+      return (test.sections?.[sIndex]?.questions as IQuestion[] | undefined)?.[
+        qIndex
+      ];
     } else {
-      return test.questions?.[parseInt(id)];
+      return (test.questions as IQuestion[] | undefined)?.[parseInt(id)];
     }
   };
 
@@ -68,7 +89,7 @@ export default async function ResultPage(props: Props) {
               <span className="text-xl opacity-80 mb-2">Score</span>
             </div>
             <p className="mt-2 text-white/70">
-              {result.totalScore} / {result.maxScore} Marks
+              {populatedResult.totalScore} / {populatedResult.maxScore} Marks
             </p>
           </div>
 
@@ -81,7 +102,7 @@ export default async function ResultPage(props: Props) {
                 AI Feedback
               </h3>
               <p className="text-muted-foreground leading-relaxed bg-background p-4 rounded-xl border border-border">
-                {result.aiFeedback || 'No feedback generated.'}
+                {populatedResult.aiFeedback || 'No feedback generated.'}
               </p>
             </div>
             <div>
@@ -91,9 +112,10 @@ export default async function ResultPage(props: Props) {
                 </span>
                 Weak Areas
               </h3>
-              {result.weakAreas && result.weakAreas.length > 0 ? (
+              {populatedResult.weakAreas &&
+              populatedResult.weakAreas.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {result.weakAreas.map((area: string, i: number) => (
+                  {populatedResult.weakAreas.map((area: string, i: number) => (
                     <span
                       key={i}
                       className="px-3 py-1 bg-red-50 text-red-700 rounded-full text-sm font-medium border border-red-100"
@@ -117,7 +139,7 @@ export default async function ResultPage(props: Props) {
             Detailed Analysis
           </h2>
 
-          {result.answers.map((ans: any, i: number) => {
+          {populatedResult.answers.map((ans: ResultAnswer, i: number) => {
             const question = findQuestion(ans.questionId);
             const qText = question ? question.text : `Question ${i + 1}`;
 

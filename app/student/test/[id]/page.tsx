@@ -1,11 +1,9 @@
-import { auth } from '@clerk/nextjs/server';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Test from '@/lib/db/models/Test';
 import Question from '@/lib/db/models/Question'; // Ensure model is registered
 import { notFound, redirect } from 'next/navigation';
 import TestTaker from './TestTaker';
-import Result from '@/lib/db/models/Result';
 
 interface Props {
   params: Promise<{
@@ -21,7 +19,6 @@ export default async function TestPage(props: Props) {
   const { id } = params;
 
   await dbConnect();
-  // @ts-ignore
   const test = await Test.findById(id)
     .populate({
       path: 'sections.questions',

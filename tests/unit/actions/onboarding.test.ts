@@ -31,14 +31,18 @@ describe('Onboarding Actions', () => {
 
   describe('completeOnboarding', () => {
     it('should fail if user is not authenticated', async () => {
-      (auth as any).mockResolvedValue({ userId: null });
+      vi.mocked(auth).mockResolvedValue({
+        userId: null,
+      } as unknown as Awaited<ReturnType<typeof auth>>);
       const formData = new FormData();
       const result = await completeOnboarding({}, formData);
       expect(result.message).toBe('No Logged In User');
     });
 
     it('should fail if role validation fails', async () => {
-      (auth as any).mockResolvedValue({ userId: 'user_123' });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'user_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
       const formData = new FormData();
       formData.append('role', 'invalid_role');
 
@@ -47,7 +51,9 @@ describe('Onboarding Actions', () => {
     });
 
     it('should complete onboarding successfully', async () => {
-      (auth as any).mockResolvedValue({ userId: 'user_123' });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'user_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
 
       const mockUser = {
         emailAddresses: [{ emailAddress: 'test@example.com' }],
@@ -56,12 +62,12 @@ describe('Onboarding Actions', () => {
       };
 
       const mockUpdateMetadata = vi.fn();
-      (clerkClient as any).mockResolvedValue({
+      vi.mocked(clerkClient).mockResolvedValue({
         users: {
           getUser: vi.fn().mockResolvedValue(mockUser),
           updateUserMetadata: mockUpdateMetadata,
         },
-      });
+      } as unknown as Awaited<ReturnType<typeof clerkClient>>);
 
       const formData = new FormData();
       formData.append('role', 'teacher');
@@ -91,10 +97,12 @@ describe('Onboarding Actions', () => {
     });
 
     it('should handle errors gracefully', async () => {
-      (auth as any).mockResolvedValue({ userId: 'user_123' });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'user_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
 
       // Mock Clerk client failure
-      (clerkClient as any).mockRejectedValue(new Error('Clerk Error'));
+      vi.mocked(clerkClient).mockRejectedValue(new Error('Clerk Error'));
 
       const formData = new FormData();
       formData.append('role', 'teacher');

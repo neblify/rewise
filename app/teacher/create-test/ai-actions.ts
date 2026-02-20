@@ -1,84 +1,7 @@
 'use server';
 
 import Groq from 'groq-sdk';
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-
-// Polyfills for pdf-parse / pdfjs-dist in Node environment
-// @ts-ignore
-if (typeof Promise.withResolvers === 'undefined') {
-  // @ts-ignore
-  if (typeof window !== 'undefined') {
-    // browser logic (unlikely here)
-  } else {
-    // Node polyfills
-    // @ts-ignore
-    global.Promise.withResolvers = function () {
-      let resolve, reject;
-      const promise = new Promise((res, rej) => {
-        resolve = res;
-        reject = rej;
-      });
-      return { promise, resolve, reject };
-    };
-  }
-}
-
-// Global mocks for DOM APIs required by pdfjs-dist legacy builds
-// @ts-ignore
-if (!global.DOMMatrix) {
-  // @ts-ignore
-  global.DOMMatrix = class DOMMatrix {
-    constructor() {
-      // @ts-ignore
-      this.a = 1;
-      // @ts-ignore
-      this.b = 0;
-      // @ts-ignore
-      this.c = 0;
-      // @ts-ignore
-      this.d = 1;
-      // @ts-ignore
-      this.e = 0;
-      // @ts-ignore
-      this.f = 0;
-    }
-    multiply() {
-      return this;
-    }
-    translate() {
-      return this;
-    }
-    scale() {
-      return this;
-    }
-    transformPoint(p: any) {
-      return p;
-    }
-  };
-}
-// @ts-ignore
-if (!global.ImageData) {
-  // @ts-ignore
-  global.ImageData = class ImageData {
-    constructor(width: number, height: number) {
-      // @ts-ignore
-      this.width = width;
-      // @ts-ignore
-      this.height = height;
-      // @ts-ignore
-      this.data = new Uint8ClampedArray(width * height * 4);
-    }
-  };
-}
-// @ts-ignore
-if (!global.Path2D) {
-  // @ts-ignore
-  global.Path2D = class Path2D {};
-}
-
-// pdf-parse require moved inside extractQuestionsFromPdf to avoid top-level execution side-effects
+import { parsePdfToText } from '@/lib/pdf/parse';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -93,11 +16,7 @@ export async function extractQuestionsFromPdf(formData: FormData) {
   }
 
   try {
-    const pdf = require('pdf-parse');
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const data = await pdf(buffer);
-    const text = data.text;
+    const text = await parsePdfToText(file);
 
     // Truncate text if too long to avoid token limits (rudimentary check)
     // 50k chars is usually safe for large context models, but being safe.
@@ -151,13 +70,13 @@ export async function extractQuestionsFromPdf(formData: FormData) {
     const parsed = JSON.parse(content);
     const questions = Array.isArray(parsed) ? parsed : parsed.questions || [];
 
-    const sanitizedQuestions = questions.map((q: any) => ({
+    const sanitizedQuestions = questions.map((q: Record<string, unknown>) => ({
       id: Date.now() + Math.random(),
-      text: q.text,
-      type: q.type || 'brief_answer',
-      options: q.options || [],
-      correctAnswer: q.correctAnswer || '',
-      marks: q.marks || 1,
+      text: q.text as string,
+      type: (q.type as string) || 'brief_answer',
+      options: (q.options as string[]) || [],
+      correctAnswer: (q.correctAnswer as string) || '',
+      marks: (q.marks as number) || 1,
     }));
 
     return { data: sanitizedQuestions };
@@ -179,10 +98,25 @@ export async function generateQuestionsAI(
     return { error: 'AI Service Unavailable (Missing Key)' };
   }
 
+  // RAG: Retrieve relevant course material for context
+  let courseContext = '';
+  try {
+    if (process.env.UPSTASH_VECTOR_REST_URL) {
+      const { queryRelevantChunks } = await import('@/lib/vector/operations');
+      const chunks = await queryRelevantChunks(topic, { board, grade }, 5);
+      if (chunks.length > 0) {
+        courseContext = chunks.map(c => c.text).join('\n\n---\n\n');
+      }
+    }
+  } catch (e) {
+    console.warn('RAG context retrieval failed:', e);
+  }
+
   const prompt = `
     You are an expert exam setter for ${board} Board, Grade ${grade}.
     Generate ${count} ${difficulty} questions on the topic: "${topic}".
-    
+    ${courseContext ? `\n    Use the following course material as reference for generating accurate, curriculum-aligned questions:\n    """\n    ${courseContext.slice(0, 15000)}\n    """` : ''}
+
     Question Type: ${type}
 
     When 'IGCSE' is selected as the Board, lookup to the website https://www.cie.org.uk/ and https://www.cambridge.org/ to generate the questions.
@@ -243,8 +177,8 @@ export async function generateQuestionsAI(
     const questions = Array.isArray(parsed) ? parsed : parsed.questions || [];
 
     // Post-processing to ensure compatibility
-    const sanitizedQuestions = questions.map((q: any) => {
-      const effectiveType = type === 'mixed' ? q.type : type;
+    const sanitizedQuestions = questions.map((q: Record<string, unknown>) => {
+      const effectiveType = type === 'mixed' ? (q.type as string) : type;
       if (
         effectiveType === 'match_columns' &&
         Array.isArray(q.options) &&
@@ -284,21 +218,21 @@ export async function generateQuestionsAI(
         );
         return {
           id: Date.now() + Math.random(),
-          text: q.text,
+          text: q.text as string,
           type: effectiveType,
           leftColumn,
           options,
           correctAnswer,
-          marks: q.marks || 1,
+          marks: (q.marks as number) || 1,
         };
       }
       return {
         id: Date.now() + Math.random(),
-        text: q.text,
+        text: q.text as string,
         type: effectiveType,
-        options: q.options || [],
-        correctAnswer: q.correctAnswer,
-        marks: q.marks || 1,
+        options: (q.options as string[]) || [],
+        correctAnswer: q.correctAnswer as string,
+        marks: (q.marks as number) || 1,
       };
     });
 

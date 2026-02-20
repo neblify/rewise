@@ -121,10 +121,10 @@ export async function deleteTest(
 
     // Collect question IDs from sections
     if (test.sections && test.sections.length > 0) {
-      test.sections.forEach((section: any) => {
+      test.sections.forEach((section: { questions?: unknown[] }) => {
         if (section.questions && Array.isArray(section.questions)) {
-          section.questions.forEach((qId: any) => {
-            questionIds.push(qId.toString());
+          section.questions.forEach((qId: unknown) => {
+            questionIds.push(String(qId));
           });
         }
       });

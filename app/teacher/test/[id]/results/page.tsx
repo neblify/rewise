@@ -3,20 +3,17 @@ import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Test from '@/lib/db/models/Test';
 import Question from '@/lib/db/models/Question'; // Ensure model is registered
-import Result from '@/lib/db/models/Result';
+import Result, { IResult } from '@/lib/db/models/Result';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, User, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, User } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+
+interface StudentInfo {
+  name: string;
+  email?: string;
+  imageUrl?: string | null;
+}
 
 interface Props {
   params: Promise<{
@@ -34,7 +31,6 @@ export default async function TestResultsPage(props: Props) {
   await dbConnect();
 
   // Fetch test to ensure it exists and belongs to this teacher
-  // @ts-ignore
   const test = await Test.findOne({ _id: id, createdBy: userId })
     .populate({
       path: 'sections.questions',
@@ -48,14 +44,13 @@ export default async function TestResultsPage(props: Props) {
   if (!test) notFound();
 
   // Fetch all results for this test
-  // @ts-ignore
   const results = await Result.find({ testId: id }).sort({ createdAt: -1 });
 
   // Fetch user details from Clerk
-  const studentIds = [...new Set(results.map((r: any) => r.studentId))];
+  const studentIds = [...new Set(results.map((r: IResult) => r.studentId))];
   const client = await clerkClient();
 
-  const userMap: Record<string, any> = {};
+  const userMap: Record<string, StudentInfo> = {};
   if (studentIds.length > 0) {
     try {
       const users = await client.users.getUserList({
@@ -115,7 +110,7 @@ export default async function TestResultsPage(props: Props) {
               {results.length > 0
                 ? Math.round(
                     results.reduce(
-                      (acc: number, curr: any) =>
+                      (acc: number, curr: IResult) =>
                         acc + (curr.totalScore / curr.maxScore) * 100,
                       0
                     ) / results.length
@@ -161,7 +156,7 @@ export default async function TestResultsPage(props: Props) {
                 </tr>
               </thead>
               <tbody className="bg-card divide-y divide-border">
-                {results.map((result: any) => {
+                {results.map((result: IResult) => {
                   // Use studentId details if populated, otherwise fallback (future proofing if User model isn't fully linked yet)
                   // In a real app, you'd rely on Clerk's user info or a synced User model
                   // Get student info from our map
@@ -178,11 +173,12 @@ export default async function TestResultsPage(props: Props) {
                   const passed = percentage >= 33;
 
                   return (
-                    <tr key={result._id} className="hover:bg-muted">
+                    <tr key={String(result._id)} className="hover:bg-muted">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="flex-shrink-0 h-8 w-8 rounded-full bg-muted flex items-center justify-center text-muted-foreground overflow-hidden">
                             {studentInfo.imageUrl ? (
+                              // eslint-disable-next-line @next/next/no-img-element
                               <img
                                 src={studentInfo.imageUrl}
                                 alt={studentName}

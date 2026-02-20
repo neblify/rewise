@@ -86,7 +86,7 @@ export async function createTest(prevState: unknown, formData: FormData) {
     }
 
     sectionsData = JSON.parse(sectionsString || '[]');
-  } catch (error) {
+  } catch (_error) {
     return { message: 'Invalid test data format' };
   }
 
@@ -176,7 +176,7 @@ export async function updateTest(prevState: unknown, formData: FormData) {
     }
 
     sectionsData = JSON.parse(sectionsString || '[]');
-  } catch (error) {
+  } catch (_error) {
     return { message: 'Invalid test data format' };
   }
 

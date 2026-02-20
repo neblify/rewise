@@ -1,4 +1,4 @@
-import { auth, clerkClient } from '@clerk/nextjs/server';
+import { clerkClient } from '@clerk/nextjs/server';
 import { currentAuth } from '@/lib/auth-wrapper';
 import { redirect } from 'next/navigation';
 import { Hero } from './_components/landing/Hero';

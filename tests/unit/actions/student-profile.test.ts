@@ -31,7 +31,9 @@ describe('Student Profile Actions', () => {
 
   describe('updateProfile', () => {
     it('should fail if user is not authenticated', async () => {
-      (auth as any).mockResolvedValue({ userId: null });
+      vi.mocked(auth).mockResolvedValue({
+        userId: null,
+      } as unknown as Awaited<ReturnType<typeof auth>>);
       const formData = new FormData();
       const result = await updateProfile(formData);
       expect(result.success).toBe(false);
@@ -39,7 +41,9 @@ describe('Student Profile Actions', () => {
     });
 
     it('should fail if required fields are missing', async () => {
-      (auth as any).mockResolvedValue({ userId: 'user_123' });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'user_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
       const formData = new FormData();
       // Missing board and grade
       const result = await updateProfile(formData);
@@ -48,16 +52,18 @@ describe('Student Profile Actions', () => {
     });
 
     it('should update profile successfully', async () => {
-      (auth as any).mockResolvedValue({ userId: 'user_123' });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'user_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
 
       const formData = new FormData();
       formData.append('board', 'CBSE');
       formData.append('grade', '10');
 
-      (User.findOneAndUpdate as any).mockResolvedValue({
+      vi.mocked(User.findOneAndUpdate).mockResolvedValue({
         clerkId: 'user_123',
         board: 'CBSE',
-      });
+      } as never);
 
       const result = await updateProfile(formData);
 
@@ -72,12 +78,14 @@ describe('Student Profile Actions', () => {
     });
 
     it('should handle database errors', async () => {
-      (auth as any).mockResolvedValue({ userId: 'user_123' });
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'user_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
       const formData = new FormData();
       formData.append('board', 'CBSE');
       formData.append('grade', '10');
 
-      (User.findOneAndUpdate as any).mockRejectedValue(
+      vi.mocked(User.findOneAndUpdate).mockRejectedValue(
         new Error('DB connection failed')
       );
 

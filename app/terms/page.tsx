@@ -23,16 +23,18 @@ export default function TermsOfService() {
             **Effective Date:** January 28, 2026
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
-            **Website:** https://rewise.vercel.app/ ("we", "us", "our",
-            "ReWise", "the Service")
+            **Website:** https://rewise.vercel.app/ (&quot;we&quot;,
+            &quot;us&quot;, &quot;our&quot;, &quot;ReWise&quot;, &quot;the
+            Service&quot;)
           </p>
         </div>
 
         <div className="prose max-w-none space-y-8">
           <p>
-            Please read these Terms of Service ("Terms", "Agreement") carefully
-            before using the website https://rewise.vercel.app/ or any
-            related services (collectively, the "Service").
+            Please read these Terms of Service (&quot;Terms&quot;,
+            &quot;Agreement&quot;) carefully before using the website
+            https://rewise.vercel.app/ or any related services (collectively,
+            the &quot;Service&quot;).
           </p>
           <p>
             By accessing or using the Service, you agree to be bound by these
@@ -60,8 +62,8 @@ export default function TermsOfService() {
           </p>
           <p>
             <strong>
-              The Service is provided "AS IS" and "AS AVAILABLE" without any
-              warranty of any kind.
+              The Service is provided &quot;AS IS&quot; and &quot;AS
+              AVAILABLE&quot; without any warranty of any kind.
             </strong>
           </p>
 
@@ -210,10 +212,11 @@ export default function TermsOfService() {
             8. Disclaimer of Warranties
           </h2>
           <p>
-            THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT
-            WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
-            LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-            PURPOSE, NON-INFRINGEMENT, ACCURACY, RELIABILITY, OR AVAILABILITY.
+            THE SERVICE IS PROVIDED &quot;AS IS&quot; AND &quot;AS
+            AVAILABLE&quot; WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED,
+            INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS
+            FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, ACCURACY, RELIABILITY,
+            OR AVAILABILITY.
           </p>
 
           <h2 className="text-2xl font-bold text-foreground mt-10">
@@ -253,7 +256,7 @@ export default function TermsOfService() {
           </h2>
           <p>
             We may revise these Terms at any time. The updated version will be
-            posted on this page with a revised "Effective Date".
+            posted on this page with a revised &quot;Effective Date&quot;.
             <br />
             Continued use of the Service after any changes constitutes
             acceptance of the new Terms.
