@@ -185,7 +185,7 @@ export async function generateQuestionsAI(
     
     Question Type: ${type}
 
-    When 'IGCSE' is selected as the Board, lookup to the website https://www.cie.org.uk/ and https://www.cambridge.org/to generate the questions.
+    When 'IGCSE' is selected as the Board, lookup to the website https://www.cie.org.uk/ and https://www.cambridge.org/ to generate the questions.
     
     When 'CBSE' is selected as the Board, lookup to the sources endorsed by NCERT syllabuses available on the website https://ncert.nic.in/ to generate the questions.
     
