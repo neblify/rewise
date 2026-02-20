@@ -13,7 +13,7 @@ vi.mock('groq-sdk', () => {
         },
       };
 
-      constructor(options: any) {
+      constructor(_options: unknown) {
         // constructor logic if needed
       }
     },
@@ -22,6 +22,7 @@ vi.mock('groq-sdk', () => {
 
 // Import after mock
 import { gradeTestWithAI } from '@/lib/ai/grader';
+import { ITest } from '@/lib/db/models/Test';
 
 describe('gradeTestWithAI', () => {
   beforeEach(() => {
@@ -68,7 +69,10 @@ describe('gradeTestWithAI', () => {
       ],
     });
 
-    const result = await gradeTestWithAI(mockTest, mockAnswers);
+    const result = await gradeTestWithAI(
+      mockTest as unknown as ITest,
+      mockAnswers
+    );
 
     expect(result).toEqual(mockAIResponse);
     expect(mockedCreate).toHaveBeenCalledTimes(1);
@@ -113,7 +117,10 @@ describe('gradeTestWithAI', () => {
       ],
     });
 
-    const result = await gradeTestWithAI(mockTest, mockAnswers);
+    const result = await gradeTestWithAI(
+      mockTest as unknown as ITest,
+      mockAnswers
+    );
 
     expect(result).toEqual(mockAIResponse);
   });
@@ -124,7 +131,7 @@ describe('gradeTestWithAI', () => {
     // Mock error
     mockedCreate.mockRejectedValueOnce(new Error('API Error'));
 
-    const result = await gradeTestWithAI(mockTest, {});
+    const result = await gradeTestWithAI(mockTest as unknown as ITest, {});
     expect(result).toBeNull();
   });
 
@@ -154,7 +161,7 @@ describe('gradeTestWithAI', () => {
       choices: [{ message: { content: '{}' } }],
     });
 
-    await gradeTestWithAI(mockTest, mockAnswers);
+    await gradeTestWithAI(mockTest as unknown as ITest, mockAnswers);
 
     const callArgs = mockedCreate.mock.calls[0][0];
     const promptSnippet = callArgs.messages[1].content;

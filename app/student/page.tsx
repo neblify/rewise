@@ -1,7 +1,6 @@
-import { auth } from '@clerk/nextjs/server';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
-import Test from '@/lib/db/models/Test';
+import Test, { ISection } from '@/lib/db/models/Test';
 import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import { Play } from 'lucide-react';
@@ -20,10 +19,9 @@ export default async function StudentDashboard() {
   const { userId } = await currentAuth();
   await dbConnect();
 
-  // @ts-ignore
   const user = await User.findOne({ clerkId: userId });
 
-  const query: any = {
+  const query: Record<string, unknown> = {
     isPublished: true,
     visibility: 'public',
   };
@@ -36,7 +34,6 @@ export default async function StudentDashboard() {
     query.grade = user.grade;
   }
 
-  // @ts-ignore
   const tests = await Test.find(query).sort({ createdAt: -1 });
 
   return (
@@ -73,7 +70,7 @@ export default async function StudentDashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {tests.map((test: any) => (
+        {tests.map(test => (
           <Card
             key={test._id}
             className="hover:shadow-md transition-shadow group border-border"
@@ -111,7 +108,7 @@ export default async function StudentDashboard() {
                 <p>
                   {(test.questions?.length || 0) +
                     (test.sections?.reduce(
-                      (acc: number, section: any) =>
+                      (acc: number, section: ISection) =>
                         acc + (section.questions?.length || 0),
                       0
                     ) || 0)}{' '}

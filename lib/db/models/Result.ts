@@ -5,7 +5,7 @@ export interface IResult extends Document {
   studentId: string;
   answers: {
     questionId: string; // or index if simple
-    answer: any;
+    answer: string | string[] | number[] | boolean;
     isCorrect?: boolean;
     marksObtained?: number;
     feedback?: string;

@@ -1,6 +1,5 @@
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
@@ -29,7 +28,6 @@ export async function getStudentResults(email: string) {
   );
 
   // Fetch results
-  // @ts-ignore
   const results = await Result.find({ studentId: student.clerkId })
     .populate({ path: 'testId', model: Test })
     .sort({ createdAt: -1 });

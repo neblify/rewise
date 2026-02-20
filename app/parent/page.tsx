@@ -4,15 +4,30 @@ import { useState } from 'react';
 import { getStudentResults, getLinkedStudents } from './actions';
 import { Search, User as UserIcon } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
-import Link from 'next/link';
 import { useEffect } from 'react';
+
+interface ParentResult {
+  _id: string;
+  testId?: { title?: string; subject?: string };
+  totalScore: number;
+  maxScore: number;
+  weakAreas?: string[];
+  createdAt: string;
+}
+
+interface LinkedStudent {
+  clerkId: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
 
 export default function ParentDashboard() {
   const [email, setEmail] = useState('');
-  const [results, setResults] = useState<any[] | null>(null);
+  const [results, setResults] = useState<ParentResult[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [linkedStudents, setLinkedStudents] = useState<any[]>([]);
+  const [linkedStudents, setLinkedStudents] = useState<LinkedStudent[]>([]);
 
   useEffect(() => {
     async function loadLinkedStudents() {
@@ -21,7 +36,7 @@ export default function ParentDashboard() {
         if (res.data) {
           setLinkedStudents(res.data);
         }
-      } catch (e) {
+      } catch (_e) {
         console.error('Failed to load linked students');
       }
     }
@@ -44,7 +59,7 @@ export default function ParentDashboard() {
         const linkedRes = await getLinkedStudents();
         if (linkedRes.data) setLinkedStudents(linkedRes.data);
       }
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to fetch results');
     } finally {
       setLoading(false);
@@ -61,7 +76,7 @@ export default function ParentDashboard() {
       <div>
         <h1 className="text-3xl font-bold text-foreground">Parent Dashboard</h1>
         <p className="text-muted-foreground mt-1">
-          Track your child's learning progress.
+          Track your child&apos;s learning progress.
         </p>
       </div>
 
@@ -135,7 +150,7 @@ export default function ParentDashboard() {
           </h2>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {results.map((result: any) => (
+            {results.map(result => (
               <div
                 key={result._id}
                 className="bg-card rounded-xl shadow-sm border border-border p-6"

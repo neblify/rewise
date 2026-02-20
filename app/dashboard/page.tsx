@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Test from '@/lib/db/models/Test';
@@ -5,7 +6,6 @@ import Result from '@/lib/db/models/Result';
 import { redirect } from 'next/navigation';
 import {
   BookOpen,
-  Users,
   Target,
   TrendingUp,
   AlertCircle,
@@ -15,6 +15,23 @@ import {
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
+
+interface LeanTest {
+  _id: mongoose.Types.ObjectId;
+  title: string;
+  subject: string;
+  grade?: string;
+  createdAt: Date;
+}
+
+interface LeanResult {
+  _id: mongoose.Types.ObjectId;
+  testId: mongoose.Types.ObjectId;
+  studentId: string;
+  totalScore: number;
+  maxScore: number;
+  createdAt: Date;
+}
 
 export default async function Dashboard() {
   const { userId } = await currentAuth();
@@ -30,7 +47,7 @@ export default async function Dashboard() {
     .select('_id title subject grade createdAt')
     .lean();
 
-  const testIds = authoredTests.map((t: any) => t._id);
+  const testIds = authoredTests.map((t: LeanTest) => t._id);
   const inventoryCount = authoredTests.length;
 
   // 2. Engagement & Performance Metrics
@@ -39,7 +56,8 @@ export default async function Dashboard() {
     .lean();
 
   const totalAttempts = results.length;
-  const uniqueStudents = new Set(results.map((r: any) => r.studentId)).size;
+  const uniqueStudents = new Set(results.map((r: LeanResult) => r.studentId))
+    .size;
 
   let totalScorePercentage = 0;
   let passedCount = 0;
@@ -47,7 +65,7 @@ export default async function Dashboard() {
   // Assume pass mark is 40% if not defined
   const PASS_THRESHOLD = 40;
 
-  results.forEach((r: any) => {
+  results.forEach((r: LeanResult) => {
     const percentage = r.maxScore > 0 ? (r.totalScore / r.maxScore) * 100 : 0;
     totalScorePercentage += percentage;
     if (percentage >= PASS_THRESHOLD) {
@@ -63,7 +81,7 @@ export default async function Dashboard() {
   // 3. Trend Metrics: Attempts per day
   // Group by date (YYYY-MM-DD)
   const attemptsByDate: Record<string, number> = {};
-  results.forEach((r: any) => {
+  results.forEach((r: LeanResult) => {
     const date = new Date(r.createdAt).toISOString().split('T')[0];
     attemptsByDate[date] = (attemptsByDate[date] || 0) + 1;
   });
@@ -89,11 +107,11 @@ export default async function Dashboard() {
   > = {};
 
   // Initialize with all tests to show 0s if needed, or just build from results
-  authoredTests.forEach((t: any) => {
+  authoredTests.forEach((t: LeanTest) => {
     testPerformance[t._id.toString()] = { total: 0, count: 0, title: t.title };
   });
 
-  results.forEach((r: any) => {
+  results.forEach((r: LeanResult) => {
     const tid = r.testId.toString();
     if (testPerformance[tid]) {
       const percentage = r.maxScore > 0 ? (r.totalScore / r.maxScore) * 100 : 0;

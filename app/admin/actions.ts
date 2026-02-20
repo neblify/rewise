@@ -1,12 +1,10 @@
 'use server';
 
 import dbConnect from '@/lib/db/connect';
-import Link from 'next/link';
 import User from '@/lib/db/models/User';
 import Test from '@/lib/db/models/Test';
 import Question from '@/lib/db/models/Question';
 import Result from '@/lib/db/models/Result';
-import { revalidatePath } from 'next/cache';
 
 export async function getAdminStats() {
   await dbConnect();

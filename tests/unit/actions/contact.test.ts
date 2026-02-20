@@ -9,7 +9,7 @@ const { mockSend } = vi.hoisted(() => ({
 vi.mock('resend', () => {
   return {
     Resend: class {
-      emails: any;
+      emails: { send: typeof mockSend };
       constructor() {
         this.emails = {
           send: mockSend,

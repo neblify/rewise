@@ -54,7 +54,6 @@ export async function updateQuestion(prevState: unknown, formData: FormData) {
     ? { _id: validated.data.questionId }
     : { _id: validated.data.questionId, createdBy: userId };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { questionId: _id, ...updateFields } = validated.data;
 
   const result = await Question.findOneAndUpdate(filter, {

@@ -13,7 +13,7 @@ vi.mock('groq-sdk', () => {
           create: mockedCreate,
         },
       };
-      constructor(options: any) {}
+      constructor(_options: unknown) {}
     },
   };
 });
@@ -43,10 +43,7 @@ vi.mock('module', async () => {
 });
 
 // Import the actions
-import {
-  generateQuestionsAI,
-  extractQuestionsFromPdf,
-} from '@/app/teacher/create-test/ai-actions';
+import { generateQuestionsAI } from '@/app/teacher/create-test/ai-actions';
 
 describe('AI Actions', () => {
   beforeEach(() => {

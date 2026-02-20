@@ -20,11 +20,7 @@ const QUESTION_TYPES = [
 ];
 
 import { BOARDS } from '@/lib/constants/boards';
-import {
-  NIOS_LEVELS,
-  STANDARD_LEVELS,
-  getGradesForBoard,
-} from '@/lib/constants/levels';
+import { getGradesForBoard } from '@/lib/constants/levels';
 import {
   defaultTimedState,
   parseTimedFromTest,
@@ -70,7 +66,7 @@ const generateId = () =>
 export default function CreateOrEditTestPage() {
   // Determine if we are in edit mode
   const params = useParams();
-  const router = useRouter();
+  const _router = useRouter();
   const isEditMode = params.id && params.id !== 'new';
   const testId = isEditMode ? (params.id as string) : null;
 
@@ -284,7 +280,6 @@ export default function CreateOrEditTestPage() {
     if (isEditMode && testId) {
       formData.set('testId', testId);
     }
-    // @ts-ignore
     formAction(formData);
   };
 
@@ -338,7 +333,7 @@ export default function CreateOrEditTestPage() {
       } else {
         alert(res.error || 'Failed to generate');
       }
-    } catch (e) {
+    } catch (_e) {
       alert('Something went wrong');
     } finally {
       setIsGenerating(false);

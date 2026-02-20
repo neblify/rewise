@@ -15,6 +15,14 @@ const eslintConfig = defineConfig([
     rules: {
       'prettier/prettier': 'error',
       '@next/next/no-html-link-for-pages': 'off', // We use Link components mostly
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+        },
+      ],
     },
   },
   // Override default ignores of eslint-config-next.

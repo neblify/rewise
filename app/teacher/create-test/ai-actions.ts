@@ -70,13 +70,13 @@ export async function extractQuestionsFromPdf(formData: FormData) {
     const parsed = JSON.parse(content);
     const questions = Array.isArray(parsed) ? parsed : parsed.questions || [];
 
-    const sanitizedQuestions = questions.map((q: any) => ({
+    const sanitizedQuestions = questions.map((q: Record<string, unknown>) => ({
       id: Date.now() + Math.random(),
-      text: q.text,
-      type: q.type || 'brief_answer',
-      options: q.options || [],
-      correctAnswer: q.correctAnswer || '',
-      marks: q.marks || 1,
+      text: q.text as string,
+      type: (q.type as string) || 'brief_answer',
+      options: (q.options as string[]) || [],
+      correctAnswer: (q.correctAnswer as string) || '',
+      marks: (q.marks as number) || 1,
     }));
 
     return { data: sanitizedQuestions };
@@ -163,8 +163,8 @@ export async function generateQuestionsAI(
     const questions = Array.isArray(parsed) ? parsed : parsed.questions || [];
 
     // Post-processing to ensure compatibility
-    const sanitizedQuestions = questions.map((q: any) => {
-      const effectiveType = type === 'mixed' ? q.type : type;
+    const sanitizedQuestions = questions.map((q: Record<string, unknown>) => {
+      const effectiveType = type === 'mixed' ? (q.type as string) : type;
       if (
         effectiveType === 'match_columns' &&
         Array.isArray(q.options) &&
@@ -204,21 +204,21 @@ export async function generateQuestionsAI(
         );
         return {
           id: Date.now() + Math.random(),
-          text: q.text,
+          text: q.text as string,
           type: effectiveType,
           leftColumn,
           options,
           correctAnswer,
-          marks: q.marks || 1,
+          marks: (q.marks as number) || 1,
         };
       }
       return {
         id: Date.now() + Math.random(),
-        text: q.text,
+        text: q.text as string,
         type: effectiveType,
-        options: q.options || [],
-        correctAnswer: q.correctAnswer,
-        marks: q.marks || 1,
+        options: (q.options as string[]) || [],
+        correctAnswer: q.correctAnswer as string,
+        marks: (q.marks as number) || 1,
       };
     });
 

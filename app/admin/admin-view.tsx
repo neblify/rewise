@@ -26,14 +26,15 @@ interface AdminViewProps {
     firstName?: string;
     lastName?: string;
     createdAt: Date;
-    [key: string]: any;
+    [key: string]: unknown;
   }>;
   tests: Array<{
     _id: string;
     title: string;
     subject: string;
     createdAt: Date;
-    [key: string]: any;
+    isPublished?: boolean;
+    [key: string]: unknown;
   }>;
   questions: Array<{
     _id: string;
@@ -41,7 +42,8 @@ interface AdminViewProps {
     type: string;
     subject: string;
     createdAt: Date;
-    [key: string]: any;
+    marks?: number;
+    [key: string]: unknown;
   }>;
 }
 
@@ -290,7 +292,7 @@ export default function AdminView({
 interface StatCardProps {
   title: string;
   value: number;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<{ className?: string }>;
   color: string;
 }
 

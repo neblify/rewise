@@ -1,9 +1,9 @@
-import { auth } from '@clerk/nextjs/server';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
-import Test from '@/lib/db/models/Test';
+import Test, { ISection } from '@/lib/db/models/Test';
 import User from '@/lib/db/models/User';
-import { Plus, Search, Filter } from 'lucide-react';
+import mongoose from 'mongoose';
+import { Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import { redirect } from 'next/navigation';
@@ -11,6 +11,29 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import DeleteTestButton from './components/DeleteTestButton';
+
+interface LeanTest {
+  _id: mongoose.Types.ObjectId;
+  title: string;
+  subject: string;
+  board?: string;
+  grade?: string;
+  createdBy: string;
+  sections?: ISection[];
+  isPublished: boolean;
+  isTimed?: boolean;
+  durationMinutes?: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface LeanUser {
+  _id: mongoose.Types.ObjectId;
+  clerkId: string;
+  email: string;
+  firstName?: string;
+  lastName?: string;
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -40,7 +63,7 @@ export default async function TeacherDashboard(props: Props) {
   const sort = searchParams.sort || 'createdAt_desc';
 
   // Build Filter
-  const filter: any = {};
+  const filter: Record<string, unknown> = {};
   if (query) {
     filter.title = { $regex: query, $options: 'i' };
   }
@@ -52,7 +75,7 @@ export default async function TeacherDashboard(props: Props) {
   }
 
   // Build Sort
-  let sortOptions: any = {};
+  let sortOptions: Record<string, 1 | -1> = {};
   switch (sort) {
     case 'createdAt_desc':
       sortOptions = { createdAt: -1 };
@@ -76,9 +99,11 @@ export default async function TeacherDashboard(props: Props) {
   const tests = await Test.find(filter).sort(sortOptions).lean();
 
   // Get Authors
-  const creatorIds = Array.from(new Set(tests.map((t: any) => t.createdBy)));
+  const creatorIds = Array.from(
+    new Set((tests as LeanTest[]).map(t => t.createdBy))
+  );
   const creators = await User.find({ clerkId: { $in: creatorIds } }).lean();
-  const creatorMap = new Map(creators.map((c: any) => [c.clerkId, c]));
+  const creatorMap = new Map((creators as LeanUser[]).map(c => [c.clerkId, c]));
 
   // Get distinct values for filters
   const subjects = await Test.distinct('subject');
@@ -195,7 +220,7 @@ export default async function TeacherDashboard(props: Props) {
                   </td>
                 </tr>
               ) : (
-                tests.map((test: any) => {
+                (tests as LeanTest[]).map(test => {
                   const creator = creatorMap.get(test.createdBy);
                   const creatorName = creator
                     ? `${creator.firstName || ''} ${creator.lastName || ''}`.trim() ||
@@ -203,13 +228,14 @@ export default async function TeacherDashboard(props: Props) {
                     : 'Unknown';
                   const questionCount =
                     test.sections?.reduce(
-                      (acc: number, s: any) => acc + (s.questions?.length || 0),
+                      (acc: number, s: ISection) =>
+                        acc + (s.questions?.length || 0),
                       0
                     ) || 0;
 
                   return (
                     <tr
-                      key={test._id}
+                      key={String(test._id)}
                       className="hover:bg-muted transition-colors"
                     >
                       <td className="px-6 py-4 font-medium text-foreground">

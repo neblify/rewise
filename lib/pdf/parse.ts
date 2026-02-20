@@ -3,11 +3,9 @@ import { createRequire } from 'module';
 const require = createRequire(import.meta.url);
 
 // Polyfills for pdf-parse / pdfjs-dist in Node environment
-// @ts-ignore
 if (typeof Promise.withResolvers === 'undefined') {
-  // @ts-ignore
   if (typeof window === 'undefined') {
-    // @ts-ignore
+    // @ts-expect-error - polyfill for pdf-parse
     global.Promise.withResolvers = function () {
       let resolve, reject;
       const promise = new Promise((res, rej) => {
@@ -20,22 +18,21 @@ if (typeof Promise.withResolvers === 'undefined') {
 }
 
 // Global mocks for DOM APIs required by pdfjs-dist legacy builds
-// @ts-ignore
 if (!global.DOMMatrix) {
-  // @ts-ignore
+  // @ts-expect-error - polyfill for pdf-parse
   global.DOMMatrix = class DOMMatrix {
     constructor() {
-      // @ts-ignore
+      // @ts-expect-error - polyfill for pdf-parse
       this.a = 1;
-      // @ts-ignore
+      // @ts-expect-error - polyfill for pdf-parse
       this.b = 0;
-      // @ts-ignore
+      // @ts-expect-error - polyfill for pdf-parse
       this.c = 0;
-      // @ts-ignore
+      // @ts-expect-error - polyfill for pdf-parse
       this.d = 1;
-      // @ts-ignore
+      // @ts-expect-error - polyfill for pdf-parse
       this.e = 0;
-      // @ts-ignore
+      // @ts-expect-error - polyfill for pdf-parse
       this.f = 0;
     }
     multiply() {
@@ -47,28 +44,26 @@ if (!global.DOMMatrix) {
     scale() {
       return this;
     }
-    transformPoint(p: any) {
+    transformPoint(p: { x: number; y: number }) {
       return p;
     }
   };
 }
-// @ts-ignore
 if (!global.ImageData) {
-  // @ts-ignore
+  // @ts-expect-error - polyfill for pdf-parse
   global.ImageData = class ImageData {
     constructor(width: number, height: number) {
-      // @ts-ignore
+      // @ts-expect-error - polyfill for pdf-parse
       this.width = width;
-      // @ts-ignore
+      // @ts-expect-error - polyfill for pdf-parse
       this.height = height;
-      // @ts-ignore
+      // @ts-expect-error - polyfill for pdf-parse
       this.data = new Uint8ClampedArray(width * height * 4);
     }
   };
 }
-// @ts-ignore
 if (!global.Path2D) {
-  // @ts-ignore
+  // @ts-expect-error - polyfill for pdf-parse
   global.Path2D = class Path2D {};
 }
 

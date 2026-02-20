@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import Question from '@/lib/db/models/Question';
-import mongoose from 'mongoose';
 
 describe('Question Model', () => {
   it('should validate a correct question', () => {

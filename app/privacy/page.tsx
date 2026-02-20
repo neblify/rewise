@@ -23,8 +23,9 @@ export default function PrivacyPolicy() {
             <strong>Effective Date:</strong> January 28, 2026
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
-            <strong>Website:</strong> https://rewise.vercel.app/ ("we", "us",
-            "our", "ReWise")
+            <strong>Website:</strong> https://rewise.vercel.app/
+            (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;,
+            &quot;ReWise&quot;)
           </p>
         </div>
 
@@ -38,7 +39,7 @@ export default function PrivacyPolicy() {
           <p>
             This policy applies to all visitors, users, and others who access or
             use the ReWise website and any related services (collectively, the
-            "Service").
+            &quot;Service&quot;).
           </p>
           <p>
             By using the Service, you agree to the collection and use of
@@ -223,7 +224,7 @@ export default function PrivacyPolicy() {
           <ul className="list-disc pl-6 space-y-2 mt-4">
             <li>Access your personal data</li>
             <li>Correct inaccurate data</li>
-            <li>Delete your data ("right to be forgotten")</li>
+            <li>Delete your data (&quot;right to be forgotten&quot;)</li>
             <li>Restrict or object to processing</li>
             <li>Data portability (where technically feasible)</li>
           </ul>
@@ -232,8 +233,8 @@ export default function PrivacyPolicy() {
             respond within the time required by applicable law.
           </p>
           <p>
-            We do not respond to "Do Not Track" browser signals as we do not
-            engage in cross-site tracking for advertising.
+            We do not respond to &quot;Do Not Track&quot; browser signals as we
+            do not engage in cross-site tracking for advertising.
           </p>
 
           <h2 className="text-2xl font-bold text-foreground mt-10">
@@ -248,7 +249,7 @@ export default function PrivacyPolicy() {
           </p>
 
           <h2 className="text-2xl font-bold text-foreground mt-10">
-            9. Children's Privacy
+            9. Children&apos;s Privacy
           </h2>
           <p>
             Our Service is not directed to children under 13 (or the minimum age
@@ -262,8 +263,8 @@ export default function PrivacyPolicy() {
           </h2>
           <p>
             We may update this policy from time to time. The updated version
-            will be posted here with a revised "Effective Date". We encourage
-            you to review it periodically.
+            will be posted here with a revised &quot;Effective Date&quot;. We
+            encourage you to review it periodically.
           </p>
           <p>
             Significant changes will be communicated via a notice on the website

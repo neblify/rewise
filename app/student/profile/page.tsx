@@ -9,7 +9,6 @@ export default async function ProfilePage() {
   if (!userId) redirect('/sign-in');
 
   await dbConnect();
-  // @ts-ignore
   const user = await User.findOne({ clerkId: userId });
 
   // If user doesn't exist in our DB yet (should exist upon sign-up, but safeguard),

@@ -1,11 +1,18 @@
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Result from '@/lib/db/models/Result';
-import Test from '@/lib/db/models/Test';
 import { redirect } from 'next/navigation';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
 import { FileText, ArrowRight } from 'lucide-react';
+
+interface PopulatedStudentResult {
+  _id: string;
+  testId?: { title?: string; subject?: string };
+  totalScore: number;
+  maxScore: number;
+  createdAt: Date;
+}
 
 export default async function StudentResults() {
   const { userId } = await currentAuth();
@@ -13,7 +20,6 @@ export default async function StudentResults() {
 
   await dbConnect();
   // Fetch results for this student, populated with Test details
-  // @ts-ignore
   const results = await Result.find({ studentId: userId })
     .populate('testId', 'title subject maxScore')
     .sort({ createdAt: -1 });
@@ -63,72 +69,76 @@ export default async function StudentResults() {
                 </tr>
               </thead>
               <tbody className="bg-card divide-y divide-border">
-                {results.map((result: any) => {
-                  const percentage =
-                    result.maxScore > 0
-                      ? Math.round((result.totalScore / result.maxScore) * 100)
-                      : 0;
+                {(results as unknown as PopulatedStudentResult[]).map(
+                  result => {
+                    const percentage =
+                      result.maxScore > 0
+                        ? Math.round(
+                            (result.totalScore / result.maxScore) * 100
+                          )
+                        : 0;
 
-                  let gradeColor = 'bg-muted text-muted-foreground';
-                  if (percentage >= 80)
-                    gradeColor = 'bg-green-100 text-green-800';
-                  else if (percentage >= 60)
-                    gradeColor = 'bg-blue-100 text-blue-800';
-                  else if (percentage >= 40)
-                    gradeColor = 'bg-yellow-100 text-yellow-800';
-                  else gradeColor = 'bg-red-100 text-red-800';
+                    let gradeColor = 'bg-muted text-muted-foreground';
+                    if (percentage >= 80)
+                      gradeColor = 'bg-green-100 text-green-800';
+                    else if (percentage >= 60)
+                      gradeColor = 'bg-blue-100 text-blue-800';
+                    else if (percentage >= 40)
+                      gradeColor = 'bg-yellow-100 text-yellow-800';
+                    else gradeColor = 'bg-red-100 text-red-800';
 
-                  return (
-                    <tr
-                      key={result._id}
-                      className="hover:bg-muted transition-colors"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10 bg-violet-light rounded-lg flex items-center justify-center text-primary">
-                            <FileText className="h-5 w-5" />
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-foreground">
-                              {result.testId?.title || 'Unknown Test'}
+                    return (
+                      <tr
+                        key={result._id}
+                        className="hover:bg-muted transition-colors"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="flex-shrink-0 h-10 w-10 bg-violet-light rounded-lg flex items-center justify-center text-primary">
+                              <FileText className="h-5 w-5" />
                             </div>
-                            <div className="text-sm text-muted-foreground">
-                              {result.testId?.subject || 'Subject'}
+                            <div className="ml-4">
+                              <div className="text-sm font-medium text-foreground">
+                                {result.testId?.title || 'Unknown Test'}
+                              </div>
+                              <div className="text-sm text-muted-foreground">
+                                {result.testId?.subject || 'Subject'}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-foreground">
-                          {formatDate(result.createdAt)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-foreground font-medium">
-                          {result.totalScore} / {result.maxScore}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Marks
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${gradeColor}`}
-                        >
-                          {percentage}%
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Link
-                          href={`/student/result/${result._id}`}
-                          className="text-primary hover:text-primary/90 flex items-center justify-end gap-1 hover:gap-2 transition-all"
-                        >
-                          View <ArrowRight className="h-4 w-4" />
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-foreground">
+                            {formatDate(result.createdAt)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-foreground font-medium">
+                            {result.totalScore} / {result.maxScore}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            Marks
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${gradeColor}`}
+                          >
+                            {percentage}%
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <Link
+                            href={`/student/result/${result._id}`}
+                            className="text-primary hover:text-primary/90 flex items-center justify-end gap-1 hover:gap-2 transition-all"
+                          >
+                            View <ArrowRight className="h-4 w-4" />
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  }
+                )}
               </tbody>
             </table>
           </div>
@@ -138,7 +148,7 @@ export default async function StudentResults() {
               No results found
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">
-              You haven't taken any tests yet.
+              You haven&apos;t taken any tests yet.
             </p>
             <div className="mt-6">
               <Link

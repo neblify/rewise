@@ -39,7 +39,9 @@ describe('Teacher Actions', () => {
   describe('createTest', () => {
     it('should fail if user is not authenticated', async () => {
       const { currentAuth } = await import('@/lib/auth-wrapper');
-      (currentAuth as any).mockResolvedValue({ userId: null });
+      vi.mocked(currentAuth).mockResolvedValue({
+        userId: null,
+      } as unknown as Awaited<ReturnType<typeof currentAuth>>);
       const formData = new FormData();
       const result = await createTest({}, formData);
       expect(result.message).toBe('Unauthorized');
@@ -47,7 +49,9 @@ describe('Teacher Actions', () => {
 
     it('should fail if input validation fails', async () => {
       const { currentAuth } = await import('@/lib/auth-wrapper');
-      (currentAuth as any).mockResolvedValue({ userId: 'user_123' });
+      vi.mocked(currentAuth).mockResolvedValue({
+        userId: 'user_123',
+      } as unknown as Awaited<ReturnType<typeof currentAuth>>);
       const formData = new FormData();
       // Empty form data
       const result = await createTest({}, formData);
@@ -56,7 +60,9 @@ describe('Teacher Actions', () => {
 
     it('should create a test successfully', async () => {
       const { currentAuth } = await import('@/lib/auth-wrapper');
-      (currentAuth as any).mockResolvedValue({ userId: 'user_123' });
+      vi.mocked(currentAuth).mockResolvedValue({
+        userId: 'user_123',
+      } as unknown as Awaited<ReturnType<typeof currentAuth>>);
 
       const formData = new FormData();
       formData.append('title', 'Math Final');
@@ -77,8 +83,8 @@ describe('Teacher Actions', () => {
       formData.append('sections', JSON.stringify(sections));
 
       // Mock DB responses
-      (Question.create as any).mockResolvedValue({ _id: 'q_123' });
-      (Test.create as any).mockResolvedValue({ _id: 't_123' });
+      vi.mocked(Question.create).mockResolvedValue({ _id: 'q_123' } as never);
+      vi.mocked(Test.create).mockResolvedValue({ _id: 't_123' } as never);
 
       await createTest({}, formData);
 
@@ -87,19 +93,28 @@ describe('Teacher Actions', () => {
       expect(redirect).toHaveBeenCalledWith('/teacher');
 
       // Verify Question creation has createdBy
-      const questionCall = (Question.create as any).mock.calls[0][0];
-      expect(questionCall.createdBy).toBe('user_123');
+      const questionCall = vi.mocked(Question.create).mock.calls[0][0];
+      expect((questionCall as Record<string, unknown>).createdBy).toBe(
+        'user_123'
+      );
 
       // Verify Test creation has formatted sections
-      const testCall = (Test.create as any).mock.calls[0][0];
-      expect(testCall.sections[0].questions[0]).toBe('q_123');
+      const testCall = vi.mocked(Test.create).mock.calls[0][0] as Record<
+        string,
+        unknown
+      >;
+      expect(
+        (testCall.sections as Array<{ questions: string[] }>)[0].questions[0]
+      ).toBe('q_123');
     });
   });
 
   describe('updateTest', () => {
     it('should update a test successfully', async () => {
       const { currentAuth } = await import('@/lib/auth-wrapper');
-      (currentAuth as any).mockResolvedValue({ userId: 'user_123' });
+      vi.mocked(currentAuth).mockResolvedValue({
+        userId: 'user_123',
+      } as unknown as Awaited<ReturnType<typeof currentAuth>>);
 
       const formData = new FormData();
       formData.append('testId', 't_existing');
@@ -120,8 +135,10 @@ describe('Teacher Actions', () => {
       ];
       formData.append('sections', JSON.stringify(sections));
 
-      (Question.create as any).mockResolvedValue({ _id: 'q_new' });
-      (Test.findOneAndUpdate as any).mockResolvedValue({ _id: 't_existing' });
+      vi.mocked(Question.create).mockResolvedValue({ _id: 'q_new' } as never);
+      vi.mocked(Test.findOneAndUpdate).mockResolvedValue({
+        _id: 't_existing',
+      } as never);
 
       await updateTest({}, formData);
 
@@ -129,8 +146,11 @@ describe('Teacher Actions', () => {
       expect(redirect).toHaveBeenCalledWith('/teacher');
 
       // Verify update logic pushes version history
-      const updateCall = (Test.findOneAndUpdate as any).mock.calls[0][1];
-      expect(updateCall.$push.versionHistory.action).toBe('update');
+      const updateCall = vi.mocked(Test.findOneAndUpdate).mock
+        .calls[0][1] as Record<string, Record<string, unknown>>;
+      expect(
+        (updateCall.$push.versionHistory as Record<string, unknown>).action
+      ).toBe('update');
     });
   });
 });

@@ -27,7 +27,8 @@ const signUpAppearance = {
     headerSubtitle: 'text-white/70',
     formFieldLabel: 'font-semibold',
     formFieldInput: 'rounded-xl bg-white/5 border-white/10 text-base',
-    formButtonPrimary: 'rounded-xl font-bold bg-gradient-to-r from-[#27c4e8] to-[#ff8a65] border-0 shadow-lg hover:opacity-90 text-primary-foreground',
+    formButtonPrimary:
+      'rounded-xl font-bold bg-gradient-to-r from-[#27c4e8] to-[#ff8a65] border-0 shadow-lg hover:opacity-90 text-primary-foreground',
     footerActionLink: 'text-[#27c4e8] font-semibold hover:underline',
     identityPreviewEditButton: 'text-white/80',
     dividerLine: 'bg-white/10',
