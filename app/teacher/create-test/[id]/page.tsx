@@ -1086,6 +1086,7 @@ export default function CreateOrEditTestPage() {
                 </label>
                 <input
                   type="text"
+                  required
                   value={aiTopic}
                   onChange={e => {
                     setAiTopic(e.target.value);
