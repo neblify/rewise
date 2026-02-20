@@ -1,4 +1,4 @@
-import { streamText } from 'ai';
+import { streamText, convertToModelMessages } from 'ai';
 import { createGroq } from '@ai-sdk/groq';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
@@ -47,12 +47,20 @@ export async function POST(request: Request) {
     let ragChunks: string[] = [];
     const lastUserMessage = [...messages]
       .reverse()
-      .find((m: { role: string }) => m.role === 'user');
+      .find((m: { role: string }) => m.role === 'user') as
+      | { role: string; parts?: { type: string; text?: string }[] }
+      | undefined;
 
-    if (lastUserMessage && (board || grade)) {
+    // Extract text from UIMessage parts format
+    const lastUserText = lastUserMessage?.parts
+      ?.filter((p: { type: string }) => p.type === 'text')
+      .map((p: { text?: string }) => p.text || '')
+      .join('');
+
+    if (lastUserText && (board || grade)) {
       try {
         const chunks = await queryRelevantChunks(
-          lastUserMessage.content,
+          lastUserText,
           { board, grade },
           3
         );
@@ -79,10 +87,13 @@ export async function POST(request: Request) {
     // Limit conversation history to last 20 messages to manage token budget
     const trimmedMessages = messages.slice(-20);
 
+    // Convert UIMessages (parts format) to ModelMessages (content format) for streamText
+    const modelMessages = await convertToModelMessages(trimmedMessages);
+
     const result = streamText({
       model: groq('llama-3.3-70b-versatile'),
       system: systemPrompt,
-      messages: trimmedMessages,
+      messages: modelMessages,
     });
 
     return result.toUIMessageStreamResponse();
