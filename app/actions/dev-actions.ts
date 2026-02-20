@@ -40,7 +40,7 @@ export async function loginAsRole(role: 'teacher' | 'student' | 'parent') {
     secure: false, // dev mode
   });
 
-  redirect('/');
+  redirect(`/${role}`);
 }
 
 export async function clearMockSession() {

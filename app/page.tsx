@@ -34,8 +34,6 @@ export default async function Home() {
     role = user.publicMetadata.role as string | undefined;
   }
 
-  console.log('Root Page: Role found:', role);
-
   if (!role) {
     redirect('/onboarding');
   }

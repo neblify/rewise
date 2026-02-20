@@ -14,19 +14,20 @@ export default function OnboardingPage() {
   const { session } = useSession();
 
   useLayoutEffect(() => {
+    // After successful onboarding, reload session and go to role page
     if (state?.success && session) {
       session.reload().then(() => {
-        router.push('/');
+        const role = session.user?.publicMetadata?.role as string | undefined;
+        router.push(role ? `/${role}` : '/');
       });
+      return;
     }
-  }, [state?.success, session, router]);
 
-  // Cleanup old redirect logic that might conflict or be redundant if we rely on state
-  useLayoutEffect(() => {
+    // If user already has a role (e.g. navigated here directly), redirect
     if (isLoaded && user?.publicMetadata?.role && !state?.success) {
-      router.push('/');
+      router.push(`/${user.publicMetadata.role}`);
     }
-  }, [isLoaded, user, router, state?.success]);
+  }, [state?.success, session, router, isLoaded, user]);
 
   if (!isLoaded) {
     return (
