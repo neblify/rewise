@@ -463,13 +463,7 @@ function CreateTestPageContent() {
                     Topic / Chapter
                   </label>
                   <input
-                    type="text"
-                    required
-                    value={aiTopic}
-                    onChange={e => setAiTopic(e.target.value)}
-                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground"
-                    placeholder="e.g. Newton's Laws of Motion"
-                  />
+                  <input\n                    type="text"\n                    required\n                    value={aiTopic}\n                    onChange={e => setAiTopic(e.target.value)}\n                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground"\n                    placeholder="e.g. Newton's Laws of Motion"\n                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-muted-foreground mb-1">
