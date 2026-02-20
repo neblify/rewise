@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useActionState, useState, useEffect } from 'react';
+import React, { useActionState, useState, useEffect, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { createTest } from './actions';
 import { extractQuestionsFromPdf, generateQuestionsAI } from './ai-actions';
 import { DEFAULT_SECTION_TITLE, isEmptyDefaultSection } from './lib/sections';
@@ -14,6 +15,16 @@ import {
   Loader2,
   FileUp,
 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const QUESTION_TYPES = [
   { value: 'fill_in_blanks', label: 'Fill in the blanks' },
@@ -49,16 +60,30 @@ interface CreateTestState {
   message?: string;
 }
 
-import { BOARDS } from '@/lib/constants/boards';
+import {
+  BOARDS,
+  BOARD_PLACEHOLDER_LABEL,
+  BOARD_PLACEHOLDER_VALUE,
+} from '@/lib/constants/boards';
 import { getGradesForBoard } from '@/lib/constants/levels';
 import { defaultTimedState, appendTimedToFormData } from './lib/timed';
 import { TestTimeLimitField } from './components/TestTimeLimitField';
 
-export default function CreateTestPage() {
-  const [state, formAction] = useActionState<CreateTestState | null, FormData>(
-    createTest,
-    null
-  );
+type CreateMode = 'ai' | 'manual' | 'pdf';
+
+function CreateTestPageContent() {
+  const searchParams = useSearchParams();
+  const mode: CreateMode = (searchParams.get('mode') as CreateMode) || 'manual';
+
+  const [state, formAction] = useActionState(createTest, null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+
+  useEffect(() => {
+    if (mode === 'pdf' && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  }, [mode]);
 
   useEffect(() => {
     if (state?.message) {
@@ -73,8 +98,8 @@ export default function CreateTestPage() {
 
   // Test Metadata State
   const [testTitle, setTestTitle] = useState('');
-  const [board, setBoard] = useState('NIOS');
-  const [grade, setGrade] = useState('A');
+  const [board, setBoard] = useState(BOARD_PLACEHOLDER_VALUE);
+  const [grade, setGrade] = useState('1');
   const [timedState, setTimedState] = useState(defaultTimedState);
 
   const gradeOptions = getGradesForBoard(board);
@@ -97,6 +122,13 @@ export default function CreateTestPage() {
   const [aiDifficulty, setAiDifficulty] = useState('Medium');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [showOverwriteConfirm, setShowOverwriteConfirm] = useState(false);
+
+  const hasGeneratedContent = sections.some((s) => (s.questions?.length ?? 0) > 0);
+  const showSectionsList =
+    mode === 'manual' ||
+    mode === 'pdf' ||
+    (mode === 'ai' && hasGeneratedContent);
 
   // ... (Existing helper functions kept same, but re-included for completeness)
   const addSection = () => {
@@ -181,8 +213,9 @@ export default function CreateTestPage() {
   };
 
   // AI Handler
-  const handleAiGenerate = async () => {
+  const handleAiGenerate = async (replaceExisting?: boolean) => {
     if (!aiTopic) return;
+    setShowOverwriteConfirm(false);
     setIsGenerating(true);
 
     try {
@@ -207,12 +240,12 @@ export default function CreateTestPage() {
           questions: res.data,
         };
         setSections(
-          isEmptyDefaultSection(sections)
+          replaceExisting || isEmptyDefaultSection(sections)
             ? [newSection]
             : [...sections, newSection]
         );
         setIsAiModalOpen(false);
-        setAiTopic('');
+        if (mode !== 'ai') setAiTopic('');
       } else {
         alert(res.error || 'Failed to generate');
       }
@@ -220,6 +253,14 @@ export default function CreateTestPage() {
       alert('Something went wrong');
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  const onGenerateTestClick = () => {
+    if (hasGeneratedContent) {
+      setShowOverwriteConfirm(true);
+    } else {
+      handleAiGenerate();
     }
   };
 
@@ -267,37 +308,30 @@ export default function CreateTestPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => {
-                setIsAiModalOpen(true);
-                setAiTopic(testTitle);
-              }}
-              className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium animate-pulse hover:animate-none"
-            >
-              <Sparkles className="h-5 w-5" />
-              AI Assistant
-            </button>
-            <div className="relative">
-              <input
-                type="file"
-                accept=".pdf"
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-                onChange={handleFileUpload}
-                disabled={isUploading}
-              />
-              <button
-                type="button"
-                className="flex items-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-full shadow-lg hover:bg-emerald-700 hover:shadow-xl transition-all font-medium disabled:opacity-50"
-              >
-                {isUploading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                ) : (
-                  <FileUp className="h-5 w-5" />
-                )}
-                {isUploading ? 'Parsing...' : 'Upload PDF'}
-              </button>
-            </div>
+            {mode !== 'ai' && (
+              <div className="relative">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf"
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                  onChange={handleFileUpload}
+                  disabled={isUploading}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isUploading ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <FileUp className="h-5 w-5" />
+                  )}
+                  {isUploading ? 'Parsing...' : 'Upload PDF'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -312,26 +346,34 @@ export default function CreateTestPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-              <div className="col-span-2">
-                <label className="block text-sm font-medium text-muted-foreground">
-                  Test Title
-                </label>
+              {mode === 'ai' ? (
                 <input
+                  type="hidden"
                   name="title"
-                  type="text"
-                  value={testTitle}
-                  onChange={e => {
-                    setTestTitle(e.target.value);
-                  }}
-                  required
-                  className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground"
-                  placeholder="e.g. Science Mid-Term"
+                  value={aiTopic}
                 />
-              </div>
+              ) : (
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-muted-foreground">
+                    Test Title
+                  </label>
+                  <input
+                    name="title"
+                    type="text"
+                    value={testTitle}
+                    onChange={e => {
+                      setTestTitle(e.target.value);
+                    }}
+                    required
+                    className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground"
+                    placeholder="e.g. Science Mid-Term"
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-muted-foreground">
-                  Board
+                  Board <span className="text-destructive">*</span>
                 </label>
                 <select
                   name="board"
@@ -339,8 +381,12 @@ export default function CreateTestPage() {
                   onChange={e => {
                     setBoard(e.target.value);
                   }}
+                  required
                   className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground bg-card"
                 >
+                  <option value={BOARD_PLACEHOLDER_VALUE}>
+                    {BOARD_PLACEHOLDER_LABEL}
+                  </option>
                   {BOARDS.map(b => (
                     <option key={b} value={b}>
                       {b}
@@ -351,7 +397,7 @@ export default function CreateTestPage() {
 
               <div>
                 <label className="block text-sm font-medium text-muted-foreground">
-                  Level / Class
+                  Grade / Level
                 </label>
                 <select
                   name="grade"
@@ -399,7 +445,91 @@ export default function CreateTestPage() {
             </div>
           </div>
 
-          {/* Sections Loop - (Same as before, abbreviated here, but full code provided in tool call) */}
+          {/* Inline AI generator fields when mode=ai (no popup) */}
+          {mode === 'ai' && (
+            <div className="rounded-xl bg-card p-6 shadow-sm border border-border space-y-6">
+              <div className="flex items-center gap-2 border-b border-border pb-4 mb-4">
+                <Sparkles className="text-primary h-5 w-5" />
+                <h2 className="text-xl font-semibold text-foreground">
+                  Generate test with AI
+                </h2>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Set topic and options below, then click <strong>Generate Test</strong> to create questions.
+              </p>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    Topic / Chapter
+                  </label>
+                  <input
+                  <input\n                    type="text"\n                    required\n                    value={aiTopic}\n                    onChange={e => setAiTopic(e.target.value)}\n                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground"\n                    placeholder="e.g. Newton's Laws of Motion"\n                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    Type
+                  </label>
+                  <select
+                    value={aiType}
+                    onChange={e => setAiType(e.target.value)}
+                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground bg-card"
+                  >
+                    <option value="mixed">Mixed Types</option>
+                    {QUESTION_TYPES.map(t => (
+                      <option key={t.value} value={t.value}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    Difficulty
+                  </label>
+                  <select
+                    value={aiDifficulty}
+                    onChange={e => setAiDifficulty(e.target.value)}
+                    className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground bg-card"
+                  >
+                    <option>Easy</option>
+                    <option>Medium</option>
+                    <option>Hard</option>
+                  </select>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                    Number of Questions: {aiCount}
+                  </label>
+                  <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value={aiCount}
+                    onChange={e => setAiCount(parseInt(e.target.value, 10))}
+                    className="w-full accent-primary"
+                  />
+                </div>
+              </div>
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={onGenerateTestClick}
+                  disabled={isGenerating || !aiTopic}
+                  className="flex items-center gap-2 gradient-primary text-white px-5 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isGenerating ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-5 w-5" />
+                  )}
+                  {hasGeneratedContent ? 'Generate new test' : 'Generate Test'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Sections Loop - hidden for mode=ai until AI has generated content */}
+          {showSectionsList && (
           <div className="space-y-8">
             {sections.map((section, secIndex) => (
               <div
@@ -998,7 +1128,9 @@ export default function CreateTestPage() {
               </div>
             ))}
           </div>
+          )}
 
+          {showSectionsList && (
           <div className="flex justify-between items-center pt-8">
             <button
               type="button"
@@ -1015,11 +1147,37 @@ export default function CreateTestPage() {
               <Save className="h-5 w-5" /> Publish Test
             </button>
           </div>
+          )}
+          {mode === 'ai' && !hasGeneratedContent && (
+            <p className="text-muted-foreground text-sm pt-4">
+              Fill in the &quot;Generate test with AI&quot; section above and click <strong>Generate Test</strong>, then review and publish below.
+            </p>
+          )}
         </form>
       </div>
 
-      {/* AI Assistant Modal */}
-      {isAiModalOpen && (
+      <AlertDialog open={showOverwriteConfirm} onOpenChange={setShowOverwriteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Replace existing test?</AlertDialogTitle>
+            <AlertDialogDescription>
+              The previously generated test will be lost and a new test will be generated if you proceed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => handleAiGenerate(true)}
+              className="gradient-primary text-white border-0"
+            >
+              Proceed
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* AI Assistant Modal - only for non-AI mode (manual/pdf) if ever opened */}
+      {isAiModalOpen && mode !== 'ai' && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
           <div className="bg-card rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="gradient-primary p-6 text-white flex justify-between items-start">
@@ -1049,6 +1207,7 @@ export default function CreateTestPage() {
                 </label>
                 <input
                   type="text"
+                  required
                   value={aiTopic}
                   onChange={e => {
                     setAiTopic(e.target.value);
@@ -1114,7 +1273,7 @@ export default function CreateTestPage() {
               </div>
 
               <button
-                onClick={handleAiGenerate}
+                onClick={() => handleAiGenerate()}
                 disabled={isGenerating || !aiTopic}
                 className="w-full mt-4 flex items-center justify-center gap-2 gradient-primary text-white py-3 rounded-lg hover:brightness-110 font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
@@ -1135,5 +1294,19 @@ export default function CreateTestPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function CreateTestPage() {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      }
+    >
+      <CreateTestPageContent />
+    </React.Suspense>
   );
 }
