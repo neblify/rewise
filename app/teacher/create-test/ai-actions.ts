@@ -112,6 +112,23 @@ export async function generateQuestionsAI(
     console.warn('RAG context retrieval failed:', e);
   }
 
+  const boardSourceWebsites: Record<string, string> = {
+    IGCSE:
+      'Look up https://www.cie.org.uk/ and https://www.cambridge.org/ to generate the questions.',
+    CBSE:
+      'Look up sources endorsed by NCERT syllabuses at https://ncert.nic.in/ to generate the questions.',
+    IB: 'Look up https://www.ibo.org/ to generate the questions.',
+    ICSE:
+      grade === '10' || grade === '12'
+        ? 'Look up https://www.icse.org/ and https://www.cisce.org/ to generate the questions.'
+        : 'Use ICSE curriculum guidelines to generate the questions.',
+    SSC: 'Look up https://ssc.nic.in/ to generate the questions.',
+    NIOS: 'Look up https://nios.ac.in/ to generate the questions.',
+  };
+  const sourceWebsites =
+    boardSourceWebsites[board] ||
+    `Use ${board} Board curriculum guidelines to generate the questions.`;
+
   const prompt = `
     You are an expert exam setter for ${board} Board, Grade ${grade}.
     Generate ${count} ${difficulty} questions on the topic: "${topic}".
@@ -119,17 +136,7 @@ export async function generateQuestionsAI(
 
     Question Type: ${type}
 
-    When 'IGCSE' is selected as the Board, lookup to the website https://www.cie.org.uk/ and https://www.cambridge.org/ to generate the questions.
-    
-    When 'CBSE' is selected as the Board, lookup to the sources endorsed by NCERT syllabuses available on the website https://ncert.nic.in/ to generate the questions.
-    
-    When 'IB' is selected as the Board, lookup to the website https://www.ibo.org/ to generate the questions.
-
-    When 'ICSE' is selected as the Board and the selected grade or class is 10th or 12th, then lookup to the website https://www.icse.org/ and https://www.cisce.org/ to generate the questions.
-
-    When 'SSC' is selected as the Board, lookup to the website https://ssc.nic.in/ to generate the questions.
-
-    When 'NIOS' is selected as the Board, lookup to the website https://nios.ac.in/ to generate the questions.
+    ${sourceWebsites}
 
     Output must be a strictly valid JSON array of question objects matching this TypeScript interface:
 
