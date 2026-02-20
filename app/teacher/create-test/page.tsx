@@ -505,7 +505,7 @@ function CreateTestPageContent() {
                     min="1"
                     max="10"
                     value={aiCount}
-                    onChange={e => setAiCount(parseInt(e.target.value))}
+                    onChange={e => setAiCount(parseInt(e.target.value, 10))}
                     className="w-full accent-primary"
                   />
                 </div>
