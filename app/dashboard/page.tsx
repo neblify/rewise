@@ -237,9 +237,9 @@ export default async function Dashboard() {
             <div className="flex-1 overflow-auto pr-1">
               {difficultyList.length > 0 ? (
                 <div className="space-y-3">
-                  {difficultyList.map((test, i) => (
+                  {difficultyList.map(test => (
                     <div
-                      key={i}
+                      key={test.title}
                       className="p-3 rounded-lg border border-border bg-background hover:bg-muted transition-colors"
                     >
                       <div className="flex justify-between items-start mb-2">

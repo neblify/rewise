@@ -254,9 +254,9 @@ export default function TestTaker({
           {/* Render Input based on Type */}
           {q.type === 'mcq' && (
             <div className="space-y-2">
-              {q.options?.map((opt, i) => (
+              {q.options?.map(opt => (
                 <label
-                  key={i}
+                  key={opt}
                   className="flex items-center gap-3 p-3 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors"
                 >
                   <input

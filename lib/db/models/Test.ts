@@ -3,7 +3,6 @@ import { IQuestionBase } from './Question';
 import { QuestionType } from '@/lib/constants/question-types';
 
 export type IQuestion = IQuestionBase;
-export { QuestionType };
 
 export interface ISection {
   title: string;

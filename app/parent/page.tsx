@@ -81,11 +81,15 @@ export default function ParentDashboard() {
       </div>
 
       <div className="bg-card p-6 rounded-xl shadow-sm border border-border">
-        <label className="block text-sm font-medium text-muted-foreground mb-2">
+        <label
+          htmlFor="parent-student-email"
+          className="block text-sm font-medium text-muted-foreground mb-2"
+        >
           Enter Student Email to View Scores
         </label>
         <form onSubmit={handleSearch} className="flex gap-4">
           <input
+            id="parent-student-email"
             type="email"
             value={email}
             onChange={e => {
@@ -184,16 +188,14 @@ export default function ParentDashboard() {
                     </p>
                     {result.weakAreas && result.weakAreas.length > 0 ? (
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {result.weakAreas
-                          .slice(0, 3)
-                          .map((area: string, i: number) => (
-                            <span
-                              key={i}
-                              className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full border border-red-100"
-                            >
-                              {area}
-                            </span>
-                          ))}
+                        {result.weakAreas.slice(0, 3).map((area: string) => (
+                          <span
+                            key={area}
+                            className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full border border-red-100"
+                          >
+                            {area}
+                          </span>
+                        ))}
                         {result.weakAreas.length > 3 && (
                           <span className="text-xs text-muted-foreground">
                             +{result.weakAreas.length - 3} more

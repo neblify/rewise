@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { clerkClient } from '@clerk/nextjs/server';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
@@ -19,6 +20,15 @@ interface Props {
   params: Promise<{
     id: string;
   }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  await dbConnect();
+  const test = await Test.findById(id).select('title').lean();
+  return {
+    title: test ? `${test.title} Results | ReWise` : 'Test Results | ReWise',
+  };
 }
 
 export default async function TestResultsPage(props: Props) {

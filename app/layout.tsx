@@ -5,9 +5,8 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 
-import { Footer } from './_components/landing/Footer';
-
 import { DevTools } from './_components/DevTools';
+import { MotionProvider } from './_components/MotionProvider';
 
 const nunito = Nunito({
   variable: '--font-nunito',
@@ -50,9 +49,8 @@ export default function RootLayout({
           >
             Skip to main content
           </a>
-          {children}
+          <MotionProvider>{children}</MotionProvider>
           <DevTools />
-          <Footer />
           <Analytics />
           <SpeedInsights />
         </body>

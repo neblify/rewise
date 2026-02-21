@@ -1,8 +1,13 @@
+import type { Metadata } from 'next';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import { redirect } from 'next/navigation';
 import UpdateProfileForm from './UpdateProfileForm';
+
+export const metadata: Metadata = {
+  title: 'My Profile | ReWise',
+};
 
 export default async function ProfilePage() {
   const { userId } = await currentAuth();

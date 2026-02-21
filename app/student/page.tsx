@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Test, { ISection } from '@/lib/db/models/Test';
@@ -5,6 +6,10 @@ import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import { Play } from 'lucide-react';
 import User from '@/lib/db/models/User';
+
+export const metadata: Metadata = {
+  title: 'Student Dashboard | ReWise',
+};
 import {
   Card,
   CardContent,

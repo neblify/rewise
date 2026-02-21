@@ -1,4 +1,4 @@
-export interface TextChunk {
+interface TextChunk {
   text: string;
   index: number;
 }

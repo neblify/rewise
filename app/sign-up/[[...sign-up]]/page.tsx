@@ -1,5 +1,10 @@
+import type { Metadata } from 'next';
 import { SignUp } from '@clerk/nextjs';
 import { dark } from '@clerk/themes';
+
+export const metadata: Metadata = {
+  title: 'Sign Up | ReWise',
+};
 
 const signUpAppearance = {
   theme: dark,

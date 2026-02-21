@@ -122,7 +122,7 @@ export default function SearchMaterial({
             {results.length === 1 ? '' : 's'}
           </p>
           {results.map((result, index) => (
-            <ResultCard key={index} result={result} />
+            <ResultCard key={`${result.fileName}-${index}`} result={result} />
           ))}
         </div>
       )}

@@ -1,9 +1,14 @@
+import type { Metadata } from 'next';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
 import { getAvailableSubjects } from './actions';
 import SearchMaterial from './SearchMaterial';
 import Link from 'next/link';
+
+export const metadata: Metadata = {
+  title: 'Study Material | ReWise',
+};
 
 export const dynamic = 'force-dynamic';
 

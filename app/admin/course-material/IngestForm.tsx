@@ -86,10 +86,14 @@ export default function IngestForm() {
 
         {/* Title */}
         <div>
-          <label className="block text-sm font-medium text-foreground mb-1">
+          <label
+            htmlFor="ingest-title"
+            className="block text-sm font-medium text-foreground mb-1"
+          >
             Title
           </label>
           <input
+            id="ingest-title"
             name="title"
             type="text"
             required
@@ -101,10 +105,14 @@ export default function IngestForm() {
         {/* Board & Grade */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
+            <label
+              htmlFor="ingest-board"
+              className="block text-sm font-medium text-foreground mb-1"
+            >
               Board
             </label>
             <select
+              id="ingest-board"
               name="board"
               value={board}
               onChange={e => handleBoardChange(e.target.value)}
@@ -118,10 +126,14 @@ export default function IngestForm() {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
+            <label
+              htmlFor="ingest-grade"
+              className="block text-sm font-medium text-foreground mb-1"
+            >
               Grade
             </label>
             <select
+              id="ingest-grade"
               name="grade"
               value={grade}
               onChange={e => setGrade(e.target.value)}
@@ -139,10 +151,14 @@ export default function IngestForm() {
         {/* Subject & Topic */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
+            <label
+              htmlFor="ingest-subject"
+              className="block text-sm font-medium text-foreground mb-1"
+            >
               Subject
             </label>
             <input
+              id="ingest-subject"
               name="subject"
               type="text"
               required
@@ -151,10 +167,14 @@ export default function IngestForm() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
+            <label
+              htmlFor="ingest-topic"
+              className="block text-sm font-medium text-foreground mb-1"
+            >
               Topic
             </label>
             <input
+              id="ingest-topic"
               name="topic"
               type="text"
               required
@@ -167,10 +187,14 @@ export default function IngestForm() {
         {/* File / URL Input */}
         {sourceType === 'url' ? (
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
+            <label
+              htmlFor="ingest-url"
+              className="block text-sm font-medium text-foreground mb-1"
+            >
               URL
             </label>
             <input
+              id="ingest-url"
               name="url"
               type="url"
               required

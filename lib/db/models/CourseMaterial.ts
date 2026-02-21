@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface ICourseMaterial extends Document {
+interface ICourseMaterial extends Document {
   title: string;
   board: string;
   grade: string;

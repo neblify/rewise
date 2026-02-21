@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Result from '@/lib/db/models/Result';
@@ -5,6 +6,10 @@ import { redirect } from 'next/navigation';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
 import { FileText, ArrowRight } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'My Results | ReWise',
+};
 
 interface PopulatedStudentResult {
   _id: string;
