@@ -9,7 +9,36 @@ import { GradientButton, GradientText } from '@/components/playful';
 export function Hero() {
   return (
     <div className="relative overflow-hidden gradient-navy text-white">
-      <div className="mx-auto max-w-7xl pb-16 pt-8 sm:pb-24 sm:pt-12 lg:pb-32 lg:pt-16">
+      {/* Background layers */}
+      <div className="hero-grid absolute inset-0 animate-[grid-pulse_4s_ease-in-out_infinite]" aria-hidden />
+      <div className="hero-grain absolute inset-0" aria-hidden />
+      {/* Floating gradient orbs */}
+      <div
+        className="absolute -left-32 top-1/4 h-[480px] w-[480px] rounded-full opacity-30 blur-[100px]"
+        style={{
+          background: 'radial-gradient(circle, var(--sky) 0%, transparent 70%)',
+          animation: 'orb-float 18s ease-in-out infinite',
+        }}
+        aria-hidden
+      />
+      <div
+        className="absolute bottom-1/4 -right-24 h-[360px] w-[360px] rounded-full opacity-25 blur-[80px]"
+        style={{
+          background: 'radial-gradient(circle, var(--coral) 0%, transparent 70%)',
+          animation: 'orb-float-slow 22s ease-in-out infinite',
+        }}
+        aria-hidden
+      />
+      <div
+        className="absolute left-1/2 top-1/2 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20 blur-[60px]"
+        style={{
+          background: 'radial-gradient(circle, var(--violet) 0%, transparent 70%)',
+          animation: 'orb-float 14s ease-in-out infinite reverse',
+        }}
+        aria-hidden
+      />
+
+      <div className="relative mx-auto max-w-7xl pb-16 pt-8 sm:pb-24 sm:pt-12 lg:pb-32 lg:pt-16">
         <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
           <div className="sm:max-w-lg">
             <motion.div
