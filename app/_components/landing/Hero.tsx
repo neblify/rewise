@@ -122,9 +122,12 @@ export function Hero() {
                 className="relative"
               >
                 {/* Use ReWise_Mascot.gif for native animation, or .png with motion above */}
-                <img
+                <Image
                   src="/ReWise_Mascot.gif"
                   alt="ReWise mascot"
+                  width={384}
+                  height={384}
+                  unoptimized
                   className="h-64 w-auto object-contain md:h-80 lg:h-96 drop-shadow-2xl"
                 />
               </motion.div>
