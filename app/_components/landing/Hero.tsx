@@ -3,8 +3,7 @@
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, BookOpen } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { ArrowRight } from 'lucide-react';
 import { GradientButton, GradientText } from '@/components/playful';
 
 export function Hero() {
@@ -108,40 +107,27 @@ export function Hero() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, type: 'spring', stiffness: 80 }}
-              className="relative h-full w-full lg:h-full"
+              className="relative h-full w-full lg:h-full flex justify-center items-center"
             >
-              <div className="relative flex justify-center items-center h-full">
-                <Card className="relative bg-white/10 backdrop-blur-md p-6 rounded-2xl shadow-2xl border-white/10 max-w-md w-full mx-4">
-                  <div className="flex items-center border-b border-white/10 pb-4 mb-4">
-                    <div className="h-10 w-10 rounded-full bg-violet-light flex items-center justify-center">
-                      <BookOpen className="h-6 w-6 text-primary" />
-                    </div>
-                    <div className="ml-3">
-                      <div className="text-sm font-semibold text-white">
-                        Psychology Test
-                      </div>
-                      <div className="text-xs text-white/60">
-                        AI Analysis in progress...
-                      </div>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="h-2 bg-white/10 rounded-full w-3/4"></div>
-                    <div className="h-2 bg-white/10 rounded-full w-full"></div>
-                    <div className="h-2 bg-white/10 rounded-full w-5/6"></div>
-                  </div>
-                  <div className="mt-6 flex gap-3">
-                    <div className="flex-1 bg-mint-light/20 rounded-xl p-3 text-center">
-                      <div className="text-lg font-bold text-mint">A</div>
-                      <div className="text-xs text-mint/80">Grade</div>
-                    </div>
-                    <div className="flex-1 bg-sky-light/20 rounded-xl p-3 text-center">
-                      <div className="text-lg font-bold text-sky">92%</div>
-                      <div className="text-xs text-sky/80">Accuracy</div>
-                    </div>
-                  </div>
-                </Card>
-              </div>
+              <motion.div
+                animate={{
+                  y: [0, -8, 0],
+                  rotate: [0, 1, -1, 0],
+                }}
+                transition={{
+                  duration: 2.5,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+                className="relative"
+              >
+                {/* Use ReWise_Mascot.gif for native animation, or .png with motion above */}
+                <img
+                  src="/ReWise_Mascot.gif"
+                  alt="ReWise mascot"
+                  className="h-64 w-auto object-contain md:h-80 lg:h-96 drop-shadow-2xl"
+                />
+              </motion.div>
             </motion.div>
           </div>
         </div>
