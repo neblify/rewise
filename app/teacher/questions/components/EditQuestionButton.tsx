@@ -179,7 +179,7 @@ export default function EditQuestionButton({
                 <div className="space-y-2 mt-1">
                   {options.map((opt, i) => (
                     <Input
-                      key={i}
+                      key={`opt-${i}`}
                       placeholder={`Option ${i + 1}`}
                       value={opt}
                       onChange={e => {

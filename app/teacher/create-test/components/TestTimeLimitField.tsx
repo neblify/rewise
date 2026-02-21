@@ -14,10 +14,10 @@ type Props = {
 
 export function TestTimeLimitField({ value, onChange }: Props) {
   return (
-    <div className="col-span-2">
-      <label className="block text-sm font-medium text-muted-foreground mb-2">
+    <fieldset className="col-span-2">
+      <legend className="block text-sm font-medium text-muted-foreground mb-2">
         Time limit
-      </label>
+      </legend>
       <div className="flex gap-6">
         <label className="inline-flex items-center gap-2 cursor-pointer">
           <input
@@ -47,10 +47,14 @@ export function TestTimeLimitField({ value, onChange }: Props) {
       {value.isTimed === 'timed' && (
         <div className="mt-3 flex gap-4">
           <div>
-            <label className="block text-xs text-muted-foreground mb-1">
+            <label
+              htmlFor="time-limit-hours"
+              className="block text-xs text-muted-foreground mb-1"
+            >
               Hours
             </label>
             <select
+              id="time-limit-hours"
               value={value.durationHours}
               onChange={e =>
                 onChange({
@@ -68,10 +72,14 @@ export function TestTimeLimitField({ value, onChange }: Props) {
             </select>
           </div>
           <div>
-            <label className="block text-xs text-muted-foreground mb-1">
+            <label
+              htmlFor="time-limit-minutes"
+              className="block text-xs text-muted-foreground mb-1"
+            >
               Minutes
             </label>
             <select
+              id="time-limit-minutes"
               value={value.durationMinutes}
               onChange={e =>
                 onChange({
@@ -90,6 +98,6 @@ export function TestTimeLimitField({ value, onChange }: Props) {
           </div>
         </div>
       )}
-    </div>
+    </fieldset>
   );
 }

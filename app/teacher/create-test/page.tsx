@@ -56,10 +56,6 @@ interface SectionState {
   questions: QuestionState[];
 }
 
-interface CreateTestState {
-  message?: string;
-}
-
 import {
   BOARDS,
   BOARD_PLACEHOLDER_LABEL,
@@ -351,10 +347,14 @@ function CreateTestPageContent() {
                 <input type="hidden" name="title" value={aiTopic} />
               ) : (
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-muted-foreground">
+                  <label
+                    htmlFor="create-test-title"
+                    className="block text-sm font-medium text-muted-foreground"
+                  >
                     Test Title
                   </label>
                   <input
+                    id="create-test-title"
                     name="title"
                     type="text"
                     value={testTitle}
@@ -369,10 +369,14 @@ function CreateTestPageContent() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground">
+                <label
+                  htmlFor="create-test-board"
+                  className="block text-sm font-medium text-muted-foreground"
+                >
                   Board <span className="text-destructive">*</span>
                 </label>
                 <select
+                  id="create-test-board"
                   name="board"
                   value={board}
                   onChange={e => {
@@ -393,10 +397,14 @@ function CreateTestPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground">
+                <label
+                  htmlFor="create-test-grade"
+                  className="block text-sm font-medium text-muted-foreground"
+                >
                   Grade / Level
                 </label>
                 <select
+                  id="create-test-grade"
                   name="grade"
                   value={grade}
                   onChange={e => {
@@ -413,10 +421,14 @@ function CreateTestPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground">
+                <label
+                  htmlFor="create-test-subject"
+                  className="block text-sm font-medium text-muted-foreground"
+                >
                   Subject
                 </label>
                 <input
+                  id="create-test-subject"
                   name="subject"
                   type="text"
                   required
@@ -426,10 +438,14 @@ function CreateTestPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground">
+                <label
+                  htmlFor="create-test-visibility"
+                  className="block text-sm font-medium text-muted-foreground"
+                >
                   Visibility
                 </label>
                 <select
+                  id="create-test-visibility"
                   name="visibility"
                   className="mt-1 block w-full rounded-md border border-border px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-primary text-foreground bg-card"
                 >
@@ -457,10 +473,14 @@ function CreateTestPageContent() {
               </p>
               <div className="grid gap-6 md:grid-cols-2">
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  <label
+                    htmlFor="ai-inline-topic"
+                    className="block text-sm font-medium text-muted-foreground mb-1"
+                  >
                     Topic / Chapter
                   </label>
                   <input
+                    id="ai-inline-topic"
                     type="text"
                     required
                     value={aiTopic}
@@ -470,10 +490,14 @@ function CreateTestPageContent() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  <label
+                    htmlFor="ai-inline-type"
+                    className="block text-sm font-medium text-muted-foreground mb-1"
+                  >
                     Type
                   </label>
                   <select
+                    id="ai-inline-type"
                     value={aiType}
                     onChange={e => setAiType(e.target.value)}
                     className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground bg-card"
@@ -487,10 +511,14 @@ function CreateTestPageContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  <label
+                    htmlFor="ai-inline-difficulty"
+                    className="block text-sm font-medium text-muted-foreground mb-1"
+                  >
                     Difficulty
                   </label>
                   <select
+                    id="ai-inline-difficulty"
                     value={aiDifficulty}
                     onChange={e => setAiDifficulty(e.target.value)}
                     className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground bg-card"
@@ -501,10 +529,14 @@ function CreateTestPageContent() {
                   </select>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  <label
+                    htmlFor="ai-inline-count"
+                    className="block text-sm font-medium text-muted-foreground mb-1"
+                  >
                     Number of Questions: {aiCount}
                   </label>
                   <input
+                    id="ai-inline-count"
                     type="range"
                     min="1"
                     max="10"
@@ -788,13 +820,13 @@ function CreateTestPageContent() {
                                         </p>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                           <div>
-                                            <label className="block text-sm font-medium text-muted-foreground mb-1">
+                                            <p className="block text-sm font-medium text-muted-foreground mb-1">
                                               Left column (keys)
-                                            </label>
+                                            </p>
                                             {(q.leftColumn || ['', '']).map(
                                               (item: string, i: number) => (
                                                 <div
-                                                  key={i}
+                                                  key={`left-${i}`}
                                                   className="flex gap-1 mb-1"
                                                 >
                                                   <input
@@ -933,9 +965,9 @@ function CreateTestPageContent() {
                                             </button>
                                           </div>
                                           <div>
-                                            <label className="block text-sm font-medium text-muted-foreground mb-1">
+                                            <p className="block text-sm font-medium text-muted-foreground mb-1">
                                               Right column (values)
-                                            </label>
+                                            </p>
                                             {(q.options || ['', '']).map(
                                               (
                                                 opt: string,
@@ -1040,10 +1072,10 @@ function CreateTestPageContent() {
                                           </div>
                                         </div>
                                         <div>
-                                          <label className="block text-sm font-medium text-muted-foreground mb-1">
+                                          <p className="block text-sm font-medium text-muted-foreground mb-1">
                                             Correct mapping (Column A → Column
                                             B)
-                                          </label>
+                                          </p>
                                           <div className="flex flex-wrap gap-2">
                                             {(q.leftColumn || ['', '']).map(
                                               (_: string, leftIdx: number) => (
@@ -1242,10 +1274,14 @@ function CreateTestPageContent() {
 
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1">
+                <label
+                  htmlFor="ai-modal-topic"
+                  className="block text-sm font-medium text-muted-foreground mb-1"
+                >
                   Topic / Chapter
                 </label>
                 <input
+                  id="ai-modal-topic"
                   type="text"
                   required
                   value={aiTopic}
@@ -1254,16 +1290,19 @@ function CreateTestPageContent() {
                   }}
                   className="block w-full rounded-md border border-border px-3 py-2 focus:ring-primary focus:border-primary text-foreground"
                   placeholder="e.g. Newton's Laws of Motion"
-                  autoFocus
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  <label
+                    htmlFor="ai-modal-type"
+                    className="block text-sm font-medium text-muted-foreground mb-1"
+                  >
                     Type
                   </label>
                   <select
+                    id="ai-modal-type"
                     value={aiType}
                     onChange={e => {
                       setAiType(e.target.value);
@@ -1279,10 +1318,14 @@ function CreateTestPageContent() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-muted-foreground mb-1">
+                  <label
+                    htmlFor="ai-modal-difficulty"
+                    className="block text-sm font-medium text-muted-foreground mb-1"
+                  >
                     Difficulty
                   </label>
                   <select
+                    id="ai-modal-difficulty"
                     value={aiDifficulty}
                     onChange={e => {
                       setAiDifficulty(e.target.value);
@@ -1297,10 +1340,14 @@ function CreateTestPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-muted-foreground mb-1">
+                <label
+                  htmlFor="ai-modal-count"
+                  className="block text-sm font-medium text-muted-foreground mb-1"
+                >
                   Number of Questions: {aiCount}
                 </label>
                 <input
+                  id="ai-modal-count"
                   type="range"
                   min="1"
                   max="10"

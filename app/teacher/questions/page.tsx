@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Question from '@/lib/db/models/Question';
@@ -8,6 +9,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
 import { isAdmin } from '@/lib/auth/isAdmin';
+
+export const metadata: Metadata = {
+  title: 'Question Bank | ReWise',
+};
 import EditQuestionButton from './components/EditQuestionButton';
 import DeleteQuestionButton from './components/DeleteQuestionButton';
 import Link from 'next/link';

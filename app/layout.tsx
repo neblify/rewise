@@ -51,9 +51,7 @@ export default function RootLayout({
           >
             Skip to main content
           </a>
-          <MotionProvider>
-            {children}
-          </MotionProvider>
+          <MotionProvider>{children}</MotionProvider>
           <DevTools />
           <Footer />
           <Analytics />

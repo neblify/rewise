@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Test, { ISection } from '@/lib/db/models/Test';
@@ -8,6 +9,10 @@ import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+
+export const metadata: Metadata = {
+  title: 'Teacher Dashboard | ReWise',
+};
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import DeleteTestButton from './components/DeleteTestButton';

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Result from '@/lib/db/models/Result';
@@ -30,6 +31,16 @@ interface Props {
   params: Promise<{
     id: string;
   }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  await dbConnect();
+  const result = await Result.findById(id).populate('testId', 'title').lean();
+  const title = (result?.testId as { title?: string } | undefined)?.title;
+  return {
+    title: title ? `${title} Result | ReWise` : 'Test Result | ReWise',
+  };
 }
 
 export default async function ResultPage(props: Props) {
@@ -115,9 +126,9 @@ export default async function ResultPage(props: Props) {
               {populatedResult.weakAreas &&
               populatedResult.weakAreas.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {populatedResult.weakAreas.map((area: string, i: number) => (
+                  {populatedResult.weakAreas.map((area: string) => (
                     <span
-                      key={i}
+                      key={area}
                       className="px-3 py-1 bg-red-50 text-red-700 rounded-full text-sm font-medium border border-red-100"
                     >
                       {area}
@@ -145,7 +156,7 @@ export default async function ResultPage(props: Props) {
 
             return (
               <div
-                key={i}
+                key={ans.questionId}
                 className={`bg-card rounded-xl p-6 shadow-sm border-l-4 ${ans.isCorrect ? 'border-green-500' : 'border-red-500'}`}
               >
                 <div className="flex justify-between items-start mb-4">
