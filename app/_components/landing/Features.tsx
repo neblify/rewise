@@ -9,7 +9,6 @@ import {
   Users,
   BarChart3,
 } from 'lucide-react';
-import { WaveDivider } from '@/components/playful';
 
 const featureColors = [
   'bg-violet-light text-primary',
@@ -62,7 +61,6 @@ const features = [
 export function Features() {
   return (
     <>
-      <WaveDivider color="var(--background)" />
       <div className="relative bg-background py-24 sm:py-32">
         <div className="section-grid absolute inset-0 opacity-40" aria-hidden />
         <div className="relative mx-auto max-w-7xl px-6 lg:px-8">

@@ -2,12 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { WaveDivider } from '@/components/playful';
-
 export function Footer() {
   return (
     <>
-      <WaveDivider color="var(--navy)" flip />
       <footer className="gradient-navy text-white">
         <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
           <div className="mt-8 md:order-1 md:mt-0 flex items-center gap-2">
