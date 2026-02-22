@@ -52,8 +52,16 @@ const roles = [
 
 export function RoleInfo() {
   return (
-    <div className="bg-card py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+    <div className="relative bg-card py-24 sm:py-32">
+      <div
+        className="absolute inset-0 opacity-30"
+        style={{
+          background:
+            'linear-gradient(135deg, var(--sky-light) 0%, transparent 40%, transparent 60%, var(--coral-light) 100%)',
+        }}
+        aria-hidden
+      />
+      <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:text-center mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Built for Everyone
