@@ -8,8 +8,7 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const STATIC_BOARD_SOURCE_WEBSITES: Record<string, string> = {
   IGCSE:
     'Look up https://www.cie.org.uk/ and https://www.cambridge.org/ to generate the questions.',
-  CBSE:
-    'Look up sources endorsed by NCERT syllabuses at https://ncert.nic.in/ to generate the questions.',
+  CBSE: 'Look up sources endorsed by NCERT syllabuses at https://ncert.nic.in/ to generate the questions.',
   IB: 'Look up https://www.ibo.org/ to generate the questions.',
   SSC: 'Look up https://ssc.nic.in/ to generate the questions.',
   NIOS: 'Look up https://nios.ac.in/ to generate the questions.',

@@ -10,7 +10,10 @@ export function Hero() {
   return (
     <div className="relative overflow-hidden gradient-navy text-white">
       {/* Background layers */}
-      <div className="hero-grid absolute inset-0 animate-[grid-pulse_4s_ease-in-out_infinite]" aria-hidden />
+      <div
+        className="hero-grid absolute inset-0 animate-[grid-pulse_4s_ease-in-out_infinite]"
+        aria-hidden
+      />
       <div className="hero-grain absolute inset-0" aria-hidden />
       {/* Floating gradient orbs */}
       <div
@@ -24,7 +27,8 @@ export function Hero() {
       <div
         className="absolute bottom-1/4 -right-24 h-[360px] w-[360px] rounded-full opacity-25 blur-[80px]"
         style={{
-          background: 'radial-gradient(circle, var(--coral) 0%, transparent 70%)',
+          background:
+            'radial-gradient(circle, var(--coral) 0%, transparent 70%)',
           animation: 'orb-float-slow 22s ease-in-out infinite',
         }}
         aria-hidden
@@ -32,7 +36,8 @@ export function Hero() {
       <div
         className="absolute left-1/2 top-1/2 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20 blur-[60px]"
         style={{
-          background: 'radial-gradient(circle, var(--violet) 0%, transparent 70%)',
+          background:
+            'radial-gradient(circle, var(--violet) 0%, transparent 70%)',
           animation: 'orb-float 14s ease-in-out infinite reverse',
         }}
         aria-hidden

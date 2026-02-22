@@ -56,7 +56,8 @@ export function RoleInfo() {
       <div
         className="absolute inset-0 opacity-30"
         style={{
-          background: 'linear-gradient(135deg, var(--sky-light) 0%, transparent 40%, transparent 60%, var(--coral-light) 100%)',
+          background:
+            'linear-gradient(135deg, var(--sky-light) 0%, transparent 40%, transparent 60%, var(--coral-light) 100%)',
         }}
         aria-hidden
       />
