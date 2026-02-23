@@ -25,7 +25,7 @@ export function Testimonials() {
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.5 }}
           className="mx-auto max-w-2xl text-center"
         >
@@ -39,7 +39,7 @@ export function Testimonials() {
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          viewport={{ once: true, amount: 0.1 }}
+          viewport={{ once: false, amount: 0.1 }}
           transition={{ duration: 0.5, delay: 0.1 }}
           className="mt-14 overflow-x-auto overflow-y-hidden pb-4 scroll-smooth sm:mt-16 snap-x snap-mandatory"
         >
@@ -49,7 +49,7 @@ export function Testimonials() {
                 key={t.author}
                 initial={{ opacity: 0, x: 24 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.3 }}
+                viewport={{ once: false, amount: 0.3 }}
                 transition={{ duration: 0.4, delay: 0.1 + index * 0.1 }}
                 whileHover={{ scale: 1.02 }}
                 className="min-w-[300px] shrink-0 snap-center rounded-2xl border border-border/50 bg-muted/30 p-8 shadow-sm sm:min-w-[360px] sm:p-10"

@@ -10,7 +10,7 @@ interface SectionRevealProps {
 
 export function SectionReveal({ children, className }: SectionRevealProps) {
   const ref = useRef<HTMLElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.1 });
+  const isInView = useInView(ref, { once: false, amount: 0.1 });
 
   return (
     <motion.section

@@ -62,12 +62,12 @@ const features = [
 
 export function Features() {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: '-100px' });
+  const inView = useInView(ref, { once: false, margin: '-100px' });
 
   return (
     <>
       <WaveDivider color="var(--background)" />
-      <div ref={ref} className="bg-background py-24 sm:py-32">
+      <div ref={ref} className="bg-background pt-[5px] pb-24 sm:pb-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -93,7 +93,7 @@ export function Features() {
                   key={feature.name}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-50px' }}
+                  viewport={{ once: false, margin: '-50px' }}
                   transition={{ duration: 0.5, delay: index * 0.12 }}
                   className="relative pl-16"
                 >

@@ -33,7 +33,12 @@ function AnimatedStat({
   const hasAnimated = useRef(false);
 
   useEffect(() => {
-    if (!inView || hasAnimated.current) return;
+    if (!inView) {
+      hasAnimated.current = false;
+      setDisplay(0);
+      return;
+    }
+    if (hasAnimated.current) return;
     hasAnimated.current = true;
     const delay = index * STAGGER_MS;
     const controls = animate(0, value, {
@@ -58,7 +63,7 @@ function AnimatedStat({
 
 export function Stats() {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.3 });
+  const inView = useInView(ref, { once: false, amount: 0.3 });
 
   return (
     <section ref={ref} className="bg-muted/30 py-24 sm:py-32">
@@ -66,7 +71,7 @@ export function Stats() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, amount: 0.2 }}
+          viewport={{ once: false, amount: 0.2 }}
           transition={{ duration: 0.5 }}
           className="mx-auto max-w-2xl text-center"
         >
@@ -83,7 +88,7 @@ export function Stats() {
               key={stat.label}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
+              viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className="flex flex-col items-center rounded-2xl border border-border/50 bg-background/80 p-8 shadow-sm backdrop-blur sm:p-10"
             >

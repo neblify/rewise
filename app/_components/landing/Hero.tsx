@@ -11,7 +11,7 @@ const spring = { type: 'spring' as const, stiffness: 100, damping: 20 };
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
+  const isInView = useInView(sectionRef, { once: false, amount: 0.2 });
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 300], [0, -80]);
 
