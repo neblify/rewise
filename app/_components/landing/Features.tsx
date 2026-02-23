@@ -66,7 +66,9 @@ export function Features() {
 
   return (
     <>
-<WaveDivider color="var(--background)" className="gradient-navy" />
+      <div className="gradient-navy -mt-24 pt-24">
+        <WaveDivider color="var(--background)" />
+      </div>
       <div ref={ref} className="bg-background pt-[5px] pb-24 sm:pb-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <motion.div
