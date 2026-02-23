@@ -3,6 +3,8 @@ import { currentAuth } from '@/lib/auth-wrapper';
 import { redirect } from 'next/navigation';
 import { Hero } from './_components/landing/Hero';
 import { Features } from './_components/landing/Features';
+import { Stats } from './_components/landing/Stats';
+import { Testimonials } from './_components/landing/Testimonials';
 import { RoleInfo } from './_components/landing/RoleInfo';
 import { Footer } from './_components/landing/Footer';
 
@@ -15,6 +17,8 @@ export default async function Home() {
         <main id="main-content" className="min-h-screen bg-background">
           <Hero />
           <Features />
+          <Stats />
+          <Testimonials />
           <RoleInfo />
         </main>
         <Footer />

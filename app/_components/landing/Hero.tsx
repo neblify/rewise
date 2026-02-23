@@ -1,58 +1,35 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView } from 'motion/react';
+import { useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { GradientButton, GradientText } from '@/components/playful';
 
-export function Hero() {
-  return (
-    <div className="relative overflow-hidden gradient-navy text-white">
-      {/* Background layers */}
-      <div
-        className="hero-grid absolute inset-0 animate-[grid-pulse_4s_ease-in-out_infinite]"
-        aria-hidden
-      />
-      <div className="hero-grain absolute inset-0" aria-hidden />
-      {/* Floating gradient orbs */}
-      <div
-        className="absolute -left-32 top-1/4 h-[480px] w-[480px] rounded-full opacity-30 blur-[100px]"
-        style={{
-          background: 'radial-gradient(circle, var(--sky) 0%, transparent 70%)',
-          animation: 'orb-float 18s ease-in-out infinite',
-        }}
-        aria-hidden
-      />
-      <div
-        className="absolute bottom-1/4 -right-24 h-[360px] w-[360px] rounded-full opacity-25 blur-[80px]"
-        style={{
-          background:
-            'radial-gradient(circle, var(--coral) 0%, transparent 70%)',
-          animation: 'orb-float-slow 22s ease-in-out infinite',
-        }}
-        aria-hidden
-      />
-      <div
-        className="absolute left-1/2 top-1/2 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20 blur-[60px]"
-        style={{
-          background:
-            'radial-gradient(circle, var(--violet) 0%, transparent 70%)',
-          animation: 'orb-float 14s ease-in-out infinite reverse',
-        }}
-        aria-hidden
-      />
+const spring = { type: 'spring' as const, stiffness: 100, damping: 20 };
 
-      <div className="relative mx-auto max-w-7xl pb-16 pt-8 sm:pb-24 sm:pt-12 lg:pb-32 lg:pt-16">
+export function Hero() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: false, amount: 0.2 });
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 300], [0, -80]);
+
+  return (
+    <motion.section
+      ref={sectionRef}
+      style={{ y }}
+      className="relative overflow-hidden gradient-navy text-white"
+    >
+      <div className="mx-auto max-w-7xl pb-16 pt-8 sm:pb-24 sm:pt-12 lg:pb-32 lg:pt-16">
         <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
           <div className="sm:max-w-lg">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, type: 'spring', stiffness: 100 }}
+              initial={{ opacity: 0, y: 24 }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+              transition={{ ...spring, delay: 0 }}
             >
               <div className="relative mb-6 inline-block">
-                {/* Light-compatible halo: whole glow shifted up above the bulb */}
                 <div
                   aria-hidden="true"
                   className="absolute inset-0 -m-12 -translate-y-[18%]"
@@ -71,7 +48,6 @@ export function Hero() {
                         'radial-gradient(circle at 50% 50%, var(--sky-light) 0%, transparent 65%)',
                     }}
                   />
-                  {/* Bright center so the bulb looks lit */}
                   <div
                     className="absolute inset-0 rounded-full opacity-95 blur-xl"
                     style={{
@@ -91,7 +67,12 @@ export function Hero() {
                   />
                 </div>
               </div>
-              <h1 className="text-4xl font-bold tracking-tight sm:text-6xl">
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ ...spring, delay: 0.08 }}
+                className="text-4xl font-bold tracking-tight sm:text-6xl"
+              >
                 Master Your Exams with{' '}
                 <GradientText
                   as="span"
@@ -99,22 +80,22 @@ export function Hero() {
                 >
                   AI-Powered Intelligence
                 </GradientText>
-              </h1>
-              <p className="mt-6 text-xl text-white/70">
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ ...spring, delay: 0.16 }}
+                className="mt-6 text-xl text-white/70"
+              >
                 Personalized learning for Students, smart tools for Teachers,
                 and insights for Parents. The all-in-one platform for exam
                 success.
-              </p>
+              </motion.p>
             </motion.div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.5,
-                delay: 0.2,
-                type: 'spring',
-                stiffness: 100,
-              }}
+              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ ...spring, delay: 0.24 }}
               className="mt-10 gap-4 flex flex-col sm:flex-row"
             >
               <GradientButton
@@ -139,9 +120,10 @@ export function Hero() {
           <div className="mt-10 md:mt-0 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.7, type: 'spring', stiffness: 80 }}
-              className="relative h-full w-full lg:h-full flex justify-center items-center"
+              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+              transition={{ ...spring, delay: 0.2 }}
+              whileHover={{ scale: 1.05, rotate: 2 }}
+              className="relative h-full w-full lg:h-full flex justify-center items-center cursor-default"
             >
               <motion.div
                 animate={{
@@ -155,7 +137,6 @@ export function Hero() {
                 }}
                 className="relative"
               >
-                {/* Use ReWise_Mascot.gif for native animation, or .png with motion above */}
                 <Image
                   src="/ReWise_Mascot.gif"
                   alt="ReWise mascot"
@@ -169,6 +150,6 @@ export function Hero() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.section>
   );
 }
