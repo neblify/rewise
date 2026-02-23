@@ -1,6 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'motion/react';
+import { useRef } from 'react';
 import {
   Brain,
   ShieldCheck,
@@ -60,12 +61,20 @@ const features = [
 ];
 
 export function Features() {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-100px' });
+
   return (
     <>
       <WaveDivider color="var(--background)" />
-      <div className="bg-background py-24 sm:py-32">
+      <div ref={ref} className="bg-background py-24 sm:py-32">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl lg:text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
+            transition={{ duration: 0.5 }}
+            className="mx-auto max-w-2xl lg:text-center"
+          >
             <h2 className="text-base font-semibold leading-7 gradient-text">
               Why Choose ReWise?
             </h2>
@@ -76,7 +85,7 @@ export function Features() {
               We combine cutting-edge technology with educational expertise to
               provide the best learning environment.
             </p>
-          </div>
+          </motion.div>
           <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
             <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-2 lg:gap-y-16">
               {features.map((feature, index) => (
@@ -84,8 +93,8 @@ export function Features() {
                   key={feature.name}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true, margin: '-50px' }}
+                  transition={{ duration: 0.5, delay: index * 0.12 }}
                   className="relative pl-16"
                 >
                   <dt className="text-base font-semibold leading-7 text-foreground">
