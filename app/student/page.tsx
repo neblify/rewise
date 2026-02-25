@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import { Play } from 'lucide-react';
 import User from '@/lib/db/models/User';
+import { InvitedToOpenChallengeCard } from '@/app/_components/dashboard/InvitedToOpenChallengeCard';
 
 export const metadata: Metadata = {
   title: 'Student Dashboard | ReWise',
@@ -44,6 +45,7 @@ export default async function StudentDashboard() {
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <InvitedToOpenChallengeCard />
       <div>
         <h1 className="text-3xl font-bold text-foreground">
           Student Dashboard

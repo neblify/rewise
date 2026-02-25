@@ -14,6 +14,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import Link from 'next/link';
+import { InvitedToOpenChallengeCard } from '@/app/_components/dashboard/InvitedToOpenChallengeCard';
 
 export const dynamic = 'force-dynamic';
 
@@ -134,6 +135,7 @@ export default async function Dashboard() {
   return (
     <div className="min-h-screen bg-background/50 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
+        <InvitedToOpenChallengeCard />
         {/* Header */}
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-bold text-foreground">

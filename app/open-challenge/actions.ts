@@ -256,3 +256,62 @@ export async function getMyOpenChallengeResults() {
     })),
   };
 }
+
+/** Invites where the current user (by email or linkedClerkId) is the invitee. Only for existing accounts (logged-in users). */
+export async function getOpenChallengeInvitesForCurrentUser(): Promise<{
+  invites: { testId: string; testTitle: string; scoreToBeat?: number }[];
+}> {
+  const { userId } = await currentAuth();
+  if (!userId) return { invites: [] };
+
+  await dbConnect();
+
+  let primaryEmail: string | null = null;
+  try {
+    const { clerkClient } = await import('@clerk/nextjs/server');
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    primaryEmail = user.primaryEmailAddress?.emailAddress ?? null;
+  } catch {
+    // Mock session or Clerk unavailable
+  }
+
+  const filter: { $or: ({ email: string } | { linkedClerkId: string })[] } = {
+    $or: [{ linkedClerkId: userId }],
+  };
+  if (primaryEmail?.trim()) {
+    filter.$or.push({ email: primaryEmail.trim().toLowerCase() });
+  }
+
+  const friendRecords = await Friend.find(filter)
+    .select('challengeTestId challengeResultId scoreToBeat')
+    .lean();
+
+  const testIds = [...new Set(friendRecords.map(f => f.challengeTestId).filter(Boolean))];
+  const tests = await Test.find({ _id: { $in: testIds }, openChallenge: true })
+    .select('_id title')
+    .lean();
+  const testMap = new Map(tests.map(t => [String(t._id), t.title ?? 'Open Challenge']));
+
+  // Exclude invites for challenges the user has already attempted
+  const attemptedTestIds = new Set(
+    (await Result.find({ studentId: userId, testId: { $in: testIds } }).select('testId').lean()).map(
+      r => r.testId?.toString()
+    ).filter(Boolean)
+  );
+
+  const seen = new Set<string>();
+  const invites: { testId: string; testTitle: string; scoreToBeat?: number }[] = [];
+  for (const f of friendRecords) {
+    const testId = f.challengeTestId?.toString();
+    if (!testId || !testMap.has(testId) || seen.has(testId) || attemptedTestIds.has(testId)) continue;
+    seen.add(testId);
+    invites.push({
+      testId,
+      testTitle: testMap.get(testId)!,
+      scoreToBeat: f.scoreToBeat,
+    });
+  }
+
+  return { invites };
+}
