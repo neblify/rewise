@@ -209,7 +209,15 @@ export default async function ResultPage(props: Props) {
           })}
         </div>
 
-        <div className="flex justify-center pt-8">
+        <div className="flex flex-wrap justify-center gap-4 pt-8">
+          {(test as { openChallenge?: boolean })?.openChallenge && (
+            <Link
+              href="/open-challenge"
+              className="px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors font-medium"
+            >
+              Invite friends to beat your score
+            </Link>
+          )}
           <Link
             href="/student"
             className="px-6 py-3 gradient-primary text-white rounded-lg hover:brightness-110 transition-colors font-medium"

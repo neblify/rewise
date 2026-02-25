@@ -24,6 +24,7 @@ export interface ITest extends Document {
   // We can also have a flat array of refs if needed:
   // questionRefs?: mongoose.Types.ObjectId[];
   isPublished: boolean;
+  openChallenge?: boolean; // true when created from Open Challenge flow
   createdAt: Date;
   updatedAt: Date;
   versionHistory?: IVersionHistory[];
@@ -68,6 +69,7 @@ const TestSchema = new Schema<ITest>(
     sections: [SectionSchema],
     questions: [QuestionSchema], // Deprecated but Schema remains valid
     isPublished: { type: Boolean, default: false },
+    openChallenge: { type: Boolean, default: false },
     versionHistory: [
       {
         modifiedAt: { type: Date, default: Date.now },

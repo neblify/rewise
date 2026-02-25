@@ -7,6 +7,7 @@ const NAV_PEEK_PX = 80;
 const DARK_SECTION_IDS = ['hero', 'footer'];
 
 const navItems = [
+  { href: '/open-challenge', label: 'Open Challenge' },
   { href: '/#features', label: 'Features' },
   { href: '/#testimonials', label: 'Testimonials' },
   { href: '/about', label: 'About Us' },
