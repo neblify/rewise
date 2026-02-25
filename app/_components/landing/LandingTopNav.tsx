@@ -6,6 +6,13 @@ import { useEffect, useState } from 'react';
 const NAV_PEEK_PX = 80;
 const DARK_SECTION_IDS = ['hero', 'footer'];
 
+const navItems = [
+  { href: '/#features', label: 'Features' },
+  { href: '/#testimonials', label: 'Testimonials' },
+  { href: '/about', label: 'About Us' },
+  { href: '/contact', label: 'Contact' },
+];
+
 function useNavLinkColor() {
   const [isDarkBg, setIsDarkBg] = useState(true);
 
@@ -38,50 +45,23 @@ export function LandingTopNav() {
 
   return (
     <nav
-      className="fixed left-0 right-0 top-0 z-50 flex min-h-[calc(30px+0.5in)] items-center justify-end bg-transparent pt-[0.5in] pb-3"
+      className="fixed left-0 right-0 top-0 z-50 flex min-h-[calc(30px+3rem)] items-center justify-end bg-transparent pt-12 pb-3"
       aria-label="Landing navigation"
     >
       <div className="mx-auto flex w-full max-w-7xl items-center justify-end gap-6 px-4 sm:px-6 lg:px-8">
-        <Link
-          href="/#features"
-          className={
-            isDarkBg
-              ? `${linkBase} text-white/90 hover:text-white focus-visible:outline-white`
-              : `${linkBase} text-foreground/90 hover:text-foreground focus-visible:outline-foreground`
-          }
-        >
-          Features
-        </Link>
-        <Link
-          href="/#testimonials"
-          className={
-            isDarkBg
-              ? `${linkBase} text-white/90 hover:text-white focus-visible:outline-white`
-              : `${linkBase} text-foreground/90 hover:text-foreground focus-visible:outline-foreground`
-          }
-        >
-          Testimonials
-        </Link>
-        <Link
-          href="/about"
-          className={
-            isDarkBg
-              ? `${linkBase} text-white/90 hover:text-white focus-visible:outline-white`
-              : `${linkBase} text-foreground/90 hover:text-foreground focus-visible:outline-foreground`
-          }
-        >
-          About Us
-        </Link>
-        <Link
-          href="/contact"
-          className={
-            isDarkBg
-              ? `${linkBase} text-white/90 hover:text-white focus-visible:outline-white`
-              : `${linkBase} text-foreground/90 hover:text-foreground focus-visible:outline-foreground`
-          }
-        >
-          Contact
-        </Link>
+        {navItems.map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={
+              isDarkBg
+                ? `${linkBase} text-white/90 hover:text-white focus-visible:outline-white`
+                : `${linkBase} text-foreground/90 hover:text-foreground focus-visible:outline-foreground`
+            }
+          >
+            {item.label}
+          </Link>
+        ))}
       </div>
     </nav>
   );
