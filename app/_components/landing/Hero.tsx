@@ -17,6 +17,7 @@ export function Hero() {
 
   return (
     <motion.section
+      id="hero"
       ref={sectionRef}
       style={{ y }}
       className="relative overflow-hidden gradient-navy text-white"
