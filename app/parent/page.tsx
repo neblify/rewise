@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { getStudentResults, getLinkedStudents } from './actions';
-import { Search, User as UserIcon } from 'lucide-react';
+import { Search, User as UserIcon, Trophy } from 'lucide-react';
+import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import { useEffect } from 'react';
 
@@ -79,6 +80,25 @@ export default function ParentDashboard() {
           Track your child&apos;s learning progress.
         </p>
       </div>
+
+      <Link
+        href="/open-challenge"
+        className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-md transition-all group block"
+      >
+        <div className="p-2 rounded-lg bg-violet-light text-primary">
+          <Trophy className="w-6 h-6" />
+        </div>
+        <div className="flex-1">
+          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+            Open Challenge
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Generate an assessment on any topic, take it, and invite friends to
+            beat your score.
+          </p>
+        </div>
+        <span className="text-sm font-medium text-primary">Go &rarr;</span>
+      </Link>
 
       <div className="bg-card p-6 rounded-xl shadow-sm border border-border">
         <label

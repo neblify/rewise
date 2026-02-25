@@ -12,7 +12,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '');
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  return 'https://rewise.app';
+  return 'https://rewise.online';
 }
 
 export type OpenChallengeInviteParams = {
@@ -31,7 +31,8 @@ export async function sendOpenChallengeInvite(
   }
 
   const baseUrl = getBaseUrl();
-  const challengeUrl = `${baseUrl}/student/test/${params.testId}`;
+  const testPath = `/student/test/${params.testId}`;
+  const challengeUrl = `${baseUrl}/sign-up?redirect_url=${encodeURIComponent(testPath)}`;
 
   const subject = `You're invited to beat the score: ${params.testTitle}`;
   const text = [

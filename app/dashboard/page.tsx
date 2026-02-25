@@ -11,6 +11,7 @@ import {
   AlertCircle,
   BarChart2,
   Calendar,
+  Trophy,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -143,6 +144,25 @@ export default async function Dashboard() {
             metrics.
           </p>
         </div>
+
+        <Link
+          href="/open-challenge"
+          className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:border-primary/50 hover:shadow-md transition-all group"
+        >
+          <div className="p-2 rounded-lg bg-violet-light text-primary">
+            <Trophy className="w-6 h-6" />
+          </div>
+          <div className="flex-1">
+            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+              Open Challenge
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Generate an assessment on any topic, take it, and invite friends to
+              beat your score.
+            </p>
+          </div>
+          <span className="text-sm font-medium text-primary">Go &rarr;</span>
+        </Link>
 
         {/* Top Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
