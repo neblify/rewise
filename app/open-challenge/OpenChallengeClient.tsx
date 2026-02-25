@@ -8,7 +8,6 @@ import {
   createOpenChallengeTest,
   getMyOpenChallengeResults,
   addFriend,
-  listFriends,
 } from './actions';
 import { Loader2, Send, Users, X } from 'lucide-react';
 
