@@ -7,6 +7,7 @@ import Question from '@/lib/db/models/Question';
 import Result from '@/lib/db/models/Result';
 import Friend from '@/lib/db/models/Friend';
 import { generateQuestionsAI } from '@/app/teacher/create-test/ai-actions';
+import { sendOpenChallengeInvite } from '@/lib/email';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
@@ -143,7 +144,17 @@ export async function addFriend(
       challengeResultId,
       scoreToBeat,
     });
-    return { success: true };
+
+    const emailResult = await sendOpenChallengeInvite(trimmed, {
+      testTitle: test.title ?? 'Open Challenge',
+      scoreToBeat,
+      testId: challengeTestId,
+    });
+    if (!emailResult.sent && emailResult.error) {
+      console.warn('Open Challenge invite email not sent:', emailResult.error);
+    }
+
+    return { success: true, emailSent: emailResult.sent };
   } catch (e) {
     console.error(e);
     return { error: 'Failed to add friend' };
@@ -206,6 +217,21 @@ export async function updateFriendProfile(
   if (data.class !== undefined) friend.class = data.class || undefined;
   if (isFriend) friend.linkedClerkId = userId;
   await friend.save();
+  return { success: true };
+}
+
+export async function deleteFriend(friendId: string) {
+  const { userId } = await currentAuth();
+  if (!userId) return { error: 'Sign in required' };
+
+  await dbConnect();
+  const friend = await Friend.findById(friendId);
+  if (!friend) return { error: 'Friend not found' };
+
+  const isOwner = friend.addedBy === userId;
+  if (!isOwner) return { error: 'Not allowed to delete this friend' };
+
+  await friend.deleteOne();
   return { success: true };
 }
 

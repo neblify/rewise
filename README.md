@@ -46,6 +46,13 @@ CLERK_SECRET_KEY=your_clerk_secret_key
 
 # Groq AI
 GROQ_API_KEY=your_groq_api_key
+
+# Email (Resend – required for contact form and invite-to-friend emails)
+RESEND_API_KEY=your_resend_api_key
+# Optional: custom from address for invite-to-friend emails
+INVITE_FROM_EMAIL=ReWise <info@nios.neblify.com>
+# Optional: base URL for invite links (defaults to VERCEL_URL or https://rewise.app)
+NEXT_PUBLIC_APP_URL=https://your-app-url.com
 ```
 
 ## 🏃 Getting Started

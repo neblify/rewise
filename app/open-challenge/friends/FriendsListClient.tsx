@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { updateFriendProfile } from '../actions';
+import { updateFriendProfile, deleteFriend } from '../actions';
 
 export type FriendItem = {
   _id: string;
@@ -28,6 +28,7 @@ export default function FriendsListClient({
     class: '',
   });
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const startEdit = (f: FriendItem) => {
     setEditingId(f._id);
@@ -66,6 +67,23 @@ export default function FriendsListClient({
     }
   };
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Remove this friend from your list?')) return;
+    setDeletingId(id);
+    try {
+      const res = await deleteFriend(id);
+      if (res?.success) {
+        setFriends(prev => prev.filter(f => f._id !== id));
+      } else {
+        alert(res?.error || 'Failed to delete friend');
+      }
+    } catch {
+      alert('Something went wrong');
+    } finally {
+      setDeletingId(current => (current === id ? null : current));
+    }
+  };
+
   if (friends.length === 0) {
     return (
       <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">
@@ -86,7 +104,7 @@ export default function FriendsListClient({
               <th className="text-left p-3 font-medium text-foreground">Location</th>
               <th className="text-left p-3 font-medium text-foreground">Class</th>
               <th className="text-left p-3 font-medium text-foreground">Score to beat</th>
-              <th className="text-left p-3 font-medium text-foreground w-24">Actions</th>
+              <th className="text-left p-3 font-medium text-foreground w-32">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -153,9 +171,17 @@ export default function FriendsListClient({
                       <button
                         type="button"
                         onClick={() => startEdit(f)}
-                        className="text-primary hover:underline"
+                        className="text-primary hover:underline mr-2"
                       >
                         Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(f._id)}
+                        disabled={deletingId === f._id}
+                        className="text-destructive hover:underline disabled:opacity-50"
+                      >
+                        {deletingId === f._id ? 'Deleting…' : 'Delete'}
                       </button>
                     </td>
                   </>
