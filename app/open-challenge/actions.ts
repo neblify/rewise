@@ -8,7 +8,6 @@ import Result from '@/lib/db/models/Result';
 import Friend from '@/lib/db/models/Friend';
 import { generateQuestionsAI } from '@/app/teacher/create-test/ai-actions';
 import { sendOpenChallengeInvite } from '@/lib/email';
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
 
 const OPEN_BOARD = 'General';
