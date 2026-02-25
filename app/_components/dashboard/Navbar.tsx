@@ -3,13 +3,74 @@
 import { UserButton, useUser } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Menu } from 'lucide-react';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
 
 interface NavbarProps {
   variant?: 'student' | 'teacher' | 'parent' | 'admin';
 }
 
+const STUDENT_NAV_LINKS: { href: string; label: string }[] = [
+  { href: '/student', label: 'Dashboard' },
+  { href: '/open-challenge', label: 'Open Challenge' },
+  { href: '/student/study-material', label: 'Study Material' },
+  { href: '/student/results', label: 'My Results' },
+  { href: '/student/profile', label: 'Profile' },
+];
+
+const TEACHER_NAV_LINKS: { href: string; label: string }[] = [
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/open-challenge', label: 'Open Challenge' },
+  { href: '/teacher', label: 'All Tests' },
+  { href: '/teacher/questions', label: 'Question Bank' },
+  { href: '/teacher/create-test/choose', label: 'Create Test' },
+];
+
+const ADMIN_NAV_LINKS: { href: string; label: string }[] = [
+  { href: '/admin', label: 'Overview' },
+  { href: '/open-challenge', label: 'Open Challenge' },
+  { href: '/admin/course-material', label: 'Course Material' },
+];
+
+const PARENT_NAV_LINKS: { href: string; label: string }[] = [
+  { href: '/parent', label: 'Dashboard' },
+  { href: '/open-challenge', label: 'Open Challenge' },
+];
+
+function getNavLinks(
+  variant: 'student' | 'teacher' | 'parent' | 'admin'
+): { href: string; label: string }[] {
+  switch (variant) {
+    case 'teacher':
+      return TEACHER_NAV_LINKS;
+    case 'admin':
+      return ADMIN_NAV_LINKS;
+    case 'parent':
+      return PARENT_NAV_LINKS;
+    default:
+      return STUDENT_NAV_LINKS;
+  }
+}
+
 export default function Navbar({ variant = 'student' }: NavbarProps) {
   const { isSignedIn } = useUser();
+  const links = getNavLinks(variant);
+  const linkContent = (
+    <>
+      {links.map(({ href, label }) => (
+        <NavLink key={href} href={href}>
+          {label}
+        </NavLink>
+      ))}
+    </>
+  );
 
   return (
     <nav className="sticky top-0 z-50 bg-card/80 backdrop-blur-md border-b-2 border-border">
@@ -27,40 +88,24 @@ export default function Navbar({ variant = 'student' }: NavbarProps) {
               />
             </Link>
             <div className="hidden md:flex items-center gap-4">
-              {variant === 'student' ? (
-                <>
-                  <NavLink href="/student">Dashboard</NavLink>
-                  <NavLink href="/open-challenge">Open Challenge</NavLink>
-                  <NavLink href="/student/study-material">
-                    Study Material
-                  </NavLink>
-                  <NavLink href="/student/results">My Results</NavLink>
-                  <NavLink href="/student/profile">Profile</NavLink>
-                </>
-              ) : variant === 'teacher' ? (
-                <>
-                  <NavLink href="/dashboard">Dashboard</NavLink>
-                  <NavLink href="/open-challenge">Open Challenge</NavLink>
-                  <NavLink href="/teacher">All Tests</NavLink>
-                  <NavLink href="/teacher/questions">Question Bank</NavLink>
-                  <NavLink href="/teacher/create-test/choose">
-                    Create Test
-                  </NavLink>
-                </>
-              ) : variant === 'admin' ? (
-                <>
-                  <NavLink href="/admin">Overview</NavLink>
-                  <NavLink href="/open-challenge">Open Challenge</NavLink>
-                  <NavLink href="/admin/course-material">
-                    Course Material
-                  </NavLink>
-                </>
-              ) : (
-                <>
-                  <NavLink href="/parent">Dashboard</NavLink>
-                  <NavLink href="/open-challenge">Open Challenge</NavLink>
-                </>
-              )}
+              {linkContent}
+            </div>
+            <div className="flex md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label="Open menu">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[280px]">
+                  <SheetHeader>
+                    <SheetTitle>Menu</SheetTitle>
+                  </SheetHeader>
+                  <nav className="flex flex-col gap-4 mt-6">
+                    {linkContent}
+                  </nav>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
           <div className="flex items-center gap-4">

@@ -1,5 +1,6 @@
 'use server';
 
+import { clerkClient } from '@clerk/nextjs/server';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
@@ -19,11 +20,28 @@ export async function updateProfile(formData: FormData) {
   await dbConnect();
 
   try {
-    await User.findOneAndUpdate(
-      { clerkId: userId },
-      { board, grade },
-      { upsert: true, new: true }
-    );
+    const existing = await User.findOne({ clerkId: userId }).lean();
+    if (existing) {
+      await User.findOneAndUpdate(
+        { clerkId: userId },
+        { board, grade },
+        { new: true }
+      );
+    } else {
+      const client = await clerkClient();
+      const clerkUser = await client.users.getUser(userId);
+      const role = (clerkUser.publicMetadata?.role as string) || 'student';
+      const email = clerkUser.emailAddresses[0]?.emailAddress ?? '';
+      await User.create({
+        clerkId: userId,
+        email,
+        role,
+        firstName: clerkUser.firstName,
+        lastName: clerkUser.lastName,
+        board,
+        grade,
+      });
+    }
 
     revalidatePath('/student');
     revalidatePath('/student/profile');

@@ -35,8 +35,18 @@ export async function completeOnboarding(
   try {
     const client = await clerkClient();
     const user = await client.users.getUser(userId);
+    const existingClerkRole = user.publicMetadata?.role as string | undefined;
 
     await dbConnect();
+
+    const existingDbUser = await User.findOne({ clerkId: userId })
+      .select('role')
+      .lean();
+    const existingDbRole = existingDbUser?.role;
+
+    // Do not overwrite existing role (e.g. Teacher/Parent who followed Open Challenge invite)
+    const roleToPersist =
+      existingClerkRole ?? existingDbRole ?? selectedRole;
 
     // Create or Update User in MongoDB
     await User.findOneAndUpdate(
@@ -44,19 +54,21 @@ export async function completeOnboarding(
       {
         clerkId: userId,
         email: user.emailAddresses[0].emailAddress,
-        role: selectedRole,
+        role: roleToPersist,
         firstName: user.firstName,
         lastName: user.lastName,
       },
       { upsert: true, new: true }
     );
 
-    // Update Clerk Metadata
-    await client.users.updateUserMetadata(userId, {
-      publicMetadata: {
-        role: selectedRole,
-      },
-    });
+    // Update Clerk Metadata only if we're not overwriting an existing role
+    if (!existingClerkRole) {
+      await client.users.updateUserMetadata(userId, {
+        publicMetadata: {
+          role: roleToPersist,
+        },
+      });
+    }
   } catch (err) {
     console.error('Error in onboarding:', err);
     return { message: 'Failed to update profile' };

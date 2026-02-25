@@ -20,7 +20,9 @@ vi.mock('next/cache', () => ({
 // Mock Models
 vi.mock('@/lib/db/models/User', () => ({
   default: {
+    findOne: vi.fn(),
     findOneAndUpdate: vi.fn(),
+    create: vi.fn(),
   },
 }));
 
@@ -60,9 +62,13 @@ describe('Student Profile Actions', () => {
       formData.append('board', 'CBSE');
       formData.append('grade', '10');
 
+      vi.mocked(User.findOne).mockReturnValue({
+        lean: vi.fn().mockResolvedValue({ clerkId: 'user_123', board: '', grade: '' }),
+      } as never);
       vi.mocked(User.findOneAndUpdate).mockResolvedValue({
         clerkId: 'user_123',
         board: 'CBSE',
+        grade: '10',
       } as never);
 
       const result = await updateProfile(formData);
@@ -70,7 +76,7 @@ describe('Student Profile Actions', () => {
       expect(User.findOneAndUpdate).toHaveBeenCalledWith(
         { clerkId: 'user_123' },
         { board: 'CBSE', grade: '10' },
-        { upsert: true, new: true }
+        { new: true }
       );
       expect(revalidatePath).toHaveBeenCalledWith('/student');
       expect(revalidatePath).toHaveBeenCalledWith('/student/profile');
@@ -85,6 +91,9 @@ describe('Student Profile Actions', () => {
       formData.append('board', 'CBSE');
       formData.append('grade', '10');
 
+      vi.mocked(User.findOne).mockReturnValue({
+        lean: vi.fn().mockResolvedValue({ clerkId: 'user_123' }),
+      } as never);
       vi.mocked(User.findOneAndUpdate).mockRejectedValue(
         new Error('DB connection failed')
       );
