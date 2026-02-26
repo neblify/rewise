@@ -33,6 +33,8 @@ interface ChallengeEntry {
   id: string;
   studentId: string;
   name: string;
+  emailLocalPart: string;
+  attemptIndex: number; // order by createdAt (0 = first attempt)
   totalScore: number;
   maxScore: number;
   createdAt: Date;
@@ -102,27 +104,33 @@ export default async function ResultPage(props: Props) {
     const users =
       clerkIds.length > 0
         ? await User.find({ clerkId: { $in: clerkIds } })
-            .select('clerkId firstName lastName')
+            .select('clerkId firstName lastName email')
             .lean()
         : [];
 
     const userByClerkId = new Map(
       users.map(u => [
         u.clerkId as string,
-        u as { firstName?: string; lastName?: string },
+        u as { firstName?: string; lastName?: string; email?: string },
       ])
     );
 
-    challengeResults = allResults.map(r => {
+    challengeResults = allResults.map((r, attemptIndex) => {
       const user = userByClerkId.get(r.studentId as string);
       const fullName = user
         ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim()
         : '';
+      const email = user?.email?.trim() ?? '';
+      const emailLocalPart = email.includes('@')
+        ? email.split('@')[0]
+        : email || '';
 
       return {
         id: r._id.toString(),
         studentId: r.studentId as string,
-        name: fullName || 'Challenger',
+        name: fullName,
+        emailLocalPart,
+        attemptIndex,
         totalScore: r.totalScore,
         maxScore: r.maxScore,
         createdAt: r.createdAt,
@@ -277,74 +285,93 @@ export default async function ResultPage(props: Props) {
         </div>
 
         {(test as { openChallenge?: boolean }).openChallenge &&
-          challengeResults.length > 0 && (
-            <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
-              <h2 className="text-2xl font-bold text-foreground mb-4">
-                Challenge Leaderboard
-              </h2>
-              <p className="text-sm text-muted-foreground mb-4">
-                Everyone who has attempted this Open Challenge can see these
-                scores.
-              </p>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border bg-muted/50">
-                      <th className="text-left px-3 py-2 font-medium text-foreground">
-                        #
-                      </th>
-                      <th className="text-left px-3 py-2 font-medium text-foreground">
-                        Challenger
-                      </th>
-                      <th className="text-left px-3 py-2 font-medium text-foreground">
-                        Score
-                      </th>
-                      <th className="text-left px-3 py-2 font-medium text-foreground">
-                        Percentage
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {challengeResults.map((entry, index) => {
-                      const isCurrent =
-                        entry.id === populatedResult._id.toString();
-                      const pct =
-                        entry.maxScore > 0
-                          ? Math.round(
-                              (entry.totalScore / entry.maxScore) * 100
-                            )
-                          : 0;
+          challengeResults.length > 0 && (() => {
+            const inviterClerkId = (test as { createdBy?: string }).createdBy;
+            const isInviter = inviterClerkId === userId;
+            const currentEntry = challengeResults.find(
+              e => e.id === populatedResult._id.toString()
+            );
+            const currentAttemptIndex = currentEntry?.attemptIndex ?? -1;
 
-                      return (
-                        <tr
-                          key={entry.id}
-                          className={`border-b border-border last:border-0 ${
-                            isCurrent ? 'bg-violet-50/70' : ''
-                          }`}
-                        >
-                          <td className="px-3 py-2 text-foreground">
-                            {index + 1}
-                          </td>
-                          <td className="px-3 py-2 text-foreground">
-                            {entry.name}
-                            {isCurrent && (
-                              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">
-                                You
-                              </span>
-                            )}
-                          </td>
-                          <td className="px-3 py-2 text-foreground">
-                            {entry.totalScore} / {entry.maxScore}
-                          </td>
-                          <td className="px-3 py-2 text-foreground">{pct}%</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+            return (
+              <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
+                <h2 className="text-2xl font-bold text-foreground mb-4">
+                  Challenge Leaderboard
+                </h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Everyone who has attempted this Open Challenge can see these
+                  scores.
+                </p>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border bg-muted/50">
+                        <th className="text-left px-3 py-2 font-medium text-foreground">
+                          #
+                        </th>
+                        <th className="text-left px-3 py-2 font-medium text-foreground">
+                          Challenger
+                        </th>
+                        <th className="text-left px-3 py-2 font-medium text-foreground">
+                          Score
+                        </th>
+                        <th className="text-left px-3 py-2 font-medium text-foreground">
+                          Percentage
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {challengeResults.map((entry, index) => {
+                        const isCurrent =
+                          entry.id === populatedResult._id.toString();
+                        const pct =
+                          entry.maxScore > 0
+                            ? Math.round(
+                                (entry.totalScore / entry.maxScore) * 100
+                              )
+                            : 0;
+
+                        // Inviter sees all names. Others: show name only for the other cohort (newer see previous, previous see newer).
+                        const showName =
+                          isInviter ||
+                          isCurrent ||
+                          entry.attemptIndex < currentAttemptIndex ||
+                          entry.attemptIndex > currentAttemptIndex;
+                        const displayLabel = showName
+                          ? (entry.name || entry.emailLocalPart || 'Challenger')
+                          : 'Challenger';
+
+                        return (
+                          <tr
+                            key={entry.id}
+                            className={`border-b border-border last:border-0 ${
+                              isCurrent ? 'bg-violet-50/70' : ''
+                            }`}
+                          >
+                            <td className="px-3 py-2 text-foreground">
+                              {index + 1}
+                            </td>
+                            <td className="px-3 py-2 text-foreground">
+                              {displayLabel}
+                              {isCurrent && (
+                                <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">
+                                  You
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-3 py-2 text-foreground">
+                              {entry.totalScore} / {entry.maxScore}
+                            </td>
+                            <td className="px-3 py-2 text-foreground">{pct}%</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
         <div className="flex flex-wrap justify-center gap-4 pt-8">
           {(test as { openChallenge?: boolean }).openChallenge && (
