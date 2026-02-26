@@ -136,6 +136,8 @@ export async function addFriend(
       return { error: 'Invalid challenge or result' };
     }
 
+    // Open Challenge must never create or update User records for invitees (by email or otherwise)
+    // and must not change any user's role. Invitees keep their existing profile (student/teacher/parent).
     await Friend.create({
       addedBy: userId,
       email: trimmed,
@@ -239,20 +241,30 @@ export async function getMyOpenChallengeResults() {
   if (!userId) return { results: [] };
 
   await dbConnect();
-  const tests = await Test.find({ createdBy: userId, openChallenge: true }).select('_id title').lean();
-  const testIds = tests.map(t => t._id);
-  const results = await Result.find({ studentId: userId, testId: { $in: testIds } })
+  // Include all open challenges the user has attempted (creator or invitee)
+  const myResults = await Result.find({ studentId: userId })
+    .select('testId totalScore maxScore createdAt')
     .sort({ createdAt: -1 })
     .lean();
+  const attemptedTestIds = [...new Set(myResults.map(r => r.testId?.toString()).filter(Boolean))];
+  const openChallengeTests = await Test.find({
+    _id: { $in: attemptedTestIds },
+    openChallenge: true,
+  })
+    .select('_id title')
+    .lean();
+  const testMap = new Map(openChallengeTests.map(t => [String(t._id), t.title ?? 'Open Challenge']));
   return {
-    results: results.map(r => ({
-      _id: r._id.toString(),
-      testId: r.testId?.toString(),
-      title: tests.find(t => String(t._id) === String(r.testId))?.title ?? 'Open Challenge',
-      totalScore: r.totalScore,
-      maxScore: r.maxScore,
-      createdAt: r.createdAt,
-    })),
+    results: myResults
+      .filter(r => testMap.has(r.testId?.toString() ?? ''))
+      .map(r => ({
+        _id: r._id.toString(),
+        testId: r.testId?.toString(),
+        title: testMap.get(r.testId?.toString() ?? '') ?? 'Open Challenge',
+        totalScore: r.totalScore,
+        maxScore: r.maxScore,
+        createdAt: r.createdAt,
+      })),
   };
 }
 

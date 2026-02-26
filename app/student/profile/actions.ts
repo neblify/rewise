@@ -30,7 +30,14 @@ export async function updateProfile(formData: FormData) {
     } else {
       const client = await clerkClient();
       const clerkUser = await client.users.getUser(userId);
-      const role = (clerkUser.publicMetadata?.role as string) || 'student';
+      const role = clerkUser.publicMetadata?.role as string | undefined;
+      // Do not default to student: preserve invitees (e.g. teacher/parent) who use student routes for Open Challenge
+      if (!role || !['student', 'teacher', 'parent', 'admin'].includes(role)) {
+        return {
+          success: false,
+          message: 'Please complete onboarding first to set your role.',
+        };
+      }
       const email = clerkUser.emailAddresses[0]?.emailAddress ?? '';
       await User.create({
         clerkId: userId,
