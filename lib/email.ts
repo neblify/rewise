@@ -22,6 +22,8 @@ export type OpenChallengeInviteParams = {
   testTitle: string;
   scoreToBeat: number;
   testId: string;
+  /** Inviter display name or email; if missing, "Someone" is used */
+  inviterDisplayName?: string;
 };
 
 export async function sendOpenChallengeInvite(
@@ -37,9 +39,10 @@ export async function sendOpenChallengeInvite(
   const testPath = `/student/test/${params.testId}`;
   const challengeUrl = `${baseUrl}/sign-up?redirect_url=${encodeURIComponent(testPath)}`;
 
+  const inviter = params.inviterDisplayName?.trim() || 'Someone';
   const subject = `You're invited to beat the score: ${params.testTitle}`;
   const text = [
-    `Someone invited you to take an Open Challenge on ReWise.`,
+    `${inviter} invited you to take an Open Challenge on ReWise.`,
     ``,
     `Challenge: ${params.testTitle}`,
     `Score to beat: ${params.scoreToBeat}`,
@@ -50,7 +53,7 @@ export async function sendOpenChallengeInvite(
   ].join('\n');
 
   const html = [
-    `<p>Someone invited you to take an Open Challenge on ReWise.</p>`,
+    `<p>${inviter} invited you to take an Open Challenge on ReWise.</p>`,
     `<p><strong>Challenge:</strong> ${params.testTitle}</p>`,
     `<p><strong>Score to beat:</strong> ${params.scoreToBeat}</p>`,
     `<p><a href="${challengeUrl}">Take the challenge</a></p>`,
