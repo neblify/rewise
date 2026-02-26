@@ -6,6 +6,7 @@ import Test from '@/lib/db/models/Test';
 import Question from '@/lib/db/models/Question';
 import Result from '@/lib/db/models/Result';
 import Friend from '@/lib/db/models/Friend';
+import User from '@/lib/db/models/User';
 import { generateQuestionsAI } from '@/app/teacher/create-test/ai-actions';
 import { sendOpenChallengeInvite } from '@/lib/email';
 import { z } from 'zod';
@@ -236,12 +237,34 @@ export async function deleteFriend(friendId: string) {
   return { success: true };
 }
 
+/** Delete an Open Challenge test. Only the creator can delete. Cascades to results, questions, and friend invites. */
+export async function deleteOpenChallengeTest(testId: string) {
+  const { userId } = await currentAuth();
+  if (!userId) return { error: 'Sign in required' };
+
+  await dbConnect();
+  const test = await Test.findOne({ _id: testId, openChallenge: true, createdBy: userId });
+  if (!test) return { error: 'Open Challenge not found or you do not have permission to delete it' };
+
+  await Friend.deleteMany({ challengeTestId: testId });
+  await Result.deleteMany({ testId });
+  const questionIds: string[] = [];
+  if (test.sections?.length) {
+    for (const section of test.sections) {
+      const qs = (section as { questions?: unknown[] }).questions;
+      if (Array.isArray(qs)) qs.forEach((qId: unknown) => questionIds.push(String(qId)));
+    }
+  }
+  if (questionIds.length) await Question.deleteMany({ _id: { $in: questionIds } });
+  await Test.deleteOne({ _id: testId });
+  return { success: true };
+}
+
 export async function getMyOpenChallengeResults() {
   const { userId } = await currentAuth();
   if (!userId) return { results: [] };
 
   await dbConnect();
-  // Include all open challenges the user has attempted (creator or invitee)
   const myResults = await Result.find({ studentId: userId })
     .select('testId totalScore maxScore createdAt')
     .sort({ createdAt: -1 })
@@ -251,20 +274,42 @@ export async function getMyOpenChallengeResults() {
     _id: { $in: attemptedTestIds },
     openChallenge: true,
   })
-    .select('_id title')
+    .select('_id title createdBy')
     .lean();
-  const testMap = new Map(openChallengeTests.map(t => [String(t._id), t.title ?? 'Open Challenge']));
+  const testMap = new Map(
+    openChallengeTests.map(t => [
+      String(t._id),
+      { title: t.title ?? 'Open Challenge', createdBy: t.createdBy },
+    ])
+  );
+  const creatorIds = [...new Set(openChallengeTests.map(t => t.createdBy).filter(Boolean))];
+  const creators = await User.find({ clerkId: { $in: creatorIds } })
+    .select('clerkId firstName lastName')
+    .lean();
+  const creatorNameMap = new Map(
+    creators.map(c => {
+      const name = [c.firstName, c.lastName].filter(Boolean).join(' ') || 'Unknown';
+      return [c.clerkId, name];
+    })
+  );
   return {
     results: myResults
       .filter(r => testMap.has(r.testId?.toString() ?? ''))
-      .map(r => ({
-        _id: r._id.toString(),
-        testId: r.testId?.toString(),
-        title: testMap.get(r.testId?.toString() ?? '') ?? 'Open Challenge',
-        totalScore: r.totalScore,
-        maxScore: r.maxScore,
-        createdAt: r.createdAt,
-      })),
+      .map(r => {
+        const testIdStr = r.testId?.toString() ?? '';
+        const meta = testMap.get(testIdStr);
+        const createdBy = meta?.createdBy ?? '';
+        return {
+          _id: r._id.toString(),
+          testId: testIdStr,
+          title: meta?.title ?? 'Open Challenge',
+          totalScore: r.totalScore,
+          maxScore: r.maxScore,
+          createdAt: r.createdAt,
+          creatorName: creatorNameMap.get(createdBy) ?? 'Unknown',
+          isOwner: createdBy === userId,
+        };
+      }),
   };
 }
 

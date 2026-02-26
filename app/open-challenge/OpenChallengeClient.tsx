@@ -8,8 +8,9 @@ import {
   createOpenChallengeTest,
   getMyOpenChallengeResults,
   addFriend,
+  deleteOpenChallengeTest,
 } from './actions';
-import { Loader2, Send, Users, X } from 'lucide-react';
+import { Loader2, Send, Trash2, Users, X } from 'lucide-react';
 
 type SectionState = {
   id: number;
@@ -33,6 +34,8 @@ type ResultItem = {
   totalScore: number;
   maxScore: number;
   createdAt: string;
+  creatorName: string;
+  isOwner: boolean;
 };
 
 type Props = { dashboardHref: string };
@@ -52,6 +55,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
   const [inviteTestId, setInviteTestId] = useState('');
   const [inviteScore, setInviteScore] = useState(0);
   const [addingFriend, setAddingFriend] = useState(false);
+  const [deletingTestId, setDeletingTestId] = useState<string | null>(null);
   const [loadResults, setLoadResults] = useState(0);
 
   useEffect(() => {
@@ -147,6 +151,20 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
     setInviteResultId(r._id);
     setInviteTestId(r.testId);
     setInviteScore(r.totalScore);
+  };
+
+  const handleDeleteChallenge = async (testId: string) => {
+    if (!confirm('Delete this Open Challenge? Results and invites for it will be removed.')) return;
+    setDeletingTestId(testId);
+    try {
+      const res = await deleteOpenChallengeTest(testId);
+      if (res?.success) setLoadResults(prev => prev + 1);
+      else alert(res?.error || 'Failed to delete');
+    } catch {
+      alert('Something went wrong');
+    } finally {
+      setDeletingTestId(null);
+    }
   };
 
   return (
@@ -261,7 +279,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
                   <div>
                     <p className="font-medium text-foreground">{r.title}</p>
                     <p className="text-sm text-muted-foreground">
-                      Score: {r.totalScore} / {r.maxScore}
+                      Created by {r.creatorName} · Score: {r.totalScore} / {r.maxScore}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -279,6 +297,22 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
                       <Send className="h-3.5 w-3.5" />
                       Invite friends
                     </button>
+                    {r.isOwner && (
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteChallenge(r.testId)}
+                        disabled={deletingTestId === r.testId}
+                        className="inline-flex items-center gap-1 rounded-md border border-red-200 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
+                        title="Delete this Open Challenge"
+                      >
+                        {deletingTestId === r.testId ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-3.5 w-3.5" />
+                        )}
+                        Delete
+                      </button>
+                    )}
                   </div>
                   {inviteResultId === r._id && (
                     <div className="w-full mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
