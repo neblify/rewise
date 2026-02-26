@@ -18,8 +18,14 @@ export async function getRole(userId: string): Promise<string> {
 }
 
 export function getRoleAsNavbarVariant(role: string): NavbarVariant {
-  if (role === 'teacher' || role === 'parent' || role === 'admin') return role;
-  return 'student';
+  switch (role) {
+    case 'teacher':
+    case 'parent':
+    case 'admin':
+      return role;
+    default:
+      return 'student';
+  }
 }
 
 export function getDashboardHref(role: string): string {
