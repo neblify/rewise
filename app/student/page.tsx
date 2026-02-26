@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import { Play } from 'lucide-react';
 import User from '@/lib/db/models/User';
+import { InvitedToOpenChallengeCard } from '@/app/_components/dashboard/InvitedToOpenChallengeCard';
 
 export const metadata: Metadata = {
   title: 'Student Dashboard | ReWise',
@@ -19,6 +20,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Trophy } from 'lucide-react';
 
 export default async function StudentDashboard() {
   const { userId } = await currentAuth();
@@ -43,6 +45,7 @@ export default async function StudentDashboard() {
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <InvitedToOpenChallengeCard />
       <div>
         <h1 className="text-3xl font-bold text-foreground">
           Student Dashboard
@@ -73,6 +76,27 @@ export default async function StudentDashboard() {
           </div>
         )}
       </div>
+
+      <Card className="border-primary/30 bg-gradient-to-r from-violet-50 to-primary/5 hover:shadow-md transition-shadow">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-lg text-foreground">
+            <Trophy className="h-5 w-5 text-primary" />
+            Open Challenge
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Generate an assessment on any topic, take it, and invite friends to
+            beat your score.
+          </p>
+        </CardHeader>
+        <CardFooter className="pt-0">
+          <Button asChild variant="gradient" className="w-full sm:w-auto">
+            <Link href="/open-challenge">
+              <Play className="h-4 w-4 mr-2" />
+              Go to Open Challenge
+            </Link>
+          </Button>
+        </CardFooter>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {tests.map(test => (

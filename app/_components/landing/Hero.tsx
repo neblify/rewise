@@ -17,6 +17,7 @@ export function Hero() {
 
   return (
     <motion.section
+      id="hero"
       ref={sectionRef}
       style={{ y }}
       className="relative overflow-hidden gradient-navy text-white"
@@ -69,7 +70,9 @@ export function Hero() {
               </div>
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                animate={
+                  isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+                }
                 transition={{ ...spring, delay: 0.08 }}
                 className="text-4xl font-bold tracking-tight sm:text-6xl"
               >
@@ -83,7 +86,9 @@ export function Hero() {
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                animate={
+                  isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+                }
                 transition={{ ...spring, delay: 0.16 }}
                 className="mt-6 text-xl text-white/70"
               >
@@ -96,7 +101,7 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ ...spring, delay: 0.24 }}
-              className="mt-10 gap-4 flex flex-col sm:flex-row"
+              className="mt-10"
             >
               <GradientButton
                 asChild
@@ -108,19 +113,14 @@ export function Hero() {
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </GradientButton>
-              <GradientButton
-                asChild
-                size="xl"
-                className="px-8 py-6 text-base font-bold md:text-lg bg-white/10 hover:bg-white/20 border border-white/20 shadow-none hover:shadow-none [background-image:none] hover:brightness-100"
-              >
-                <Link href="/sign-in">Welcome Back</Link>
-              </GradientButton>
             </motion.div>
           </div>
           <div className="mt-10 md:mt-0 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+              animate={
+                isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }
+              }
               transition={{ ...spring, delay: 0.2 }}
               whileHover={{ scale: 1.05, rotate: 2 }}
               className="relative h-full w-full lg:h-full flex justify-center items-center cursor-default"

@@ -24,7 +24,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function TestPage(props: Props) {
   const params = await props.params;
   const { userId } = await currentAuth();
-  if (!userId) redirect('/sign-in');
+  if (!userId)
+    redirect(
+      `/sign-up?redirect_url=${encodeURIComponent('/student/test/' + params.id)}`
+    );
 
   const { id } = params;
 

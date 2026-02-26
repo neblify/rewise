@@ -1,6 +1,7 @@
 import { clerkClient } from '@clerk/nextjs/server';
 import { currentAuth } from '@/lib/auth-wrapper';
 import { redirect } from 'next/navigation';
+import { LandingTopNav } from './_components/landing/LandingTopNav';
 import { Hero } from './_components/landing/Hero';
 import { Features } from './_components/landing/Features';
 import { Stats } from './_components/landing/Stats';
@@ -14,6 +15,7 @@ export default async function Home() {
   if (!userId) {
     return (
       <>
+        <LandingTopNav />
         <main id="main-content" className="min-h-screen bg-background">
           <Hero />
           <Features />

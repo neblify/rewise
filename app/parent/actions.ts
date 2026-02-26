@@ -1,5 +1,6 @@
 'use server';
 
+import { clerkClient } from '@clerk/nextjs/server';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import User from '@/lib/db/models/User';
@@ -18,14 +19,34 @@ export async function getStudentResults(email: string) {
     return { error: 'Student not found with this email.' };
   }
 
-  // Link student to parent if not already linked
-  // userId from auth() is the Clerk ID of the parent
-  // We need to find the parent User document to update children
-  await User.findOneAndUpdate(
-    { clerkId: userId },
-    { $addToSet: { children: student.clerkId } },
-    { upsert: true } // Create parent record if it doesn't exist (though it should on login usually)
-  );
+  // Link student to parent if not already linked; on upsert preserve caller's role (do not default to student)
+  const existing = await User.findOne({ clerkId: userId })
+    .select('role')
+    .lean();
+  if (existing) {
+    await User.findOneAndUpdate(
+      { clerkId: userId },
+      { $addToSet: { children: student.clerkId } }
+    );
+  } else {
+    const client = await clerkClient();
+    const clerkUser = await client.users.getUser(userId);
+    const role = (clerkUser.publicMetadata?.role as string) || 'parent';
+    const email = clerkUser.emailAddresses[0]?.emailAddress ?? '';
+    await User.findOneAndUpdate(
+      { clerkId: userId },
+      {
+        $addToSet: { children: student.clerkId },
+        $setOnInsert: {
+          email,
+          role,
+          firstName: clerkUser.firstName,
+          lastName: clerkUser.lastName,
+        },
+      },
+      { upsert: true }
+    );
+  }
 
   // Fetch results
   const results = await Result.find({ studentId: student.clerkId })

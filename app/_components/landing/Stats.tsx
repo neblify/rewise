@@ -35,7 +35,6 @@ function AnimatedStat({
   useEffect(() => {
     if (!inView) {
       hasAnimated.current = false;
-      setDisplay(0);
       return;
     }
     if (hasAnimated.current) return;
@@ -44,7 +43,7 @@ function AnimatedStat({
     const controls = animate(0, value, {
       duration: DURATION_S,
       delay: delay / 1000,
-      onUpdate: (latest) => setDisplay(Math.round(latest)),
+      onUpdate: (latest: number) => setDisplay(Math.round(latest)),
     });
     return () => controls.stop();
   }, [inView, value, index]);
@@ -66,7 +65,7 @@ export function Stats() {
   const inView = useInView(ref, { once: false, amount: 0.3 });
 
   return (
-    <section ref={ref} className="bg-muted/30 py-24 sm:py-32">
+    <section id="stats" ref={ref} className="bg-muted/30 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}

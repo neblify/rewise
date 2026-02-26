@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Result from '@/lib/db/models/Result';
+import User from '@/lib/db/models/User';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, XCircle } from 'lucide-react';
@@ -24,6 +25,15 @@ interface PopulatedResult {
   maxScore: number;
   aiFeedback?: string;
   weakAreas?: string[];
+  createdAt: Date;
+}
+
+interface ChallengeEntry {
+  id: string;
+  studentId: string;
+  name: string;
+  totalScore: number;
+  maxScore: number;
   createdAt: Date;
 }
 
@@ -73,6 +83,59 @@ export default async function ResultPage(props: Props) {
           (populatedResult.totalScore / populatedResult.maxScore) * 100
         )
       : 0;
+
+  let challengeResults: ChallengeEntry[] = [];
+
+  if ((test as { openChallenge?: boolean }).openChallenge) {
+    const allResults = await Result.find({ testId: test._id })
+      .sort({ createdAt: 1 })
+      .lean();
+
+    const clerkIds = Array.from(
+      new Set(allResults.map(r => r.studentId).filter(Boolean))
+    );
+
+    const users =
+      clerkIds.length > 0
+        ? await User.find({ clerkId: { $in: clerkIds } })
+            .select('clerkId firstName lastName')
+            .lean()
+        : [];
+
+    const userByClerkId = new Map(
+      users.map(u => [
+        u.clerkId as string,
+        u as { firstName?: string; lastName?: string },
+      ])
+    );
+
+    challengeResults = allResults.map(r => {
+      const user = userByClerkId.get(r.studentId as string);
+      const fullName = user
+        ? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim()
+        : '';
+
+      return {
+        id: r._id.toString(),
+        studentId: r.studentId as string,
+        name: fullName || 'Challenger',
+        totalScore: r.totalScore,
+        maxScore: r.maxScore,
+        createdAt: r.createdAt,
+      };
+    });
+
+    // Sort by score desc, then by createdAt asc
+    challengeResults.sort((a, b) => {
+      const percA = a.maxScore > 0 ? a.totalScore / a.maxScore : 0;
+      const percB = b.maxScore > 0 ? b.totalScore / b.maxScore : 0;
+
+      if (percA !== percB) {
+        return percB - percA;
+      }
+      return a.createdAt.getTime() - b.createdAt.getTime();
+    });
+  }
 
   // Helper to find question text by ID (which is "sIndex-qIndex" or just "index")
   const findQuestion = (id: string): IQuestion | undefined => {
@@ -209,7 +272,85 @@ export default async function ResultPage(props: Props) {
           })}
         </div>
 
-        <div className="flex justify-center pt-8">
+        {(test as { openChallenge?: boolean }).openChallenge &&
+          challengeResults.length > 0 && (
+            <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
+              <h2 className="text-2xl font-bold text-foreground mb-4">
+                Challenge Leaderboard
+              </h2>
+              <p className="text-sm text-muted-foreground mb-4">
+                Everyone who has attempted this Open Challenge can see these
+                scores.
+              </p>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border bg-muted/50">
+                      <th className="text-left px-3 py-2 font-medium text-foreground">
+                        #
+                      </th>
+                      <th className="text-left px-3 py-2 font-medium text-foreground">
+                        Challenger
+                      </th>
+                      <th className="text-left px-3 py-2 font-medium text-foreground">
+                        Score
+                      </th>
+                      <th className="text-left px-3 py-2 font-medium text-foreground">
+                        Percentage
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {challengeResults.map((entry, index) => {
+                      const isCurrent =
+                        entry.id === populatedResult._id.toString();
+                      const pct =
+                        entry.maxScore > 0
+                          ? Math.round(
+                              (entry.totalScore / entry.maxScore) * 100
+                            )
+                          : 0;
+
+                      return (
+                        <tr
+                          key={entry.id}
+                          className={`border-b border-border last:border-0 ${
+                            isCurrent ? 'bg-violet-50/70' : ''
+                          }`}
+                        >
+                          <td className="px-3 py-2 text-foreground">
+                            {index + 1}
+                          </td>
+                          <td className="px-3 py-2 text-foreground">
+                            {entry.name}
+                            {isCurrent && (
+                              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-violet-100 text-violet-700">
+                                You
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2 text-foreground">
+                            {entry.totalScore} / {entry.maxScore}
+                          </td>
+                          <td className="px-3 py-2 text-foreground">{pct}%</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+        <div className="flex flex-wrap justify-center gap-4 pt-8">
+          {(test as { openChallenge?: boolean }).openChallenge && (
+            <Link
+              href="/open-challenge"
+              className="px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors font-medium"
+            >
+              Invite friends to beat your score
+            </Link>
+          )}
           <Link
             href="/student"
             className="px-6 py-3 gradient-primary text-white rounded-lg hover:brightness-110 transition-colors font-medium"

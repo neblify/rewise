@@ -20,9 +20,18 @@ vi.mock('next/navigation', () => ({
 // Mock Models
 vi.mock('@/lib/db/models/User', () => ({
   default: {
+    findOne: vi.fn(),
     findOneAndUpdate: vi.fn(),
   },
 }));
+
+function mockUserFindOne(result: { role?: string } | null) {
+  vi.mocked(User.findOne).mockReturnValue({
+    select: vi.fn().mockReturnValue({
+      lean: vi.fn().mockResolvedValue(result),
+    }),
+  } as never);
+}
 
 describe('Onboarding Actions', () => {
   beforeEach(() => {
@@ -59,7 +68,10 @@ describe('Onboarding Actions', () => {
         emailAddresses: [{ emailAddress: 'test@example.com' }],
         firstName: 'Test',
         lastName: 'User',
+        publicMetadata: undefined,
       };
+
+      mockUserFindOne(null);
 
       const mockUpdateMetadata = vi.fn();
       vi.mocked(clerkClient).mockResolvedValue({
@@ -94,6 +106,48 @@ describe('Onboarding Actions', () => {
 
       expect(result.success).toBe(true);
       expect(result.message).toBe('Success');
+    });
+
+    it('should preserve existing Clerk role and not overwrite with selected role', async () => {
+      vi.mocked(auth).mockResolvedValue({
+        userId: 'user_123',
+      } as unknown as Awaited<ReturnType<typeof auth>>);
+
+      const mockUser = {
+        emailAddresses: [{ emailAddress: 'teacher@example.com' }],
+        firstName: 'Teacher',
+        lastName: 'User',
+        publicMetadata: { role: 'teacher' },
+      };
+
+      mockUserFindOne({ role: 'teacher' });
+
+      const mockUpdateMetadata = vi.fn();
+      vi.mocked(clerkClient).mockResolvedValue({
+        users: {
+          getUser: vi.fn().mockResolvedValue(mockUser),
+          updateUserMetadata: mockUpdateMetadata,
+        },
+      } as unknown as Awaited<ReturnType<typeof clerkClient>>);
+
+      const formData = new FormData();
+      formData.append('role', 'student');
+
+      const result = await completeOnboarding({}, formData);
+
+      expect(User.findOneAndUpdate).toHaveBeenCalledWith(
+        { clerkId: 'user_123' },
+        expect.objectContaining({
+          clerkId: 'user_123',
+          email: 'teacher@example.com',
+          role: 'teacher',
+          firstName: 'Teacher',
+          lastName: 'User',
+        }),
+        { upsert: true, new: true }
+      );
+      expect(mockUpdateMetadata).not.toHaveBeenCalled();
+      expect(result.success).toBe(true);
     });
 
     it('should handle errors gracefully', async () => {

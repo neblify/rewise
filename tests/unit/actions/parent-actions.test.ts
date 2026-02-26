@@ -65,7 +65,18 @@ describe('Parent Actions', () => {
         clerkId: 'student_123',
         email: 'student@example.com',
       };
-      vi.mocked(User.findOne).mockResolvedValue(mockStudent as never);
+      const parentChain = {
+        select: vi.fn().mockReturnValue({
+          lean: vi.fn().mockResolvedValue({ role: 'parent' }),
+        }),
+      };
+      vi.mocked(User.findOne).mockImplementation(((query: {
+        email?: string;
+        clerkId?: string;
+      }) => {
+        if (query?.email) return Promise.resolve(mockStudent as never);
+        return parentChain as never;
+      }) as unknown as typeof User.findOne);
 
       const mockResults = [{ score: 10, testId: { title: 'Math Test' } }];
 
@@ -78,11 +89,10 @@ describe('Parent Actions', () => {
 
       const result = await getStudentResults('student@example.com');
 
-      // Verify linking
+      // Verify linking (existing parent: update only, no upsert)
       expect(User.findOneAndUpdate).toHaveBeenCalledWith(
         { clerkId: 'parent_123' },
-        { $addToSet: { children: 'student_123' } },
-        { upsert: true }
+        { $addToSet: { children: 'student_123' } }
       );
 
       // Verify result fetching
