@@ -4,6 +4,13 @@
       "command": "docker",
       "args": ["mcp", "gateway", "run"],
       "type": "stdio"
+    },
+    "codacy": {
+      "command": "node",
+      "args": ["/Users/deepak/.npm-global/lib/node_modules/@codacy/codacy-mcp/dist/index.js"],
+      "env": {
+        "CODACY_ACCOUNT_TOKEN": "${CODACY_ACCOUNT_TOKEN}"
+      }
     }
   }
 }
