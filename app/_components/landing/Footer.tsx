@@ -8,7 +8,7 @@ export function Footer() {
     <footer id="footer" className="gradient-navy text-white">
       <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
         <div className="mt-8 md:order-1 md:mt-0 flex items-center gap-2">
-<div className="relative inline-block shrink-0">
+          <div className="relative inline-block shrink-0">
             {/* Halo scaled to footer logo size (h-28 vs hero h-60) */}
             <div
               aria-hidden="true"

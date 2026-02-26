@@ -70,10 +70,13 @@ describe('Parent Actions', () => {
           lean: vi.fn().mockResolvedValue({ role: 'parent' }),
         }),
       };
-      vi.mocked(User.findOne).mockImplementation((query: { email?: string; clerkId?: string }) => {
+      vi.mocked(User.findOne).mockImplementation(((query: {
+        email?: string;
+        clerkId?: string;
+      }) => {
         if (query?.email) return Promise.resolve(mockStudent as never);
         return parentChain as never;
-      });
+      }) as unknown as typeof User.findOne);
 
       const mockResults = [{ score: 10, testId: { title: 'Math Test' } }];
 

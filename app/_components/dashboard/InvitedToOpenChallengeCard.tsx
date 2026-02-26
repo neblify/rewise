@@ -1,11 +1,6 @@
 import Link from 'next/link';
 import { getOpenChallengeInvitesForCurrentUser } from '@/app/open-challenge/actions';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Play, Mail } from 'lucide-react';
 
@@ -27,12 +22,14 @@ export async function InvitedToOpenChallengeCard() {
       </CardHeader>
       <CardContent className="space-y-3">
         <ul className="space-y-2">
-          {invites.map((inv) => (
+          {invites.map(inv => (
             <li
               key={inv.testId}
               className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200/60 bg-white/50 px-3 py-2 dark:border-amber-800/60 dark:bg-black/20"
             >
-              <span className="font-medium text-foreground">{inv.testTitle}</span>
+              <span className="font-medium text-foreground">
+                {inv.testTitle}
+              </span>
               <div className="flex items-center gap-3">
                 {inv.scoreToBeat != null && (
                   <span className="text-sm text-muted-foreground">

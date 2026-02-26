@@ -159,8 +159,8 @@ export default async function Dashboard() {
               Open Challenge
             </h3>
             <p className="text-sm text-muted-foreground">
-              Generate an assessment on any topic, take it, and invite friends to
-              beat your score.
+              Generate an assessment on any topic, take it, and invite friends
+              to beat your score.
             </p>
           </div>
           <span className="text-sm font-medium text-primary">Go &rarr;</span>

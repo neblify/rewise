@@ -45,8 +45,7 @@ export async function completeOnboarding(
     const existingDbRole = existingDbUser?.role;
 
     // Do not overwrite existing role (e.g. Teacher/Parent who followed Open Challenge invite)
-    const roleToPersist =
-      existingClerkRole ?? existingDbRole ?? selectedRole;
+    const roleToPersist = existingClerkRole ?? existingDbRole ?? selectedRole;
 
     // Create or Update User in MongoDB
     await User.findOneAndUpdate(

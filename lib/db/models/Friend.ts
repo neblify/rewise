@@ -19,8 +19,16 @@ const FriendSchema = new Schema<IFriend>(
   {
     addedBy: { type: String, required: true },
     email: { type: String, required: true },
-    challengeTestId: { type: Schema.Types.ObjectId, ref: 'Test', required: true },
-    challengeResultId: { type: Schema.Types.ObjectId, ref: 'Result', required: true },
+    challengeTestId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Test',
+      required: true,
+    },
+    challengeResultId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Result',
+      required: true,
+    },
     scoreToBeat: { type: Number },
     name: { type: String },
     location: { type: String },
@@ -30,7 +38,10 @@ const FriendSchema = new Schema<IFriend>(
   { timestamps: true }
 );
 
-FriendSchema.index({ addedBy: 1, challengeTestId: 1, email: 1 }, { unique: true });
+FriendSchema.index(
+  { addedBy: 1, challengeTestId: 1, email: 1 },
+  { unique: true }
+);
 
 export default mongoose.models.Friend ||
   mongoose.model<IFriend>('Friend', FriendSchema);

@@ -19,7 +19,9 @@ const questionSchema = z.object({
   type: z.string(),
   options: z.array(z.string()).optional(),
   leftColumn: z.array(z.string()).optional(),
-  correctAnswer: z.union([z.string(), z.array(z.string()), z.array(z.number())]).optional(),
+  correctAnswer: z
+    .union([z.string(), z.array(z.string()), z.array(z.number())])
+    .optional(),
   mediaUrl: z.string().optional(),
   marks: z.coerce.number().min(1),
 });
@@ -44,10 +46,20 @@ export async function generateOpenChallengeQuestions(
 ) {
   const { userId } = await currentAuth();
   if (!userId) return { error: 'Sign in required' };
-  return generateQuestionsAI(topic, count, type, difficulty, OPEN_BOARD, OPEN_GRADE);
+  return generateQuestionsAI(
+    topic,
+    count,
+    type,
+    difficulty,
+    OPEN_BOARD,
+    OPEN_GRADE
+  );
 }
 
-export async function createOpenChallengeTest(prevState: unknown, formData: FormData) {
+export async function createOpenChallengeTest(
+  prevState: unknown,
+  formData: FormData
+) {
   const { userId } = await currentAuth();
   if (!userId) return { message: 'Sign in required' };
 
@@ -92,7 +104,11 @@ export async function createOpenChallengeTest(prevState: unknown, formData: Form
             return questionDoc._id;
           })
         );
-        return { title: section.title, description: section.description, questions: questionRefs };
+        return {
+          title: section.title,
+          description: section.description,
+          questions: questionRefs,
+        };
       })
     );
 
@@ -133,7 +149,12 @@ export async function addFriend(
 
     const result = await Result.findById(challengeResultId).lean();
     const test = await Test.findById(challengeTestId).lean();
-    if (!result || !test || result.studentId !== userId || String(result.testId) !== String(challengeTestId)) {
+    if (
+      !result ||
+      !test ||
+      result.studentId !== userId ||
+      String(result.testId) !== String(challengeTestId)
+    ) {
       return { error: 'Invalid challenge or result' };
     }
 
@@ -168,12 +189,12 @@ export async function listFriends(challengeTestId?: string) {
   if (!userId) return { error: 'Sign in required', friends: [] };
 
   await dbConnect();
-  const filter: { addedBy: string; challengeTestId?: unknown } = { addedBy: userId };
+  const filter: { addedBy: string; challengeTestId?: unknown } = {
+    addedBy: userId,
+  };
   if (challengeTestId) filter.challengeTestId = challengeTestId;
 
-  const friends = await Friend.find(filter)
-    .sort({ createdAt: -1 })
-    .lean();
+  const friends = await Friend.find(filter).sort({ createdAt: -1 }).lean();
   return {
     friends: friends.map(f => ({
       _id: f._id.toString(),
@@ -212,7 +233,8 @@ export async function updateFriendProfile(
     // ignore
   }
 
-  if (!isOwner && !isFriend) return { error: 'Not allowed to update this profile' };
+  if (!isOwner && !isFriend)
+    return { error: 'Not allowed to update this profile' };
 
   if (data.name !== undefined) friend.name = data.name || undefined;
   if (data.location !== undefined) friend.location = data.location || undefined;
@@ -243,8 +265,16 @@ export async function deleteOpenChallengeTest(testId: string) {
   if (!userId) return { error: 'Sign in required' };
 
   await dbConnect();
-  const test = await Test.findOne({ _id: testId, openChallenge: true, createdBy: userId });
-  if (!test) return { error: 'Open Challenge not found or you do not have permission to delete it' };
+  const test = await Test.findOne({
+    _id: testId,
+    openChallenge: true,
+    createdBy: userId,
+  });
+  if (!test)
+    return {
+      error:
+        'Open Challenge not found or you do not have permission to delete it',
+    };
 
   await Friend.deleteMany({ challengeTestId: testId });
   await Result.deleteMany({ testId });
@@ -252,10 +282,12 @@ export async function deleteOpenChallengeTest(testId: string) {
   if (test.sections?.length) {
     for (const section of test.sections) {
       const qs = (section as { questions?: unknown[] }).questions;
-      if (Array.isArray(qs)) qs.forEach((qId: unknown) => questionIds.push(String(qId)));
+      if (Array.isArray(qs))
+        qs.forEach((qId: unknown) => questionIds.push(String(qId)));
     }
   }
-  if (questionIds.length) await Question.deleteMany({ _id: { $in: questionIds } });
+  if (questionIds.length)
+    await Question.deleteMany({ _id: { $in: questionIds } });
   await Test.deleteOne({ _id: testId });
   return { success: true };
 }
@@ -269,7 +301,9 @@ export async function getMyOpenChallengeResults() {
     .select('testId totalScore maxScore createdAt')
     .sort({ createdAt: -1 })
     .lean();
-  const attemptedTestIds = [...new Set(myResults.map(r => r.testId?.toString()).filter(Boolean))];
+  const attemptedTestIds = [
+    ...new Set(myResults.map(r => r.testId?.toString()).filter(Boolean)),
+  ];
   const openChallengeTests = await Test.find({
     _id: { $in: attemptedTestIds },
     openChallenge: true,
@@ -282,13 +316,16 @@ export async function getMyOpenChallengeResults() {
       { title: t.title ?? 'Open Challenge', createdBy: t.createdBy },
     ])
   );
-  const creatorIds = [...new Set(openChallengeTests.map(t => t.createdBy).filter(Boolean))];
+  const creatorIds = [
+    ...new Set(openChallengeTests.map(t => t.createdBy).filter(Boolean)),
+  ];
   const creators = await User.find({ clerkId: { $in: creatorIds } })
     .select('clerkId firstName lastName')
     .lean();
   const creatorNameMap = new Map(
     creators.map(c => {
-      const name = [c.firstName, c.lastName].filter(Boolean).join(' ') || 'Unknown';
+      const name =
+        [c.firstName, c.lastName].filter(Boolean).join(' ') || 'Unknown';
       return [c.clerkId, name];
     })
   );
@@ -343,24 +380,39 @@ export async function getOpenChallengeInvitesForCurrentUser(): Promise<{
     .select('challengeTestId challengeResultId scoreToBeat')
     .lean();
 
-  const testIds = [...new Set(friendRecords.map(f => f.challengeTestId).filter(Boolean))];
+  const testIds = [
+    ...new Set(friendRecords.map(f => f.challengeTestId).filter(Boolean)),
+  ];
   const tests = await Test.find({ _id: { $in: testIds }, openChallenge: true })
     .select('_id title')
     .lean();
-  const testMap = new Map(tests.map(t => [String(t._id), t.title ?? 'Open Challenge']));
+  const testMap = new Map(
+    tests.map(t => [String(t._id), t.title ?? 'Open Challenge'])
+  );
 
   // Exclude invites for challenges the user has already attempted
   const attemptedTestIds = new Set(
-    (await Result.find({ studentId: userId, testId: { $in: testIds } }).select('testId').lean()).map(
-      r => r.testId?.toString()
-    ).filter(Boolean)
+    (
+      await Result.find({ studentId: userId, testId: { $in: testIds } })
+        .select('testId')
+        .lean()
+    )
+      .map(r => r.testId?.toString())
+      .filter(Boolean)
   );
 
   const seen = new Set<string>();
-  const invites: { testId: string; testTitle: string; scoreToBeat?: number }[] = [];
+  const invites: { testId: string; testTitle: string; scoreToBeat?: number }[] =
+    [];
   for (const f of friendRecords) {
     const testId = f.challengeTestId?.toString();
-    if (!testId || !testMap.has(testId) || seen.has(testId) || attemptedTestIds.has(testId)) continue;
+    if (
+      !testId ||
+      !testMap.has(testId) ||
+      seen.has(testId) ||
+      attemptedTestIds.has(testId)
+    )
+      continue;
     seen.add(testId);
     invites.push({
       testId,

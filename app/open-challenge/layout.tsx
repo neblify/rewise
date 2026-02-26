@@ -11,7 +11,9 @@ type NavbarVariant = 'student' | 'teacher' | 'parent' | 'admin';
 async function getRole(userId: string): Promise<NavbarVariant> {
   if (userId.startsWith('mock_')) {
     await dbConnect();
-    const dbUser = await User.findOne({ clerkId: userId }).select('role').lean();
+    const dbUser = await User.findOne({ clerkId: userId })
+      .select('role')
+      .lean();
     const r = dbUser?.role;
     if (r === 'teacher' || r === 'parent' || r === 'admin') return r;
     return 'student';
@@ -33,7 +35,13 @@ export default async function OpenChallengeLayout({
 
   const role = await getRole(userId);
   const variant: NavbarVariant =
-    role === 'admin' ? 'admin' : role === 'teacher' ? 'teacher' : role === 'parent' ? 'parent' : 'student';
+    role === 'admin'
+      ? 'admin'
+      : role === 'teacher'
+        ? 'teacher'
+        : role === 'parent'
+          ? 'parent'
+          : 'student';
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

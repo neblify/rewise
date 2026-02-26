@@ -70,7 +70,9 @@ export function Hero() {
               </div>
               <motion.h1
                 initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                animate={
+                  isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+                }
                 transition={{ ...spring, delay: 0.08 }}
                 className="text-4xl font-bold tracking-tight sm:text-6xl"
               >
@@ -84,7 +86,9 @@ export function Hero() {
               </motion.h1>
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                animate={
+                  isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
+                }
                 transition={{ ...spring, delay: 0.16 }}
                 className="mt-6 text-xl text-white/70"
               >
@@ -114,7 +118,9 @@ export function Hero() {
           <div className="mt-10 md:mt-0 lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
-              animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
+              animate={
+                isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }
+              }
               transition={{ ...spring, delay: 0.2 }}
               whileHover={{ scale: 1.05, rotate: 2 }}
               className="relative h-full w-full lg:h-full flex justify-center items-center cursor-default"

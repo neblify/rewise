@@ -7,10 +7,13 @@ import { Resend } from 'resend';
  * - INVITE_FROM_EMAIL (optional, defaults to "ReWise <info@nios.neblify.com>")
  */
 
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const resend = process.env.RESEND_API_KEY
+  ? new Resend(process.env.RESEND_API_KEY)
+  : null;
 
 function getBaseUrl(): string {
-  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '');
+  if (process.env.NEXT_PUBLIC_APP_URL)
+    return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '');
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
   return 'https://rewise.online';
 }
@@ -55,7 +58,8 @@ export async function sendOpenChallengeInvite(
   ].join('');
 
   try {
-    const from = process.env.INVITE_FROM_EMAIL || 'ReWise <info@nios.neblify.com>';
+    const from =
+      process.env.INVITE_FROM_EMAIL || 'ReWise <info@nios.neblify.com>';
     const { error } = await resend.emails.send({
       from,
       to,

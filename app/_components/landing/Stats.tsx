@@ -35,7 +35,6 @@ function AnimatedStat({
   useEffect(() => {
     if (!inView) {
       hasAnimated.current = false;
-      setDisplay(0);
       return;
     }
     if (hasAnimated.current) return;
@@ -44,7 +43,7 @@ function AnimatedStat({
     const controls = animate(0, value, {
       duration: DURATION_S,
       delay: delay / 1000,
-      onUpdate: (latest) => setDisplay(Math.round(latest)),
+      onUpdate: (latest: number) => setDisplay(Math.round(latest)),
     });
     return () => controls.stop();
   }, [inView, value, index]);

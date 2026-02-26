@@ -101,9 +101,7 @@ export default function Navbar({ variant = 'student' }: NavbarProps) {
                   <SheetHeader>
                     <SheetTitle>Menu</SheetTitle>
                   </SheetHeader>
-                  <nav className="flex flex-col gap-4 mt-6">
-                    {linkContent}
-                  </nav>
+                  <nav className="flex flex-col gap-4 mt-6">{linkContent}</nav>
                 </SheetContent>
               </Sheet>
             </div>

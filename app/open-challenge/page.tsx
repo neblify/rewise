@@ -21,7 +21,9 @@ function getDashboardHref(role: string): string {
 async function getRole(userId: string): Promise<string> {
   if (userId.startsWith('mock_')) {
     await dbConnect();
-    const dbUser = await User.findOne({ clerkId: userId }).select('role').lean();
+    const dbUser = await User.findOne({ clerkId: userId })
+      .select('role')
+      .lean();
     return dbUser?.role ?? 'student';
   }
   const client = await clerkClient();

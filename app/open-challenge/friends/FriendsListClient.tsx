@@ -22,7 +22,11 @@ export default function FriendsListClient({
 }) {
   const [friends, setFriends] = useState(initialFriends);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<{ name: string; location: string; class: string }>({
+  const [editForm, setEditForm] = useState<{
+    name: string;
+    location: string;
+    class: string;
+  }>({
     name: '',
     location: '',
     class: '',
@@ -87,8 +91,8 @@ export default function FriendsListClient({
   if (friends.length === 0) {
     return (
       <div className="rounded-xl border border-border bg-card p-8 text-center text-muted-foreground">
-        No friends invited yet. Invite people from the Open Challenge page after taking an
-        assessment.
+        No friends invited yet. Invite people from the Open Challenge page after
+        taking an assessment.
       </div>
     );
   }
@@ -99,12 +103,24 @@ export default function FriendsListClient({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/50">
-              <th className="text-left p-3 font-medium text-foreground">Email</th>
-              <th className="text-left p-3 font-medium text-foreground">Name</th>
-              <th className="text-left p-3 font-medium text-foreground">Location</th>
-              <th className="text-left p-3 font-medium text-foreground">Class</th>
-              <th className="text-left p-3 font-medium text-foreground">Score to beat</th>
-              <th className="text-left p-3 font-medium text-foreground w-32">Actions</th>
+              <th className="text-left p-3 font-medium text-foreground">
+                Email
+              </th>
+              <th className="text-left p-3 font-medium text-foreground">
+                Name
+              </th>
+              <th className="text-left p-3 font-medium text-foreground">
+                Location
+              </th>
+              <th className="text-left p-3 font-medium text-foreground">
+                Class
+              </th>
+              <th className="text-left p-3 font-medium text-foreground">
+                Score to beat
+              </th>
+              <th className="text-left p-3 font-medium text-foreground w-32">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -117,7 +133,12 @@ export default function FriendsListClient({
                       <input
                         type="text"
                         value={editForm.name}
-                        onChange={e => { setEditForm(prev => ({ ...prev, name: e.target.value })); }}
+                        onChange={e => {
+                          setEditForm(prev => ({
+                            ...prev,
+                            name: e.target.value,
+                          }));
+                        }}
                         placeholder="Name"
                         className="w-full rounded border border-border px-2 py-1 text-foreground bg-background"
                       />
@@ -126,7 +147,12 @@ export default function FriendsListClient({
                       <input
                         type="text"
                         value={editForm.location}
-                        onChange={e => { setEditForm(prev => ({ ...prev, location: e.target.value })); }}
+                        onChange={e => {
+                          setEditForm(prev => ({
+                            ...prev,
+                            location: e.target.value,
+                          }));
+                        }}
                         placeholder="Location"
                         className="w-full rounded border border-border px-2 py-1 text-foreground bg-background"
                       />
@@ -135,12 +161,19 @@ export default function FriendsListClient({
                       <input
                         type="text"
                         value={editForm.class}
-                        onChange={e => { setEditForm(prev => ({ ...prev, class: e.target.value })); }}
+                        onChange={e => {
+                          setEditForm(prev => ({
+                            ...prev,
+                            class: e.target.value,
+                          }));
+                        }}
                         placeholder="Class"
                         className="w-full rounded border border-border px-2 py-1 text-foreground bg-background"
                       />
                     </td>
-                    <td className="p-3 text-muted-foreground">{f.scoreToBeat ?? '—'}</td>
+                    <td className="p-3 text-muted-foreground">
+                      {f.scoreToBeat ?? '—'}
+                    </td>
                     <td className="p-2">
                       <button
                         type="button"
@@ -164,11 +197,15 @@ export default function FriendsListClient({
                     <td className="p-3 text-foreground">{f.name ?? '—'}</td>
                     <td className="p-3 text-foreground">{f.location ?? '—'}</td>
                     <td className="p-3 text-foreground">{f.class ?? '—'}</td>
-                    <td className="p-3 text-muted-foreground">{f.scoreToBeat ?? '—'}</td>
+                    <td className="p-3 text-muted-foreground">
+                      {f.scoreToBeat ?? '—'}
+                    </td>
                     <td className="p-2">
                       <button
                         type="button"
-                        onClick={() => { startEdit(f); }}
+                        onClick={() => {
+                          startEdit(f);
+                        }}
                         className="text-primary hover:underline mr-2"
                       >
                         Edit

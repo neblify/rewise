@@ -63,7 +63,9 @@ describe('Student Profile Actions', () => {
       formData.append('grade', '10');
 
       vi.mocked(User.findOne).mockReturnValue({
-        lean: vi.fn().mockResolvedValue({ clerkId: 'user_123', board: '', grade: '' }),
+        lean: vi
+          .fn()
+          .mockResolvedValue({ clerkId: 'user_123', board: '', grade: '' }),
       } as never);
       vi.mocked(User.findOneAndUpdate).mockResolvedValue({
         clerkId: 'user_123',

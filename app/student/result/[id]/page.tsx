@@ -103,7 +103,10 @@ export default async function ResultPage(props: Props) {
         : [];
 
     const userByClerkId = new Map(
-      users.map(u => [u.clerkId as string, u as { firstName?: string; lastName?: string }])
+      users.map(u => [
+        u.clerkId as string,
+        u as { firstName?: string; lastName?: string },
+      ])
     );
 
     challengeResults = allResults.map(r => {
@@ -124,10 +127,8 @@ export default async function ResultPage(props: Props) {
 
     // Sort by score desc, then by createdAt asc
     challengeResults.sort((a, b) => {
-      const percA =
-        a.maxScore > 0 ? a.totalScore / a.maxScore : 0;
-      const percB =
-        b.maxScore > 0 ? b.totalScore / b.maxScore : 0;
+      const percA = a.maxScore > 0 ? a.totalScore / a.maxScore : 0;
+      const percB = b.maxScore > 0 ? b.totalScore / b.maxScore : 0;
 
       if (percA !== percB) {
         return percB - percA;
@@ -331,9 +332,7 @@ export default async function ResultPage(props: Props) {
                           <td className="px-3 py-2 text-foreground">
                             {entry.totalScore} / {entry.maxScore}
                           </td>
-                          <td className="px-3 py-2 text-foreground">
-                            {pct}%
-                          </td>
+                          <td className="px-3 py-2 text-foreground">{pct}%</td>
                         </tr>
                       );
                     })}

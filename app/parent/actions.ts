@@ -20,7 +20,9 @@ export async function getStudentResults(email: string) {
   }
 
   // Link student to parent if not already linked; on upsert preserve caller's role (do not default to student)
-  const existing = await User.findOne({ clerkId: userId }).select('role').lean();
+  const existing = await User.findOne({ clerkId: userId })
+    .select('role')
+    .lean();
   if (existing) {
     await User.findOneAndUpdate(
       { clerkId: userId },

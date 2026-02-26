@@ -30,7 +30,8 @@ export default async function OpenChallengeFriendsPage() {
             </Link>
             <h1 className="text-2xl font-bold text-foreground mt-1">Friends</h1>
             <p className="text-sm text-muted-foreground mt-0.5">
-              People you invited to beat your score. You or they can update optional details below.
+              People you invited to beat your score. You or they can update
+              optional details below.
             </p>
           </div>
         </div>
