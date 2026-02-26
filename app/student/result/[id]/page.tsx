@@ -3,6 +3,7 @@ import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Result from '@/lib/db/models/Result';
 import User from '@/lib/db/models/User';
+import { getDashboardHref, getRole } from '@/lib/role';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, XCircle } from 'lucide-react';
@@ -57,6 +58,9 @@ export default async function ResultPage(props: Props) {
   const params = await props.params;
   const { userId } = await currentAuth();
   if (!userId) redirect('/sign-in');
+
+  const role = await getRole(userId);
+  const dashboardHref = getDashboardHref(role);
 
   const { id } = params;
 
@@ -352,7 +356,7 @@ export default async function ResultPage(props: Props) {
             </Link>
           )}
           <Link
-            href="/student"
+            href={dashboardHref}
             className="px-6 py-3 gradient-primary text-white rounded-lg hover:brightness-110 transition-colors font-medium"
           >
             Back to Dashboard
