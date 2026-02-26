@@ -54,7 +54,7 @@ export async function createOpenChallengeTest(prevState: unknown, formData: Form
   let sectionsData: unknown;
   try {
     const sectionsString = formData.get('sections') as string;
-    if (sectionsString?.length > 4.5 * 1024 * 1024) {
+    if (sectionsString.length > 4.5 * 1024 * 1024) {
       return { message: 'Test data too large.' };
     }
     sectionsData = JSON.parse(sectionsString || '[]');

@@ -52,13 +52,13 @@ export default function FriendsListClient({
         location: editForm.location || undefined,
         class: editForm.class || undefined,
       });
-      if (res?.success) {
+      if (res.success) {
         setFriends(prev =>
           prev.map(p => (p._id === editingId ? { ...p, ...editForm } : p))
         );
         setEditingId(null);
       } else {
-        alert(res?.error || 'Failed to update');
+        alert(res.error || 'Failed to update');
       }
     } catch {
       alert('Something went wrong');
@@ -72,10 +72,10 @@ export default function FriendsListClient({
     setDeletingId(id);
     try {
       const res = await deleteFriend(id);
-      if (res?.success) {
+      if (res.success) {
         setFriends(prev => prev.filter(f => f._id !== id));
       } else {
-        alert(res?.error || 'Failed to delete friend');
+        alert(res.error || 'Failed to delete friend');
       }
     } catch {
       alert('Something went wrong');
@@ -117,7 +117,7 @@ export default function FriendsListClient({
                       <input
                         type="text"
                         value={editForm.name}
-                        onChange={e => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                        onChange={e => { setEditForm(prev => ({ ...prev, name: e.target.value })); }}
                         placeholder="Name"
                         className="w-full rounded border border-border px-2 py-1 text-foreground bg-background"
                       />
@@ -126,9 +126,7 @@ export default function FriendsListClient({
                       <input
                         type="text"
                         value={editForm.location}
-                        onChange={e =>
-                          setEditForm(prev => ({ ...prev, location: e.target.value }))
-                        }
+                        onChange={e => { setEditForm(prev => ({ ...prev, location: e.target.value })); }}
                         placeholder="Location"
                         className="w-full rounded border border-border px-2 py-1 text-foreground bg-background"
                       />
@@ -137,7 +135,7 @@ export default function FriendsListClient({
                       <input
                         type="text"
                         value={editForm.class}
-                        onChange={e => setEditForm(prev => ({ ...prev, class: e.target.value }))}
+                        onChange={e => { setEditForm(prev => ({ ...prev, class: e.target.value })); }}
                         placeholder="Class"
                         className="w-full rounded border border-border px-2 py-1 text-foreground bg-background"
                       />
@@ -170,7 +168,7 @@ export default function FriendsListClient({
                     <td className="p-2">
                       <button
                         type="button"
-                        onClick={() => startEdit(f)}
+                        onClick={() => { startEdit(f); }}
                         className="text-primary hover:underline mr-2"
                       >
                         Edit

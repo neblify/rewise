@@ -118,7 +118,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
         router.push(`/student/test/${out.testId}`);
         return;
       }
-      alert((out as { message?: string })?.message || 'Failed to create test');
+      alert((out as { message?: string }).message || 'Failed to create test');
     } catch {
       alert('Something went wrong');
     } finally {
@@ -131,14 +131,14 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
     setAddingFriend(true);
     try {
       const res = await addFriend(inviteEmail.trim(), inviteTestId, inviteResultId, inviteScore);
-      if (res?.success) {
+      if (res.success) {
         setInviteEmail('');
         setInviteResultId(null);
         setInviteTestId('');
         setInviteScore(0);
         setLoadResults(r => r + 1);
       } else {
-        alert(res?.error || 'Failed to add');
+        alert(res.error || 'Failed to add');
       }
     } catch {
       alert('Something went wrong');
@@ -158,8 +158,8 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
     setDeletingTestId(testId);
     try {
       const res = await deleteOpenChallengeTest(testId);
-      if (res?.success) setLoadResults(prev => prev + 1);
-      else alert(res?.error || 'Failed to delete');
+      if (res.success) setLoadResults(prev => prev + 1);
+      else alert(res.error || 'Failed to delete');
     } catch {
       alert('Something went wrong');
     } finally {
@@ -186,7 +186,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
               <input
                 type="text"
                 value={topic}
-                onChange={e => setTopic(e.target.value)}
+                onChange={e => { setTopic(e.target.value); }}
                 placeholder="e.g. World War II, Quadratic Equations"
                 className="w-full rounded-md border border-border px-3 py-2 text-foreground bg-background focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
               />
@@ -195,7 +195,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
               <label className="block text-sm font-medium text-muted-foreground mb-1">Questions</label>
               <select
                 value={count}
-                onChange={e => setCount(Number(e.target.value))}
+                onChange={e => { setCount(Number(e.target.value)); }}
                 className="w-full rounded-md border border-border px-3 py-2 text-foreground bg-background"
               >
                 {[3, 5, 7, 10].map(n => (
@@ -207,7 +207,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
               <label className="block text-sm font-medium text-muted-foreground mb-1">Type</label>
               <select
                 value={qType}
-                onChange={e => setQType(e.target.value)}
+                onChange={e => { setQType(e.target.value); }}
                 className="w-full rounded-md border border-border px-3 py-2 text-foreground bg-background"
               >
                 <option value="mcq">MCQ</option>
@@ -219,7 +219,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
               <label className="block text-sm font-medium text-muted-foreground mb-1">Difficulty</label>
               <select
                 value={difficulty}
-                onChange={e => setDifficulty(e.target.value)}
+                onChange={e => { setDifficulty(e.target.value); }}
                 className="w-full rounded-md border border-border px-3 py-2 text-foreground bg-background"
               >
                 <option value="Easy">Easy</option>
@@ -291,7 +291,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
                     </Link>
                     <button
                       type="button"
-                      onClick={() => openInvite(r)}
+                      onClick={() => { openInvite(r); }}
                       className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted"
                     >
                       <Send className="h-3.5 w-3.5" />
@@ -319,7 +319,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
                       <input
                         type="email"
                         value={inviteEmail}
-                        onChange={e => setInviteEmail(e.target.value)}
+                        onChange={e => { setInviteEmail(e.target.value); }}
                         placeholder="Friend's email"
                         className="flex-1 min-w-[200px] rounded-md border border-border px-3 py-2 text-sm text-foreground bg-background"
                       />

@@ -21,7 +21,7 @@ function useNavLinkColor() {
     const check = () => {
       const y = NAV_PEEK_PX;
       const el = document.elementFromPoint(0, y);
-      const section = el?.closest?.('section, [id="roleinfo"], footer');
+      const section = el?.closest('section, [id="roleinfo"], footer');
       const id = section?.id ?? null;
       setIsDarkBg(id !== null && DARK_SECTION_IDS.includes(id));
     };

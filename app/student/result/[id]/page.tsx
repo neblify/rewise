@@ -86,7 +86,7 @@ export default async function ResultPage(props: Props) {
 
   let challengeResults: ChallengeEntry[] = [];
 
-  if ((test as { openChallenge?: boolean })?.openChallenge) {
+  if ((test as { openChallenge?: boolean }).openChallenge) {
     const allResults = await Result.find({ testId: test._id })
       .sort({ createdAt: 1 })
       .lean();
@@ -271,7 +271,7 @@ export default async function ResultPage(props: Props) {
           })}
         </div>
 
-        {(test as { openChallenge?: boolean })?.openChallenge &&
+        {(test as { openChallenge?: boolean }).openChallenge &&
           challengeResults.length > 0 && (
             <div className="bg-card rounded-2xl shadow-sm border border-border p-6">
               <h2 className="text-2xl font-bold text-foreground mb-4">
@@ -344,7 +344,7 @@ export default async function ResultPage(props: Props) {
           )}
 
         <div className="flex flex-wrap justify-center gap-4 pt-8">
-          {(test as { openChallenge?: boolean })?.openChallenge && (
+          {(test as { openChallenge?: boolean }).openChallenge && (
             <Link
               href="/open-challenge"
               className="px-6 py-3 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors font-medium"
