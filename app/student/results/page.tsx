@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Result from '@/lib/db/models/Result';
+import { getDashboardHref, getRole } from '@/lib/role';
 import { redirect } from 'next/navigation';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
@@ -22,6 +23,8 @@ interface PopulatedStudentResult {
 export default async function StudentResults() {
   const { userId } = await currentAuth();
   if (!userId) redirect('/sign-in');
+
+  const dashboardHref = getDashboardHref(await getRole(userId));
 
   await dbConnect();
   // Fetch results for this student, populated with Test details
@@ -157,7 +160,7 @@ export default async function StudentResults() {
             </p>
             <div className="mt-6">
               <Link
-                href="/student"
+                href={dashboardHref}
                 className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 Go to Dashboard

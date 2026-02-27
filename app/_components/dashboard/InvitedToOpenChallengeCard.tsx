@@ -16,8 +16,9 @@ export async function InvitedToOpenChallengeCard() {
           You&apos;re invited to an Open Challenge
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Someone invited you to beat their score. Take the challenge from the
-          list below.
+          {invites.length === 1 && invites[0].inviterDisplayName
+            ? `${invites[0].inviterDisplayName} invited you to beat their score. Take the challenge from the list below.`
+            : 'You have open challenge invites. Take the challenges from the list below.'}
         </p>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -27,9 +28,16 @@ export async function InvitedToOpenChallengeCard() {
               key={inv.testId}
               className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-200/60 bg-white/50 px-3 py-2 dark:border-amber-800/60 dark:bg-black/20"
             >
-              <span className="font-medium text-foreground">
-                {inv.testTitle}
-              </span>
+              <div className="flex flex-col gap-0.5">
+                <span className="font-medium text-foreground">
+                  {inv.testTitle}
+                </span>
+                {inv.inviterDisplayName && (
+                  <span className="text-xs text-muted-foreground">
+                    Invited by {inv.inviterDisplayName}
+                  </span>
+                )}
+              </div>
               <div className="flex items-center gap-3">
                 {inv.scoreToBeat != null && (
                   <span className="text-sm text-muted-foreground">

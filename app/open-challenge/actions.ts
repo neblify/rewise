@@ -168,10 +168,19 @@ export async function addFriend(
       scoreToBeat,
     });
 
+    const inviterUser = await User.findOne({ clerkId: userId })
+      .select('firstName lastName email')
+      .lean();
+    const inviterDisplayName =
+      inviterUser &&
+      [inviterUser.firstName, inviterUser.lastName].filter(Boolean).join(' ');
+    const inviterLabel = (inviterDisplayName?.trim() || inviterUser?.email) ?? undefined;
+
     const emailResult = await sendOpenChallengeInvite(trimmed, {
       testTitle: test.title ?? 'Open Challenge',
       scoreToBeat,
       testId: challengeTestId,
+      inviterDisplayName: inviterLabel,
     });
     if (!emailResult.sent && emailResult.error) {
       console.warn('Open Challenge invite email not sent:', emailResult.error);
@@ -352,7 +361,12 @@ export async function getMyOpenChallengeResults() {
 
 /** Invites where the current user (by email or linkedClerkId) is the invitee. Only for existing accounts (logged-in users). */
 export async function getOpenChallengeInvitesForCurrentUser(): Promise<{
-  invites: { testId: string; testTitle: string; scoreToBeat?: number }[];
+  invites: {
+    testId: string;
+    testTitle: string;
+    scoreToBeat?: number;
+    inviterDisplayName?: string;
+  }[];
 }> {
   const { userId } = await currentAuth();
   if (!userId) return { invites: [] };
@@ -377,7 +391,7 @@ export async function getOpenChallengeInvitesForCurrentUser(): Promise<{
   }
 
   const friendRecords = await Friend.find(filter)
-    .select('challengeTestId challengeResultId scoreToBeat')
+    .select('challengeTestId challengeResultId scoreToBeat addedBy')
     .lean();
 
   const testIds = [
@@ -389,6 +403,46 @@ export async function getOpenChallengeInvitesForCurrentUser(): Promise<{
   const testMap = new Map(
     tests.map(t => [String(t._id), t.title ?? 'Open Challenge'])
   );
+
+  const inviterIds = [
+    ...new Set(friendRecords.map(f => f.addedBy).filter(Boolean)),
+  ];
+  const inviterUsers = await User.find({ clerkId: { $in: inviterIds } })
+    .select('clerkId firstName lastName email')
+    .lean();
+  const inviterNameMap = new Map<string, string>();
+  const inviterEmailMap = new Map<string, string>();
+  for (const u of inviterUsers) {
+    const name = [u.firstName, u.lastName].filter(Boolean).join(' ').trim();
+    inviterNameMap.set(u.clerkId, name || u.email);
+    if (u.email?.trim()) inviterEmailMap.set(u.clerkId, u.email.trim().toLowerCase());
+  }
+
+  // Add inviter as friend of invitee (so invitee sees inviter in their friends list)
+  for (const f of friendRecords) {
+    const inviterClerkId = f.addedBy as string | undefined;
+    const inviterEmail = inviterClerkId ? inviterEmailMap.get(inviterClerkId) : undefined;
+    if (!inviterEmail || !f.challengeTestId || !f.challengeResultId) continue;
+    const inviterName = inviterClerkId ? inviterNameMap.get(inviterClerkId) : undefined;
+    await Friend.findOneAndUpdate(
+      {
+        addedBy: userId,
+        challengeTestId: f.challengeTestId,
+        email: inviterEmail,
+      },
+      {
+        $setOnInsert: {
+          addedBy: userId,
+          email: inviterEmail,
+          challengeTestId: f.challengeTestId,
+          challengeResultId: f.challengeResultId,
+          scoreToBeat: f.scoreToBeat,
+          ...(inviterName && { name: inviterName }),
+        },
+      },
+      { upsert: true }
+    );
+  }
 
   // Exclude invites for challenges the user has already attempted
   const attemptedTestIds = new Set(
@@ -402,8 +456,12 @@ export async function getOpenChallengeInvitesForCurrentUser(): Promise<{
   );
 
   const seen = new Set<string>();
-  const invites: { testId: string; testTitle: string; scoreToBeat?: number }[] =
-    [];
+  const invites: {
+    testId: string;
+    testTitle: string;
+    scoreToBeat?: number;
+    inviterDisplayName?: string;
+  }[] = [];
   for (const f of friendRecords) {
     const testId = f.challengeTestId?.toString();
     if (
@@ -414,10 +472,12 @@ export async function getOpenChallengeInvitesForCurrentUser(): Promise<{
     )
       continue;
     seen.add(testId);
+    const addedBy = f.addedBy as string | undefined;
     invites.push({
       testId,
       testTitle: testMap.get(testId)!,
       scoreToBeat: f.scoreToBeat,
+      inviterDisplayName: addedBy ? inviterNameMap.get(addedBy) : undefined,
     });
   }
 
