@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -9,8 +9,17 @@ import {
   getMyOpenChallengeResults,
   addFriend,
   deleteOpenChallengeTest,
+  listFriends,
 } from './actions';
 import { Loader2, Send, Trash2, Users, X } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
 
 type SectionState = {
   id: number;
@@ -40,6 +49,172 @@ type ResultItem = {
 
 type Props = { dashboardHref: string };
 
+type FriendEntry = { email: string; name?: string };
+
+function InviteFriendsModal({
+  result,
+  onClose,
+  onSuccess,
+}: {
+  result: ResultItem;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [friends, setFriends] = useState<FriendEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedEmails, setSelectedEmails] = useState<Set<string>>(new Set());
+  const [newEmail, setNewEmail] = useState('');
+  const [inviting, setInviting] = useState(false);
+
+  useEffect(() => {
+    if (!result) return;
+    setLoading(true);
+    listFriends()
+      .then(r => {
+        const list = r.friends ?? [];
+        const byEmail = new Map<string, FriendEntry>();
+        for (const f of list) {
+          const email = f.email?.toLowerCase().trim();
+          if (email && !byEmail.has(email))
+            byEmail.set(email, { email, name: f.name });
+        }
+        setFriends(Array.from(byEmail.values()));
+        setSelectedEmails(new Set());
+      })
+      .finally(() => setLoading(false));
+  }, [result]);
+
+  const toggleOne = (email: string) => {
+    setSelectedEmails(prev => {
+      const next = new Set(prev);
+      if (next.has(email)) next.delete(email);
+      else next.add(email);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (friends.length === 0) return;
+    const allSelected = friends.every(f => selectedEmails.has(f.email));
+    setSelectedEmails(allSelected ? new Set() : new Set(friends.map(f => f.email)));
+  };
+
+  const handleInvite = async () => {
+    const emailsToInvite = [
+      ...selectedEmails,
+      ...(newEmail.trim() ? [newEmail.trim().toLowerCase()] : []),
+    ];
+    if (emailsToInvite.length === 0) return;
+    setInviting(true);
+    try {
+      let hadError = false;
+      for (const email of emailsToInvite) {
+        const res = await addFriend(
+          email,
+          result.testId,
+          result._id,
+          result.totalScore
+        );
+        if (!res.success) {
+          hadError = true;
+          alert(res.error ?? 'Failed to add');
+        }
+      }
+      if (!hadError) {
+        setNewEmail('');
+        setSelectedEmails(new Set());
+        onSuccess();
+        onClose();
+      }
+    } catch {
+      alert('Something went wrong');
+    } finally {
+      setInviting(false);
+    }
+  };
+
+  const allSelected =
+    friends.length > 0 && friends.every(f => selectedEmails.has(f.email));
+  const hasSelection =
+    selectedEmails.size > 0 || (newEmail.trim().length > 0);
+
+  return (
+    <Dialog open onOpenChange={open => !open && onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Invite friends</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : (
+            <>
+              {friends.length > 0 && (
+                <div className="space-y-2">
+                  <label className="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                    <Checkbox
+                      checked={allSelected}
+                      onCheckedChange={toggleSelectAll}
+                    />
+                    Select All
+                  </label>
+                  <ul className="max-h-48 overflow-y-auto rounded-md border border-border divide-y divide-border">
+                    {friends.map(f => (
+                      <li key={f.email} className="flex items-center gap-2 p-2">
+                        <Checkbox
+                          checked={selectedEmails.has(f.email)}
+                          onCheckedChange={() => toggleOne(f.email)}
+                        />
+                        <span className="text-sm text-foreground truncate">
+                          {f.name?.trim() || f.email}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-foreground">
+                  Invite by email
+                </label>
+                <input
+                  type="email"
+                  value={newEmail}
+                  onChange={e => setNewEmail(e.target.value)}
+                  placeholder="Friend's email (not in list)"
+                  className="w-full rounded-md border border-border px-3 py-2 text-sm text-foreground bg-background"
+                />
+              </div>
+            </>
+          )}
+        </div>
+        <DialogFooter>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-md border border-border px-3 py-2 text-sm"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleInvite}
+            disabled={!hasSelection || inviting}
+            className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          >
+            {inviting ? (
+              <Loader2 className="h-4 w-4 animate-spin inline" />
+            ) : null}{' '}
+            Invite
+          </button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function OpenChallengeClient({ dashboardHref }: Props) {
   const router = useRouter();
   const [topic, setTopic] = useState('');
@@ -50,11 +225,9 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [results, setResults] = useState<ResultItem[]>([]);
-  const [inviteResultId, setInviteResultId] = useState<string | null>(null);
-  const [inviteEmail, setInviteEmail] = useState('');
-  const [inviteTestId, setInviteTestId] = useState('');
-  const [inviteScore, setInviteScore] = useState(0);
-  const [addingFriend, setAddingFriend] = useState(false);
+  const [inviteModalResult, setInviteModalResult] = useState<ResultItem | null>(
+    null
+  );
   const [deletingTestId, setDeletingTestId] = useState<string | null>(null);
   const [loadResults, setLoadResults] = useState(0);
 
@@ -137,37 +310,12 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
     }
   };
 
-  const handleAddFriend = async () => {
-    if (!inviteEmail.trim() || !inviteResultId || !inviteTestId) return;
-    setAddingFriend(true);
-    try {
-      const res = await addFriend(
-        inviteEmail.trim(),
-        inviteTestId,
-        inviteResultId,
-        inviteScore
-      );
-      if (res.success) {
-        setInviteEmail('');
-        setInviteResultId(null);
-        setInviteTestId('');
-        setInviteScore(0);
-        setLoadResults(r => r + 1);
-      } else {
-        alert(res.error || 'Failed to add');
-      }
-    } catch {
-      alert('Something went wrong');
-    } finally {
-      setAddingFriend(false);
-    }
-  };
-
-  const openInvite = (r: ResultItem) => {
-    setInviteResultId(r._id);
-    setInviteTestId(r.testId);
-    setInviteScore(r.totalScore);
-  };
+  const openInviteModal = (r: ResultItem) => setInviteModalResult(r);
+  const closeInviteModal = () => setInviteModalResult(null);
+  const onInviteSuccess = useCallback(() => {
+    setLoadResults(prev => prev + 1);
+    setInviteModalResult(null);
+  }, []);
 
   const handleDeleteChallenge = async (testId: string) => {
     if (
@@ -341,9 +489,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
                     </Link>
                     <button
                       type="button"
-                      onClick={() => {
-                        openInvite(r);
-                      }}
+                      onClick={() => openInviteModal(r)}
                       className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted"
                     >
                       <Send className="h-3.5 w-3.5" />
@@ -366,41 +512,6 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
                       </button>
                     )}
                   </div>
-                  {inviteResultId === r._id && (
-                    <div className="w-full mt-3 flex flex-wrap items-end gap-2 border-t border-border pt-3">
-                      <input
-                        type="email"
-                        value={inviteEmail}
-                        onChange={e => {
-                          setInviteEmail(e.target.value);
-                        }}
-                        placeholder="Friend's email"
-                        className="flex-1 min-w-[200px] rounded-md border border-border px-3 py-2 text-sm text-foreground bg-background"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddFriend}
-                        disabled={!inviteEmail.trim() || addingFriend}
-                        className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
-                      >
-                        {addingFriend ? (
-                          <Loader2 className="h-4 w-4 animate-spin inline" />
-                        ) : null}
-                        Add
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setInviteResultId(null);
-                          setInviteTestId('');
-                          setInviteEmail('');
-                        }}
-                        className="text-sm text-muted-foreground hover:text-foreground"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  )}
                 </li>
               ))}
             </ul>
@@ -416,6 +527,14 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
             Cancel Challenge
           </Link>
         </div>
+
+        {inviteModalResult && (
+          <InviteFriendsModal
+            result={inviteModalResult}
+            onClose={closeInviteModal}
+            onSuccess={onInviteSuccess}
+          />
+        )}
       </div>
     </div>
   );
