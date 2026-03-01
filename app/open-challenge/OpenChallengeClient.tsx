@@ -100,27 +100,24 @@ function InviteFriendsModal({
   };
 
   const handleInvite = async () => {
-    const emailsToInvite = [
+    const emailsToInvite = Array.from(new Set([
       ...selectedEmails,
       ...(newEmail.trim() ? [newEmail.trim().toLowerCase()] : []),
-    ];
+    ]));
     if (emailsToInvite.length === 0) return;
     setInviting(true);
     try {
-      let hadError = false;
-      for (const email of emailsToInvite) {
-        const res = await addFriend(
-          email,
-          result.testId,
-          result._id,
-          result.totalScore
-        );
-        if (!res.success) {
-          hadError = true;
-          alert(res.error ?? 'Failed to add');
-        }
-      }
-      if (!hadError) {
+      const results = await Promise.all(
+        emailsToInvite.map(email =>
+          addFriend(email, result.testId, result._id, result.totalScore)
+        )
+      );
+
+      const failed = results.filter(res => !res.success);
+      if (failed.length > 0) {
+        const errorMessages = failed.map(res => res.error || 'Failed to add').join('\n');
+        alert(`Failed to invite some friends:\n${errorMessages}`);
+      } else {
         setNewEmail('');
         setSelectedEmails(new Set());
         onSuccess();
@@ -310,8 +307,8 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
     }
   };
 
-  const openInviteModal = (r: ResultItem) => setInviteModalResult(r);
-  const closeInviteModal = () => setInviteModalResult(null);
+  const openInviteModal = useCallback((r: ResultItem) => setInviteModalResult(r), []);
+  const closeInviteModal = useCallback(() => setInviteModalResult(null), []);
   const onInviteSuccess = useCallback(() => {
     setLoadResults(prev => prev + 1);
     setInviteModalResult(null);
