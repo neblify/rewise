@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import { currentAuth } from '@/lib/auth-wrapper';
 import dbConnect from '@/lib/db/connect';
 import Test from '@/lib/db/models/Test';
-import Question from '@/lib/db/models/Question'; // Ensure model is registered
+import Question from '@/lib/db/models/Question';
 import { notFound, redirect } from 'next/navigation';
-import TestTaker from './TestTaker';
+import TestTaker from '@/app/student/test/[id]/TestTaker';
 
 interface Props {
   params: Promise<{
@@ -17,17 +17,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   await dbConnect();
   const test = await Test.findById(id).select('title').lean();
   return {
-    title: test ? `${test.title} | ReWise` : 'Take Test | ReWise',
+    title: test ? `${test.title} | ReWise` : 'Open Challenge | ReWise',
   };
 }
 
-export default async function TestPage(props: Props) {
+export default async function OpenChallengeTestPage(props: Props) {
   const params = await props.params;
   const { userId } = await currentAuth();
-  if (!userId)
+  if (!userId) {
     redirect(
-      `/sign-up?redirect_url=${encodeURIComponent('/student/test/' + params.id)}`
+      `/sign-up?redirect_url=${encodeURIComponent('/open-challenge/test/' + params.id)}`
     );
+  }
 
   const { id } = params;
 
@@ -38,7 +39,7 @@ export default async function TestPage(props: Props) {
       model: Question,
     })
     .populate({
-      path: 'questions', // For backward compatibility
+      path: 'questions',
       model: Question,
     })
     .lean();
@@ -47,17 +48,20 @@ export default async function TestPage(props: Props) {
     notFound();
   }
 
-  if ((test as { openChallenge?: boolean }).openChallenge) {
-    redirect(`/open-challenge/test/${id}`);
+  if (!(test as { openChallenge?: boolean }).openChallenge) {
+    redirect(`/student/test/${id}`);
   }
 
-  // Ensure plain object for client (lean() already gives plain object; stringify/parse preserves all fields including leftColumn/options)
   const serializedTest = JSON.parse(JSON.stringify(test));
 
   return (
     <div className="min-h-screen bg-background p-8">
       <div className="mx-auto max-w-4xl">
-        <TestTaker test={serializedTest} userId={userId} />
+        <TestTaker
+          test={serializedTest}
+          userId={userId}
+          resultBasePath="/open-challenge/result"
+        />
       </div>
     </div>
   );

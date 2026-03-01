@@ -299,7 +299,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
       );
       const out = await createOpenChallengeTest(null, formData);
       if (out && 'testId' in out && out.testId) {
-        router.push(`/student/test/${out.testId}`);
+        router.push(`/open-challenge/test/${out.testId}`);
         return;
       }
       alert((out as { message?: string }).message || 'Failed to create test');
@@ -482,7 +482,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
                   </div>
                   <div className="flex items-center gap-2">
                     <Link
-                      href={`/student/result/${r._id}`}
+                      href={`/open-challenge/result/${r._id}`}
                       className="text-sm text-primary hover:underline"
                     >
                       View result

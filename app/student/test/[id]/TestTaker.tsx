@@ -139,12 +139,16 @@ function MatchColumnQuestion({
   );
 }
 
+const DEFAULT_RESULT_BASE_PATH = '/student/result';
+
 export default function TestTaker({
   test,
   userId: _userId,
+  resultBasePath = DEFAULT_RESULT_BASE_PATH,
 }: {
   test: ITest;
   userId: string;
+  resultBasePath?: string;
 }) {
   const [answers, setAnswers] = useState<Record<string, string | number[]>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -176,7 +180,7 @@ export default function TestTaker({
             submitTest(test._id as unknown as string, answersRef.current)
               .then(result => {
                 if (result && 'success' in result && result.success) {
-                  router.push(`/student/result/${result.resultId}`);
+                  router.push(`${resultBasePath}/${result.resultId}`);
                 } else {
                   setSubmittingRef.current(false);
                   alert(
@@ -211,7 +215,7 @@ export default function TestTaker({
     try {
       const result = await submitTest(test._id as unknown as string, answers);
       if (result && 'success' in result && result.success) {
-        router.push(`/student/result/${result.resultId}`);
+        router.push(`${resultBasePath}/${result.resultId}`);
       } else {
         alert('Failed to submit test: ' + (result?.message || 'Unknown error'));
         setIsSubmitting(false);

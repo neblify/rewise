@@ -36,7 +36,7 @@ export async function sendOpenChallengeInvite(
   }
 
   const baseUrl = getBaseUrl();
-  const testPath = `/student/test/${params.testId}`;
+  const testPath = `/open-challenge/test/${params.testId}`;
   const challengeUrl = `${baseUrl}/sign-up?redirect_url=${encodeURIComponent(testPath)}`;
 
   const inviter = params.inviterDisplayName?.trim() || 'Someone';
