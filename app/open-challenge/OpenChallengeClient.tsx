@@ -200,7 +200,7 @@ function InviteFriendsModal({
           </button>
           <button
             type="button"
-            onClick={handleInvite}
+            onClick={() => { void handleInvite(); }}
             disabled={!hasSelection || inviting}
             className="rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
@@ -505,7 +505,7 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
                       <button
                         type="button"
                         onClick={() => {
-                        handleDeleteChallenge(r.testId);
+                        void handleDeleteChallenge(r.testId);
                       }}
                         disabled={deletingTestId === r.testId}
                         className="inline-flex items-center gap-1 rounded-md border border-red-200 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
