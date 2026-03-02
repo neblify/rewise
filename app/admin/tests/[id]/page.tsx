@@ -189,39 +189,84 @@ export default async function AdminTestDetailPage(props: Props) {
               </div>
 
               <ol className="space-y-4 list-decimal list-inside">
-                {section.questions.map((q, index) => (
-                  <li key={q.id || index} className="space-y-2">
-                    <div className="text-sm font-medium text-foreground">
-                      {q.text}
-                    </div>
-                    <div className="text-xs uppercase text-muted-foreground">
-                      Type: {q.type.replace(/_/g, ' ')} · Marks: {q.marks}
-                    </div>
+                {section.questions.map((q, index) => {
+                  const isMatchColumns =
+                    q.type === 'match_columns' &&
+                    q.leftColumn.length > 0 &&
+                    q.options.length > 0;
 
-                    {q.leftColumn.length > 0 && q.options.length > 0 ? (
-                      <div className="mt-2 grid gap-4 md:grid-cols-2">
-                        <div>
-                          <p className="text-xs font-semibold text-muted-foreground">
-                            Left column
-                          </p>
-                          <ul className="mt-1 space-y-1 text-sm">
-                            {q.leftColumn.map((item, idx) => (
-                              <li key={idx}>{item}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <p className="text-xs font-semibold text-muted-foreground">
-                            Right column
-                          </p>
-                          <ul className="mt-1 space-y-1 text-sm">
-                            {q.options.map((opt, idx) => (
-                              <li key={idx}>{opt}</li>
-                            ))}
-                          </ul>
-                        </div>
+                  let mappedRightColumn: string[] | null = null;
+                  if (isMatchColumns && Array.isArray(q.correctAnswer)) {
+                    const answerIndices = q.correctAnswer as number[];
+                    mappedRightColumn = q.leftColumn.map((_, idx) => {
+                      const optIndex = answerIndices[idx];
+                      if (
+                        typeof optIndex === 'number' &&
+                        optIndex >= 0 &&
+                        optIndex < q.options.length
+                      ) {
+                        return q.options[optIndex];
+                      }
+                      return '';
+                    });
+                  }
+
+                  return (
+                    <li key={q.id || index} className="space-y-2">
+                      <div className="text-sm font-medium text-foreground">
+                        {q.text}
                       </div>
-                    ) : null}
+                      <div className="text-xs uppercase text-muted-foreground">
+                        Type: {q.type.replace(/_/g, ' ')} · Marks: {q.marks}
+                      </div>
+
+                      {isMatchColumns && mappedRightColumn ? (
+                        <div className="mt-2 grid gap-4 md:grid-cols-2">
+                          <div>
+                            <p className="text-xs font-semibold text-muted-foreground">
+                              Column A (Question keys)
+                            </p>
+                            <ul className="mt-1 space-y-1 text-sm">
+                              {q.leftColumn.map((item, idx) => (
+                                <li key={idx}>{item}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-muted-foreground">
+                              Column B (Correct answers)
+                            </p>
+                            <ul className="mt-1 space-y-1 text-sm">
+                              {mappedRightColumn.map((opt, idx) => (
+                                <li key={idx}>{opt}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      ) : q.leftColumn.length > 0 && q.options.length > 0 ? (
+                        <div className="mt-2 grid gap-4 md:grid-cols-2">
+                          <div>
+                            <p className="text-xs font-semibold text-muted-foreground">
+                              Left column
+                            </p>
+                            <ul className="mt-1 space-y-1 text-sm">
+                              {q.leftColumn.map((item, idx) => (
+                                <li key={idx}>{item}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-muted-foreground">
+                              Right column
+                            </p>
+                            <ul className="mt-1 space-y-1 text-sm">
+                              {q.options.map((opt, idx) => (
+                                <li key={idx}>{opt}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      ) : null}
 
                     {q.options.length > 0 && q.leftColumn.length === 0 ? (
                       <ul className="mt-2 space-y-1 text-sm">
@@ -281,7 +326,8 @@ export default async function AdminTestDetailPage(props: Props) {
                       </div>
                     ) : null}
                   </li>
-                ))}
+                );
+              })}
               </ol>
             </div>
           ))
@@ -293,41 +339,94 @@ export default async function AdminTestDetailPage(props: Props) {
               </p>
             ) : (
               <ol className="space-y-4 list-decimal list-inside">
-                {flatQuestions.map((q, index) => (
-                  <li key={String(q._id) || index} className="space-y-2">
-                    <div className="text-sm font-medium text-foreground">
-                      {String(q.text ?? '')}
-                    </div>
-                    <div className="text-xs uppercase text-muted-foreground">
-                      Type:{' '}
-                      {String(q.type ?? '')
-                        .toLowerCase()
-                        .replace(/_/g, ' ')}{' '}
-                      · Marks: {typeof q.marks === 'number' ? q.marks : 1}
-                    </div>
-                    {Array.isArray(q.options) && q.options.length > 0 ? (
-                      <ul className="mt-2 space-y-1 text-sm">
-                        {q.options.map((opt, idx) => (
-                          <li key={idx}>{opt}</li>
-                        ))}
-                      </ul>
-                    ) : null}
-                    <div className="mt-2 text-sm">
-                      <span className="text-xs font-semibold uppercase text-muted-foreground">
-                        Correct answer:{' '}
-                      </span>
-                      <span className="text-foreground">
-                        {Array.isArray(q.correctAnswer)
-                          ? (q.correctAnswer as unknown[])
-                              .map(v => String(v))
-                              .join(', ')
-                          : q.correctAnswer != null
-                            ? String(q.correctAnswer)
-                            : 'Not specified'}
-                      </span>
-                    </div>
-                  </li>
-                ))}
+                {flatQuestions.map((q, index) => {
+                  const leftColumn = Array.isArray(q.leftColumn)
+                    ? q.leftColumn
+                    : [];
+                  const options = Array.isArray(q.options) ? q.options : [];
+                  const typeString = String(q.type ?? '');
+                  const isMatchColumns =
+                    typeString === 'match_columns' &&
+                    leftColumn.length > 0 &&
+                    options.length > 0;
+
+                  let mappedRightColumn: string[] | null = null;
+                  if (isMatchColumns && Array.isArray(q.correctAnswer)) {
+                    const answerIndices = q.correctAnswer as number[];
+                    mappedRightColumn = leftColumn.map((_, idx) => {
+                      const optIndex = answerIndices[idx];
+                      if (
+                        typeof optIndex === 'number' &&
+                        optIndex >= 0 &&
+                        optIndex < options.length
+                      ) {
+                        return options[optIndex];
+                      }
+                      return '';
+                    });
+                  }
+
+                  return (
+                    <li key={String(q._id) || index} className="space-y-2">
+                      <div className="text-sm font-medium text-foreground">
+                        {String(q.text ?? '')}
+                      </div>
+                      <div className="text-xs uppercase text-muted-foreground">
+                        Type:{' '}
+                        {typeString.toLowerCase().replace(/_/g, ' ')} · Marks:{' '}
+                        {typeof q.marks === 'number' ? q.marks : 1}
+                      </div>
+
+                      {isMatchColumns && mappedRightColumn ? (
+                        <div className="mt-2 grid gap-4 md:grid-cols-2">
+                          <div>
+                            <p className="text-xs font-semibold text-muted-foreground">
+                              Column A (Question keys)
+                            </p>
+                            <ul className="mt-1 space-y-1 text-sm">
+                              {leftColumn.map((item, idx) => (
+                                <li key={idx}>{item}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-muted-foreground">
+                              Column B (Correct answers)
+                            </p>
+                            <ul className="mt-1 space-y-1 text-sm">
+                              {mappedRightColumn.map((opt, idx) => (
+                                <li key={idx}>{opt}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      ) : options.length > 0 ? (
+                        <ul className="mt-2 space-y-1 text-sm">
+                          {options.map((opt, idx) => (
+                            <li key={idx}>{opt}</li>
+                          ))}
+                        </ul>
+                      ) : null}
+
+                      {!isMatchColumns && (
+                        <div className="mt-2 text-sm">
+                          <span className="text-xs font-semibold uppercase text-muted-foreground">
+                            Correct answer:{' '}
+                          </span>
+                          <span className="text-foreground">
+                            {Array.isArray(q.correctAnswer)
+                              ? (q.correctAnswer as unknown[])
+                                  .map(v => String(v))
+                                  .join(', ')
+                              : q.correctAnswer != null
+                                ? String(q.correctAnswer)
+                                : 'Not specified'}
+                          </span>
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
               </ol>
             )}
           </div>
