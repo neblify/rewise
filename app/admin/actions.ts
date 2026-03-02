@@ -47,7 +47,15 @@ export async function getTests() {
     return [];
   }
 
-  const plainTests = JSON.parse(
+  const plainTests: Array<{
+    _id: unknown;
+    title?: unknown;
+    subject?: unknown;
+    createdAt?: unknown;
+    isPublished?: unknown;
+    createdBy?: unknown;
+    [key: string]: unknown;
+  }> = JSON.parse(
     JSON.stringify(
       tests as Array<{
         _id: unknown;
