@@ -74,8 +74,7 @@ export async function getTests() {
       plainTests
         .map(t => t.createdBy)
         .filter(
-          (id): id is string =>
-            typeof id === 'string' && id.trim().length > 0
+          (id): id is string => typeof id === 'string' && id.trim().length > 0
         )
     )
   );
@@ -129,7 +128,7 @@ export async function getTests() {
     const createdByDisplay =
       (fullName && fullName.length > 0) ||
       (creator?.email && creator.email.trim().length > 0)
-        ? fullName || creator!.email!.trim()
+        ? fullName || creator?.email?.trim() || createdBy || 'Deleted user'
         : createdBy || 'Deleted user';
 
     return {
@@ -186,7 +185,10 @@ export async function getChallengesForAdmin() {
     firstResultByTestId.set(key, r._id.toString());
   }
 
-  const creatorMap = new Map<string, { firstName?: string; lastName?: string; email?: string }>();
+  const creatorMap = new Map<
+    string,
+    { firstName?: string; lastName?: string; email?: string }
+  >();
   for (const c of creators) {
     creatorMap.set(c.clerkId as string, {
       firstName: c.firstName as string | undefined,
@@ -206,7 +208,11 @@ export async function getChallengesForAdmin() {
       (fullName && fullName.length > 0) ||
       (creator?.email && creator.email.trim().length > 0)
     ) {
-      creatorName = fullName || creator!.email!.trim();
+      creatorName =
+        fullName ||
+        creator?.email?.trim() ||
+        (t.createdBy as string) ||
+        'Deleted user';
     } else {
       creatorName = (t.createdBy as string) || 'Deleted user';
     }
@@ -215,7 +221,7 @@ export async function getChallengesForAdmin() {
 
     return {
       _id: testIdStr,
-      title: (t.title as string) ?? 'Open Challenge',
+      title: (t.title as string) || 'Open Challenge',
       creatorName,
       sampleResultId: firstResultByTestId.get(testIdStr) ?? null,
     };
@@ -224,7 +230,7 @@ export async function getChallengesForAdmin() {
 
 export async function deleteUsers(userIds: string[]) {
   await dbConnect();
-  if (!userIds?.length) return { error: 'No users selected' };
+  if (!userIds.length) return { error: 'No users selected' };
   const users = await User.find({ _id: { $in: userIds } }).lean();
   if (!users.length) return { error: 'No users found' };
 
@@ -268,16 +274,14 @@ export async function deleteUsers(userIds: string[]) {
     if (Array.isArray(flatQuestions)) {
       flatQuestions.forEach(q => {
         const id =
-          q && typeof q === 'object'
-            ? (q as { _id?: unknown })._id
-            : undefined;
+          q && typeof q === 'object' ? (q as { _id?: unknown })._id : undefined;
         if (id) questionIdsFromTests.push(String(id));
       });
     }
   }
 
   // Delete results where the deleted users are students or where their tests are involved
-  const resultConditions: any[] = [];
+  const resultConditions: Record<string, unknown>[] = [];
   if (clerkIds.length) {
     resultConditions.push({ studentId: { $in: clerkIds } });
   }
@@ -289,7 +293,7 @@ export async function deleteUsers(userIds: string[]) {
   }
 
   // Delete friends where deleted users are inviters, invitees, or related to their tests
-  const friendConditions: any[] = [];
+  const friendConditions: Record<string, unknown>[] = [];
   if (clerkIds.length) {
     friendConditions.push({ addedBy: { $in: clerkIds } });
     friendConditions.push({ linkedClerkId: { $in: clerkIds } });
@@ -302,7 +306,7 @@ export async function deleteUsers(userIds: string[]) {
   }
 
   // Delete questions authored by these users or referenced by their tests
-  const questionConditions: any[] = [];
+  const questionConditions: Record<string, unknown>[] = [];
   if (clerkIds.length) {
     questionConditions.push({ createdBy: { $in: clerkIds } });
   }
@@ -347,8 +351,12 @@ export async function deleteUsers(userIds: string[]) {
   return {
     deletedUsers: userResult.deletedCount ?? 0,
     deletedTests,
-    failedClerkDeletes: failedClerkDeletes.length ? failedClerkDeletes : undefined,
-    skippedAdminUsers: adminUsers.length ? adminUsers.map(u => String(u._id)) : undefined,
+    failedClerkDeletes: failedClerkDeletes.length
+      ? failedClerkDeletes
+      : undefined,
+    skippedAdminUsers: adminUsers.length
+      ? adminUsers.map(u => String(u._id))
+      : undefined,
   };
 }
 
@@ -370,9 +378,7 @@ export async function getUserByIdWithFriends(userId: string) {
     linkedClerkIds.length > 0
       ? await User.find({ clerkId: { $in: linkedClerkIds } }).lean()
       : [];
-  const linkedUserMap = new Map(
-    linkedUsers.map(u => [u.clerkId, u])
-  );
+  const linkedUserMap = new Map(linkedUsers.map(u => [u.clerkId, u]));
   return {
     user: JSON.parse(JSON.stringify(user)),
     friends: JSON.parse(
