@@ -45,7 +45,7 @@ export async function InvitedToOpenChallengeCard() {
                   </span>
                 )}
                 <Button asChild size="sm" variant="gradient">
-                  <Link href={`/student/test/${inv.testId}`}>
+                  <Link href={`/open-challenge/test/${inv.testId}`}>
                     <Play className="h-4 w-4 mr-1" />
                     Take challenge
                   </Link>
