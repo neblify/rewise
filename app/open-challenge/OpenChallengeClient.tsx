@@ -105,9 +105,9 @@ function InviteFriendsModal({
       ...selectedEmails,
       ...(newEmail.trim() ? [newEmail.trim().toLowerCase()] : []),
     ]));
-    const existingEmails = new Set(friends.map(f => f.email.toLowerCase().trim()));
+    const existingEmails = new Set(friends.map(f => f.email));
     const emailsToInvite = candidateEmails.filter(
-      e => !existingEmails.has(e.toLowerCase().trim())
+      e => !existingEmails.has(e)
     );
     if (emailsToInvite.length === 0) {
       if (candidateEmails.length > 0) {
