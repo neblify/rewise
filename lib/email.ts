@@ -4,7 +4,7 @@ import { Resend } from 'resend';
  * Email configuration:
  * - RESEND_API_KEY (required)
  * - NEXT_PUBLIC_APP_URL or VERCEL_URL for challenge link base URL
- * - INVITE_FROM_EMAIL (optional, defaults to "ReWise <info@nios.neblify.com>")
+ * - INVITE_FROM_EMAIL (optional, defaults to "ReWise <info@rewise.online>")
  */
 
 const resend = process.env.RESEND_API_KEY
@@ -62,7 +62,7 @@ export async function sendOpenChallengeInvite(
 
   try {
     const from =
-      process.env.INVITE_FROM_EMAIL || 'ReWise <info@nios.neblify.com>';
+      process.env.INVITE_FROM_EMAIL || 'ReWise <info@rewise.online>';
     const { error } = await resend.emails.send({
       from,
       to,

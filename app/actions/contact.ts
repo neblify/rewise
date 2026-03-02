@@ -44,7 +44,7 @@ export async function submitContactForm(
 
   try {
     const { data: _data, error } = await resend.emails.send({
-      from: 'ReWise <info@nios.neblify.com>', // Default testing domain
+      from: 'ReWise <info@rewise.online>', // Default testing domain
       to: ['deepak@neblify.com'],
       replyTo: email,
       subject: `New Contact Form Submission: ${subject}`,
