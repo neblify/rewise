@@ -96,11 +96,16 @@ export async function getChallengesForAdmin() {
     const fullName =
       creator &&
       [creator.firstName, creator.lastName].filter(Boolean).join(' ').trim();
-    const creatorName =
+    let creatorName: string;
+
+    if (
       (fullName && fullName.length > 0) ||
       (creator?.email && creator.email.trim().length > 0)
-        ? fullName || creator!.email!.trim()
-        : 'Unknown';
+    ) {
+      creatorName = fullName || creator!.email!.trim();
+    } else {
+      creatorName = (t.createdBy as string) || 'Deleted user';
+    }
 
     const testIdStr = t._id.toString();
 
