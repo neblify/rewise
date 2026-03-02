@@ -462,25 +462,20 @@ export default function AdminView({
                 No Open Challenges found.
               </p>
             ) : (
-              challenges.map(challenge => {
-                const href = challenge.sampleResultId
-                  ? `/open-challenge/result/${challenge.sampleResultId}`
-                  : `/open-challenge/test/${challenge._id}`;
-                return (
-                  <Link
-                    key={challenge._id}
-                    href={href}
-                    className="block px-4 py-4 hover:bg-muted transition-colors"
-                  >
-                    <p className="font-medium text-foreground">
-                      {challenge.title}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Created by {challenge.creatorName}
-                    </p>
-                  </Link>
-                );
-              })
+              challenges.map(challenge => (
+                <Link
+                  key={challenge._id}
+                  href={`/admin/challenges/${challenge._id}`}
+                  className="block px-4 py-4 hover:bg-muted transition-colors"
+                >
+                  <p className="font-medium text-foreground">
+                    {challenge.title}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Created by {challenge.creatorName}
+                  </p>
+                </Link>
+              ))
             )}
           </div>
         </div>
