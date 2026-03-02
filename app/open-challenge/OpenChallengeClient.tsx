@@ -67,9 +67,8 @@ function InviteFriendsModal({
   const [inviting, setInviting] = useState(false);
 
   useEffect(() => {
-    if (!result) return;
     setLoading(true);
-    listFriends()
+    void listFriends()
       .then(r => {
         const list = r.friends ?? [];
         const byEmail = new Map<string, FriendEntry>();
@@ -81,7 +80,9 @@ function InviteFriendsModal({
         setFriends(Array.from(byEmail.values()));
         setSelectedEmails(new Set());
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+      });
   }, [result]);
 
   const toggleOne = (email: string) => {
@@ -136,7 +137,7 @@ function InviteFriendsModal({
     selectedEmails.size > 0 || (newEmail.trim().length > 0);
 
   return (
-    <Dialog open onOpenChange={open => !open && onClose()}>
+    <Dialog open onOpenChange={open => { if (!open) onClose(); }}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>Invite friends</DialogTitle>
@@ -162,7 +163,9 @@ function InviteFriendsModal({
                       <li key={f.email} className="flex items-center gap-2 p-2">
                         <Checkbox
                           checked={selectedEmails.has(f.email)}
-                          onCheckedChange={() => toggleOne(f.email)}
+                          onCheckedChange={() => {
+                          toggleOne(f.email);
+                        }}
                         />
                         <span className="text-sm text-foreground truncate">
                           {f.name?.trim() || f.email}
@@ -179,7 +182,7 @@ function InviteFriendsModal({
                 <input
                   type="email"
                   value={newEmail}
-                  onChange={e => setNewEmail(e.target.value)}
+                  onChange={e => { setNewEmail(e.target.value); }}
                   placeholder="Friend's email (not in list)"
                   className="w-full rounded-md border border-border px-3 py-2 text-sm text-foreground bg-background"
                 />
@@ -190,7 +193,7 @@ function InviteFriendsModal({
         <DialogFooter>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => { onClose(); }}
             className="rounded-md border border-border px-3 py-2 text-sm"
           >
             Cancel
@@ -307,8 +310,12 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
     }
   };
 
-  const openInviteModal = useCallback((r: ResultItem) => setInviteModalResult(r), []);
-  const closeInviteModal = useCallback(() => setInviteModalResult(null), []);
+  const openInviteModal = useCallback((r: ResultItem) => {
+    setInviteModalResult(r);
+  }, []);
+  const closeInviteModal = useCallback(() => {
+    setInviteModalResult(null);
+  }, []);
   const onInviteSuccess = useCallback(() => {
     setLoadResults(prev => prev + 1);
     setInviteModalResult(null);
@@ -486,7 +493,9 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
                     </Link>
                     <button
                       type="button"
-                      onClick={() => openInviteModal(r)}
+                      onClick={() => {
+                        openInviteModal(r);
+                      }}
                       className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-sm hover:bg-muted"
                     >
                       <Send className="h-3.5 w-3.5" />
@@ -495,7 +504,9 @@ export default function OpenChallengeClient({ dashboardHref }: Props) {
                     {r.isOwner && (
                       <button
                         type="button"
-                        onClick={() => handleDeleteChallenge(r.testId)}
+                        onClick={() => {
+                        handleDeleteChallenge(r.testId);
+                      }}
                         disabled={deletingTestId === r.testId}
                         className="inline-flex items-center gap-1 rounded-md border border-red-200 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50 disabled:opacity-50"
                         title="Delete this Open Challenge"
