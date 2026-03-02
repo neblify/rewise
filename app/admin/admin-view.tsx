@@ -10,10 +10,12 @@ import {
   PenTool,
   LayoutDashboard,
   Trash2,
+  ShieldCheck,
 } from 'lucide-react';
 import { deleteUsers } from './actions';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+import { ADMIN_EMAILS } from '@/lib/constants/admins';
 
 interface AdminViewProps {
   stats: {
@@ -222,31 +224,46 @@ export default function AdminView({
                 </tr>
               </thead>
               <tbody className="bg-card divide-y divide-border">
-                {users.map(user => (
-                  <tr key={user._id}>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      <input
-                        type="checkbox"
-                        aria-label={`Select user ${user.email}`}
-                        checked={selectedUserIds.has(user._id)}
-                        onChange={() => toggleUser(user._id)}
-                        className="h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
-                      />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                      <Link
-                        href={`/admin/users/${user._id}`}
-                        className="text-primary hover:underline"
-                      >
-                        {userDisplayName(user)}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                      {user.email}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+                {users.map(user => {
+                  const isAdminUser =
+                    user.role === 'admin' || ADMIN_EMAILS.includes(user.email);
+
+                  return (
+                    <tr key={user._id}>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+                        <input
+                          type="checkbox"
+                          aria-label={`Select user ${user.email}`}
+                          checked={selectedUserIds.has(user._id)}
+                          onChange={() => toggleUser(user._id)}
+                          className="h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/admin/users/${user._id}`}
+                            className="text-primary hover:underline"
+                          >
+                            {userDisplayName(user)}
+                          </Link>
+                          {isAdminUser && (
+                            <span
+                              className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-purple-800"
+                              title="Admin user"
+                            >
+                              <ShieldCheck className="h-3 w-3" />
+                              Admin
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                        {user.email}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
                         ${
                           user.role === 'teacher'
                             ? 'bg-green-100 text-green-800'
@@ -256,15 +273,16 @@ export default function AdminView({
                                 ? 'bg-purple-100 text-purple-800'
                                 : 'bg-muted text-muted-foreground'
                         }`}
-                      >
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      {formatDate(user.createdAt)}
-                    </td>
-                  </tr>
-                ))}
+                        >
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                        {formatDate(user.createdAt)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

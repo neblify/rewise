@@ -57,7 +57,16 @@ export async function deleteUsers(userIds: string[]) {
   const users = await User.find({ _id: { $in: userIds } }).lean();
   if (!users.length) return { error: 'No users found' };
 
-  const clerkIds = users
+  const nonAdminUsers = users.filter(u => u.role !== 'admin');
+  const adminUsers = users.filter(u => u.role === 'admin');
+
+  if (!nonAdminUsers.length) {
+    return { error: 'Admin users cannot be deleted' };
+  }
+
+  const effectiveUserIds = nonAdminUsers.map(u => String(u._id));
+
+  const clerkIds = nonAdminUsers
     .map(u => u.clerkId)
     .filter((id): id is string => Boolean(id));
 
@@ -138,7 +147,7 @@ export async function deleteUsers(userIds: string[]) {
   }
 
   // Finally delete the User records themselves
-  const userResult = await User.deleteMany({ _id: { $in: userIds } });
+  const userResult = await User.deleteMany({ _id: { $in: effectiveUserIds } });
 
   // Attempt to remove users from Clerk so they can no longer sign in
   const failedClerkDeletes: string[] = [];
@@ -165,6 +174,7 @@ export async function deleteUsers(userIds: string[]) {
     deletedUsers: userResult.deletedCount ?? 0,
     deletedTests,
     failedClerkDeletes: failedClerkDeletes.length ? failedClerkDeletes : undefined,
+    skippedAdminUsers: adminUsers.length ? adminUsers.map(u => String(u._id)) : undefined,
   };
 }
 
