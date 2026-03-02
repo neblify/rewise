@@ -73,7 +73,10 @@ export async function getTests() {
     new Set(
       plainTests
         .map(t => t.createdBy)
-        .filter((id): id is string => typeof id === 'string' && id.trim().length)
+        .filter(
+          (id): id is string =>
+            typeof id === 'string' && id.trim().length > 0
+        )
     )
   );
 
