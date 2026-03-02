@@ -138,7 +138,15 @@ export async function getTests() {
     };
   });
 
-  return enrichedTests;
+  return enrichedTests as Array<{
+    _id: string;
+    title: string;
+    subject: string;
+    createdAt: Date;
+    createdByDisplay: string;
+    isPublished?: boolean;
+    [key: string]: unknown;
+  }>;
 }
 
 export async function getQuestions() {
@@ -258,15 +266,18 @@ export async function deleteUsers(userIds: string[]) {
     }
     const flatQuestions = (test as { questions?: unknown[] }).questions;
     if (Array.isArray(flatQuestions)) {
-      flatQuestions.forEach((q: unknown & { _id?: unknown }) => {
-        const id = (q && (q as { _id?: unknown })._id) as unknown;
+      flatQuestions.forEach(q => {
+        const id =
+          q && typeof q === 'object'
+            ? (q as { _id?: unknown })._id
+            : undefined;
         if (id) questionIdsFromTests.push(String(id));
       });
     }
   }
 
   // Delete results where the deleted users are students or where their tests are involved
-  const resultConditions: unknown[] = [];
+  const resultConditions: any[] = [];
   if (clerkIds.length) {
     resultConditions.push({ studentId: { $in: clerkIds } });
   }
@@ -278,7 +289,7 @@ export async function deleteUsers(userIds: string[]) {
   }
 
   // Delete friends where deleted users are inviters, invitees, or related to their tests
-  const friendConditions: unknown[] = [];
+  const friendConditions: any[] = [];
   if (clerkIds.length) {
     friendConditions.push({ addedBy: { $in: clerkIds } });
     friendConditions.push({ linkedClerkId: { $in: clerkIds } });
@@ -291,7 +302,7 @@ export async function deleteUsers(userIds: string[]) {
   }
 
   // Delete questions authored by these users or referenced by their tests
-  const questionConditions: unknown[] = [];
+  const questionConditions: any[] = [];
   if (clerkIds.length) {
     questionConditions.push({ createdBy: { $in: clerkIds } });
   }
