@@ -101,11 +101,20 @@ function InviteFriendsModal({
   };
 
   const handleInvite = async () => {
-    const emailsToInvite = Array.from(new Set([
+    const candidateEmails = Array.from(new Set([
       ...selectedEmails,
       ...(newEmail.trim() ? [newEmail.trim().toLowerCase()] : []),
     ]));
-    if (emailsToInvite.length === 0) return;
+    const existingEmails = new Set(friends.map(f => f.email));
+    const emailsToInvite = candidateEmails.filter(
+      e => !existingEmails.has(e)
+    );
+    if (emailsToInvite.length === 0) {
+      if (candidateEmails.length > 0) {
+        alert('All selected emails are already in your friend list.');
+      }
+      return;
+    }
     setInviting(true);
     try {
       const results = await Promise.all(

@@ -57,9 +57,12 @@ describe('Admin Actions', () => {
         if (q.role === 'parent') return Promise.resolve(50) as never;
         return Promise.resolve(0) as never;
       });
-      vi.mocked(Test.countDocuments).mockResolvedValue(5 as never);
+      vi.mocked(Test.countDocuments).mockImplementation((query?: unknown) => {
+        const q = (query || {}) as { openChallenge?: boolean };
+        if (q.openChallenge) return Promise.resolve(2) as never;
+        return Promise.resolve(5) as never;
+      });
       vi.mocked(Question.countDocuments).mockResolvedValue(50 as never);
-      vi.mocked(Result.countDocuments).mockResolvedValue(200 as never);
 
       const stats = await getAdminStats();
 
@@ -69,7 +72,7 @@ describe('Admin Actions', () => {
         parents: 50,
         tests: 5,
         questions: 50,
-        results: 200,
+        challenges: 2,
       });
     });
   });
@@ -105,17 +108,60 @@ describe('Admin Actions', () => {
 
   describe('getTests', () => {
     it('should fetch all tests sorted by date', async () => {
-      const mockTests = [{ title: 'Math Test' }];
+      const mockTests = [
+        {
+          _id: '1',
+          title: 'Math Test',
+          subject: 'Math',
+          createdAt: new Date(),
+          isPublished: true,
+          createdBy: 'clerk_1',
+        },
+        {
+          _id: '2',
+          title: 'Science Test',
+          subject: 'Science',
+          createdAt: new Date(),
+          isPublished: false,
+          createdBy: 'clerk_2',
+        },
+      ];
       const mockSort = vi.fn().mockResolvedValue(mockTests);
       vi.mocked(Test.find).mockReturnValue({
         sort: mockSort,
       } as unknown as ReturnType<typeof Test.find>);
 
+      const mockCreators = [
+        {
+          clerkId: 'clerk_1',
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+        },
+        {
+          clerkId: 'clerk_2',
+          email: 'noname@example.com',
+        },
+      ];
+      vi.mocked(User.find).mockResolvedValue(mockCreators as never);
+
       const result = await getTests();
 
-      expect(Test.find).toHaveBeenCalledWith({});
+      expect(Test.find).toHaveBeenCalledWith({ openChallenge: { $ne: true } });
       expect(mockSort).toHaveBeenCalledWith({ createdAt: -1 });
-      expect(result).toEqual(mockTests);
+      expect(User.find).toHaveBeenCalledWith({
+        clerkId: { $in: ['clerk_1', 'clerk_2'] },
+      });
+      expect(result).toEqual([
+        expect.objectContaining({
+          title: 'Math Test',
+          createdByDisplay: 'John Doe',
+        }),
+        expect.objectContaining({
+          title: 'Science Test',
+          createdByDisplay: 'noname@example.com',
+        }),
+      ]);
     });
   });
 

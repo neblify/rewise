@@ -50,6 +50,8 @@ describe('Contact Actions', () => {
       expect(result.message).toBe(
         'Please fill in all required fields correctly.'
       );
+      expect(result.errors?.email).toBeDefined();
+      expect(result.errors?.subject).toBeDefined();
       expect(result.errors?.message).toBeDefined();
     });
 

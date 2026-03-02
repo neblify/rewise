@@ -1,14 +1,21 @@
-import { getAdminStats, getUsers, getTests, getQuestions } from './actions';
+import {
+  getAdminStats,
+  getUsers,
+  getTests,
+  getQuestions,
+  getChallengesForAdmin,
+} from './actions';
 import AdminView from './admin-view';
 
 export const dynamic = 'force-dynamic'; // Ensure fresh data on every request
 
 export default async function AdminPage() {
-  const [stats, users, tests, questions] = await Promise.all([
+  const [stats, users, tests, questions, challenges] = await Promise.all([
     getAdminStats(),
     getUsers(),
     getTests(),
     getQuestions(),
+    getChallengesForAdmin(),
   ]);
 
   return (
@@ -17,6 +24,7 @@ export default async function AdminPage() {
       users={users}
       tests={tests}
       questions={questions}
+      challenges={challenges}
     />
   );
 }

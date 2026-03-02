@@ -46,7 +46,7 @@ export default function ContactPage() {
                 htmlFor="email"
                 className="block text-sm font-semibold leading-6 text-foreground"
               >
-                Email (Optional)
+                Email <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
                 <input
@@ -54,7 +54,8 @@ export default function ContactPage() {
                   name="email"
                   id="email"
                   autoComplete="email"
-                  placeholder="you@example.com (if you want a reply)"
+                  required
+                  placeholder="you@example.com"
                   className="block w-full rounded-md border-0 px-3.5 py-2 text-foreground shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                 />
                 {state.errors?.email && (
@@ -70,13 +71,14 @@ export default function ContactPage() {
                 htmlFor="subject"
                 className="block text-sm font-semibold leading-6 text-foreground"
               >
-                Subject
+                Subject <span className="text-red-500">*</span>
               </label>
               <div className="mt-2.5">
                 <input
                   type="text"
                   name="subject"
                   id="subject"
+                  required
                   placeholder="Feature Request / Bug Report"
                   className="block w-full rounded-md border-0 px-3.5 py-2 text-foreground shadow-sm ring-1 ring-inset ring-border placeholder:text-muted-foreground focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                 />

@@ -50,7 +50,7 @@ GROQ_API_KEY=your_groq_api_key
 # Email (Resend – required for contact form and invite-to-friend emails)
 RESEND_API_KEY=your_resend_api_key
 # Optional: custom from address for invite-to-friend emails
-INVITE_FROM_EMAIL=ReWise <info@nios.neblify.com>
+INVITE_FROM_EMAIL=ReWise <info@rewise.online>
 # Optional: base URL for invite links (defaults to VERCEL_URL or https://rewise.app)
 NEXT_PUBLIC_APP_URL=https://your-app-url.com
 ```

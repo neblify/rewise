@@ -6,8 +6,8 @@ import { z } from 'zod';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 const contactSchema = z.object({
-  email: z.string().email().optional().or(z.literal('')),
-  subject: z.string().optional(),
+  email: z.string().min(1, 'Email is required').email('Please enter a valid email'),
+  subject: z.string().min(1, 'Subject is required'),
   message: z.string().min(10, 'Message must be at least 10 characters long'),
 });
 
@@ -44,15 +44,15 @@ export async function submitContactForm(
 
   try {
     const { data: _data, error } = await resend.emails.send({
-      from: 'ReWise <info@nios.neblify.com>', // Default testing domain
+      from: 'ReWise <info@rewise.online>', // Default testing domain
       to: ['deepak@neblify.com'],
-      replyTo: email || undefined,
-      subject: `New Contact Form Submission: ${subject || 'No Subject'}`,
+      replyTo: email,
+      subject: `New Contact Form Submission: ${subject}`,
       text: `
         New User Feedback/Issue Report
         
-        From: ${email || 'Anonymous'}
-        Subject: ${subject || 'N/A'}
+        From: ${email}
+        Subject: ${subject}
         
         Message:
         ${message}

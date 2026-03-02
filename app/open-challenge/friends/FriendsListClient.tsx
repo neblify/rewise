@@ -115,9 +115,6 @@ export default function FriendsListClient({
               <th className="text-left p-3 font-medium text-foreground">
                 Class
               </th>
-              <th className="text-left p-3 font-medium text-foreground">
-                Score to beat
-              </th>
               <th className="text-left p-3 font-medium text-foreground w-32">
                 Actions
               </th>
@@ -171,9 +168,6 @@ export default function FriendsListClient({
                         className="w-full rounded border border-border px-2 py-1 text-foreground bg-background"
                       />
                     </td>
-                    <td className="p-3 text-muted-foreground">
-                      {f.scoreToBeat ?? '—'}
-                    </td>
                     <td className="p-2">
                       <button
                         type="button"
@@ -197,9 +191,6 @@ export default function FriendsListClient({
                     <td className="p-3 text-foreground">{f.name ?? '—'}</td>
                     <td className="p-3 text-foreground">{f.location ?? '—'}</td>
                     <td className="p-3 text-foreground">{f.class ?? '—'}</td>
-                    <td className="p-3 text-muted-foreground">
-                      {f.scoreToBeat ?? '—'}
-                    </td>
                     <td className="p-2">
                       <button
                         type="button"

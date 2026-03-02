@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import {
   Users,
@@ -8,7 +9,13 @@ import {
   ClipboardList,
   PenTool,
   LayoutDashboard,
+  Trash2,
+  ShieldCheck,
 } from 'lucide-react';
+import { deleteUsers } from './actions';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { ADMIN_EMAILS } from '@/lib/constants/admins';
 
 interface AdminViewProps {
   stats: {
@@ -17,10 +24,11 @@ interface AdminViewProps {
     parents: number;
     tests: number;
     questions: number;
-    results: number;
+    challenges: number;
   };
   users: Array<{
     _id: string;
+    clerkId?: string;
     email: string;
     role: string;
     firstName?: string;
@@ -33,6 +41,7 @@ interface AdminViewProps {
     title: string;
     subject: string;
     createdAt: Date;
+    createdByDisplay: string;
     isPublished?: boolean;
     [key: string]: unknown;
   }>;
@@ -45,6 +54,12 @@ interface AdminViewProps {
     marks?: number;
     [key: string]: unknown;
   }>;
+  challenges: Array<{
+    _id: string;
+    title: string;
+    creatorName: string;
+    sampleResultId?: string | null;
+  }>;
 }
 
 export default function AdminView({
@@ -52,15 +67,67 @@ export default function AdminView({
   users,
   tests,
   questions,
+  challenges,
 }: AdminViewProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
+  const [userRoleFilter, setUserRoleFilter] = useState<string | null>(null);
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
+
+  const toggleUser = (id: string) => {
+    setSelectedUserIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAllUsers = () => {
+    const targetUsers = filteredUsers;
+    if (targetUsers.length === 0) return;
+    const allSelected = targetUsers.every(u => selectedUserIds.has(u._id));
+    if (allSelected) {
+      const next = new Set(selectedUserIds);
+      targetUsers.forEach(u => next.delete(u._id));
+      setSelectedUserIds(next);
+    } else {
+      const next = new Set(selectedUserIds);
+      targetUsers.forEach(u => next.add(u._id));
+      setSelectedUserIds(next);
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedUserIds.size === 0) return;
+    if (!confirm(`Delete ${selectedUserIds.size} user(s)? This cannot be undone.`)) return;
+    setDeleting(true);
+    try {
+      const res = await deleteUsers([...selectedUserIds]);
+      if (res?.error) alert(res.error);
+      else {
+        setSelectedUserIds(new Set());
+        router.refresh();
+      }
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const userDisplayName = (u: (typeof users)[0]) =>
+    [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.email;
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'tests', label: 'Tests', icon: FileText },
     { id: 'questions', label: 'Questions', icon: PenTool },
+    { id: 'challenges', label: 'Challenges', icon: ClipboardList },
   ];
+
+  const filteredUsers =
+    userRoleFilter != null ? users.filter(u => u.role === userRoleFilter) : users;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -74,6 +141,9 @@ export default function AdminView({
                 key={tab.id}
                 onClick={() => {
                   setActiveTab(tab.id);
+                  if (tab.id === 'users') {
+                    setUserRoleFilter(null);
+                  }
                 }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === tab.id
@@ -96,51 +166,105 @@ export default function AdminView({
             value={stats.students}
             icon={Users}
             color="blue"
+            onClick={() => {
+              setUserRoleFilter('student');
+              setActiveTab('users');
+            }}
+            clickable
           />
           <StatCard
             title="Total Teachers"
             value={stats.teachers}
             icon={Users}
             color="green"
+            onClick={() => {
+              setUserRoleFilter('teacher');
+              setActiveTab('users');
+            }}
+            clickable
           />
           <StatCard
             title="Total Parents"
             value={stats.parents}
             icon={Users}
             color="purple"
+            onClick={() => {
+              setUserRoleFilter('parent');
+              setActiveTab('users');
+            }}
+            clickable
           />
           <StatCard
             title="Total Tests"
             value={stats.tests}
             icon={FileText}
             color="indigo"
+            onClick={() => {
+              setActiveTab('tests');
+            }}
+            clickable
           />
           <StatCard
             title="Total Questions"
             value={stats.questions}
             icon={PenTool}
             color="yellow"
+            onClick={() => {
+              setActiveTab('questions');
+            }}
+            clickable
           />
           <StatCard
-            title="Total Results"
-            value={stats.results}
+            title="Total Challenges"
+            value={stats.challenges}
             icon={ClipboardList}
             color="pink"
+            onClick={() => {
+              setActiveTab('challenges');
+            }}
+            clickable
           />
         </div>
       )}
 
       {activeTab === 'users' && (
         <div className="bg-card shadow-sm rounded-lg border border-border overflow-hidden">
-          <div className="px-4 py-5 sm:px-6 border-b border-border">
+          <div className="px-4 py-5 sm:px-6 border-b border-border flex items-center justify-between gap-4">
             <h3 className="text-lg leading-6 font-medium text-foreground">
               All Users
             </h3>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteSelected}
+                disabled={deleting || selectedUserIds.size === 0}
+                className="inline-flex items-center gap-1"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete selected
+              </Button>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-border">
               <thead className="bg-background">
                 <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-10">
+                    <input
+                      type="checkbox"
+                      aria-label="Select all users"
+                      checked={
+                        filteredUsers.length > 0 &&
+                        filteredUsers.every(u => selectedUserIds.has(u._id))
+                      }
+                      onChange={toggleAllUsers}
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
+                    />
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Name
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Email
                   </th>
@@ -153,14 +277,46 @@ export default function AdminView({
                 </tr>
               </thead>
               <tbody className="bg-card divide-y divide-border">
-                {users.map(user => (
-                  <tr key={user._id}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                      {user.email}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
+                {filteredUsers.map(user => {
+                  const isAdminUser =
+                    user.role === 'admin' || ADMIN_EMAILS.includes(user.email);
+
+                  return (
+                    <tr key={user._id}>
+                      <td className="px-4 py-4 whitespace-nowrap text-sm">
+                        <input
+                          type="checkbox"
+                          aria-label={`Select user ${user.email}`}
+                          checked={selectedUserIds.has(user._id)}
+                          onChange={() => toggleUser(user._id)}
+                          className="h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
+                        />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`/admin/users/${user._id}`}
+                            className="text-primary hover:underline"
+                          >
+                            {userDisplayName(user)}
+                          </Link>
+                          {isAdminUser && (
+                            <span
+                              className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-purple-800"
+                              title="Admin user"
+                            >
+                              <ShieldCheck className="h-3 w-3" />
+                              Admin
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                        {user.email}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize
                         ${
                           user.role === 'teacher'
                             ? 'bg-green-100 text-green-800'
@@ -170,15 +326,16 @@ export default function AdminView({
                                 ? 'bg-purple-100 text-purple-800'
                                 : 'bg-muted text-muted-foreground'
                         }`}
-                      >
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      {formatDate(user.createdAt)}
-                    </td>
-                  </tr>
-                ))}
+                        >
+                          {user.role}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                        {formatDate(user.createdAt)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -203,6 +360,9 @@ export default function AdminView({
                     Subject
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Created By
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -212,13 +372,21 @@ export default function AdminView({
               </thead>
               <tbody className="bg-card divide-y divide-border">
                 {tests.map(test => (
-                  <tr key={test._id}>
+                  <tr key={test._id} className="hover:bg-muted transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                      {test.title}
+                      <Link
+                        href={`/admin/tests/${test._id}`}
+                        className="text-primary hover:underline"
+                      >
+                        {test.title}
+                      </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                       {test.subject}
                     </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                          {test.createdByDisplay}
+                        </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
@@ -285,6 +453,38 @@ export default function AdminView({
           </div>
         </div>
       )}
+
+      {activeTab === 'challenges' && (
+        <div className="bg-card shadow-sm rounded-lg border border-border overflow-hidden">
+          <div className="px-4 py-5 sm:px-6 border-b border-border">
+            <h3 className="text-lg leading-6 font-medium text-foreground">
+              Open Challenges
+            </h3>
+          </div>
+          <div className="divide-y divide-border">
+            {challenges.length === 0 ? (
+              <p className="px-4 py-6 text-sm text-muted-foreground">
+                No Open Challenges found.
+              </p>
+            ) : (
+              challenges.map(challenge => (
+                <Link
+                  key={challenge._id}
+                  href={`/admin/challenges/${challenge._id}`}
+                  className="block px-4 py-4 hover:bg-muted transition-colors"
+                >
+                  <p className="font-medium text-foreground">
+                    {challenge.title}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Created by {challenge.creatorName}
+                  </p>
+                </Link>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -294,9 +494,18 @@ interface StatCardProps {
   value: number;
   icon: React.ComponentType<{ className?: string }>;
   color: string;
+  onClick?: () => void;
+  clickable?: boolean;
 }
 
-function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  color,
+  onClick,
+  clickable,
+}: StatCardProps) {
   const colorClasses: Record<string, string> = {
     blue: 'bg-blue-100 text-blue-600',
     green: 'bg-green-100 text-green-600',
@@ -307,7 +516,13 @@ function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
   };
 
   return (
-    <div className="bg-card overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6">
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full text-left bg-card overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6 ${
+        clickable ? 'cursor-pointer hover:bg-muted transition-colors' : ''
+      }`}
+    >
       <div className="flex items-center">
         <div className={`flex-shrink-0 rounded-md p-3 ${colorClasses[color]}`}>
           <Icon className="h-6 w-6" aria-hidden="true" />
@@ -323,6 +538,6 @@ function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
           </dd>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
