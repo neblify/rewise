@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
 import {
   Users,
@@ -8,7 +9,11 @@ import {
   ClipboardList,
   PenTool,
   LayoutDashboard,
+  Trash2,
 } from 'lucide-react';
+import { deleteUsers } from './actions';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 interface AdminViewProps {
   stats: {
@@ -21,6 +26,7 @@ interface AdminViewProps {
   };
   users: Array<{
     _id: string;
+    clerkId?: string;
     email: string;
     role: string;
     firstName?: string;
@@ -53,7 +59,43 @@ export default function AdminView({
   tests,
   questions,
 }: AdminViewProps) {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
+
+  const toggleUser = (id: string) => {
+    setSelectedUserIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAllUsers = () => {
+    if (selectedUserIds.size === users.length) setSelectedUserIds(new Set());
+    else setSelectedUserIds(new Set(users.map(u => u._id)));
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedUserIds.size === 0) return;
+    if (!confirm(`Delete ${selectedUserIds.size} user(s)? This cannot be undone.`)) return;
+    setDeleting(true);
+    try {
+      const res = await deleteUsers([...selectedUserIds]);
+      if (res?.error) alert(res.error);
+      else {
+        setSelectedUserIds(new Set());
+        router.refresh();
+      }
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const userDisplayName = (u: (typeof users)[0]) =>
+    [u.firstName, u.lastName].filter(Boolean).join(' ').trim() || u.email;
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -132,15 +174,42 @@ export default function AdminView({
 
       {activeTab === 'users' && (
         <div className="bg-card shadow-sm rounded-lg border border-border overflow-hidden">
-          <div className="px-4 py-5 sm:px-6 border-b border-border">
+          <div className="px-4 py-5 sm:px-6 border-b border-border flex items-center justify-between gap-4">
             <h3 className="text-lg leading-6 font-medium text-foreground">
               All Users
             </h3>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteSelected}
+                disabled={deleting || selectedUserIds.size === 0}
+                className="inline-flex items-center gap-1"
+              >
+                <Trash2 className="h-4 w-4" />
+                Delete selected
+              </Button>
+            </div>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-border">
               <thead className="bg-background">
                 <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider w-10">
+                    <input
+                      type="checkbox"
+                      aria-label="Select all users"
+                      checked={
+                        users.length > 0 &&
+                        selectedUserIds.size === users.length
+                      }
+                      onChange={toggleAllUsers}
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
+                    />
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Name
+                  </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Email
                   </th>
@@ -155,6 +224,23 @@ export default function AdminView({
               <tbody className="bg-card divide-y divide-border">
                 {users.map(user => (
                   <tr key={user._id}>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">
+                      <input
+                        type="checkbox"
+                        aria-label={`Select user ${user.email}`}
+                        checked={selectedUserIds.has(user._id)}
+                        onChange={() => toggleUser(user._id)}
+                        className="h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                      <Link
+                        href={`/admin/users/${user._id}`}
+                        className="text-primary hover:underline"
+                      >
+                        {userDisplayName(user)}
+                      </Link>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
                       {user.email}
                     </td>
