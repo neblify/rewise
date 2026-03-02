@@ -39,10 +39,95 @@ export async function getUsers(role?: string) {
 
 export async function getTests() {
   await dbConnect();
-  // Populate createdBy to get teacher name if needed, assuming createdBy is just an ID string currently
-  // If createdBy was a ref, we would populate. Since it's a clerkId string, we might need to fetch user separately or just show the ID.
-  const tests = await Test.find({}).sort({ createdAt: -1 });
-  return JSON.parse(JSON.stringify(tests));
+  const tests = await Test.find({ openChallenge: { $ne: true } }).sort({
+    createdAt: -1,
+  });
+
+  if (!tests.length) {
+    return [];
+  }
+
+  const plainTests = JSON.parse(
+    JSON.stringify(
+      tests as Array<{
+        _id: unknown;
+        title?: unknown;
+        subject?: unknown;
+        createdAt?: unknown;
+        isPublished?: unknown;
+        createdBy?: unknown;
+        [key: string]: unknown;
+      }>
+    )
+  );
+
+  const clerkIds = Array.from(
+    new Set(
+      plainTests
+        .map(t => t.createdBy)
+        .filter((id): id is string => typeof id === 'string' && id.trim().length)
+    )
+  );
+
+  let creators: Array<{
+    clerkId?: unknown;
+    firstName?: unknown;
+    lastName?: unknown;
+    email?: unknown;
+  }> = [];
+
+  if (clerkIds.length) {
+    const creatorDocs = await User.find({ clerkId: { $in: clerkIds } });
+    creators = JSON.parse(JSON.stringify(creatorDocs));
+  }
+
+  const creatorMap = new Map<
+    string,
+    { firstName?: string; lastName?: string; email?: string }
+  >();
+
+  for (const c of creators) {
+    const clerkId = typeof c.clerkId === 'string' ? c.clerkId : undefined;
+    if (!clerkId) continue;
+    creatorMap.set(clerkId, {
+      firstName:
+        typeof c.firstName === 'string' && c.firstName.trim().length
+          ? c.firstName
+          : undefined,
+      lastName:
+        typeof c.lastName === 'string' && c.lastName.trim().length
+          ? c.lastName
+          : undefined,
+      email:
+        typeof c.email === 'string' && c.email.trim().length
+          ? c.email
+          : undefined,
+    });
+  }
+
+  const enrichedTests = plainTests.map(t => {
+    const createdBy =
+      typeof t.createdBy === 'string' && t.createdBy.trim().length
+        ? t.createdBy.trim()
+        : undefined;
+    const creator = createdBy ? creatorMap.get(createdBy) : undefined;
+    const fullName =
+      creator &&
+      [creator.firstName, creator.lastName].filter(Boolean).join(' ').trim();
+
+    const createdByDisplay =
+      (fullName && fullName.length > 0) ||
+      (creator?.email && creator.email.trim().length > 0)
+        ? fullName || creator!.email!.trim()
+        : createdBy || 'Deleted user';
+
+    return {
+      ...t,
+      createdByDisplay,
+    };
+  });
+
+  return enrichedTests;
 }
 
 export async function getQuestions() {

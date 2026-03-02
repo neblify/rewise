@@ -108,17 +108,60 @@ describe('Admin Actions', () => {
 
   describe('getTests', () => {
     it('should fetch all tests sorted by date', async () => {
-      const mockTests = [{ title: 'Math Test' }];
+      const mockTests = [
+        {
+          _id: '1',
+          title: 'Math Test',
+          subject: 'Math',
+          createdAt: new Date(),
+          isPublished: true,
+          createdBy: 'clerk_1',
+        },
+        {
+          _id: '2',
+          title: 'Science Test',
+          subject: 'Science',
+          createdAt: new Date(),
+          isPublished: false,
+          createdBy: 'clerk_2',
+        },
+      ];
       const mockSort = vi.fn().mockResolvedValue(mockTests);
       vi.mocked(Test.find).mockReturnValue({
         sort: mockSort,
       } as unknown as ReturnType<typeof Test.find>);
 
+      const mockCreators = [
+        {
+          clerkId: 'clerk_1',
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john@example.com',
+        },
+        {
+          clerkId: 'clerk_2',
+          email: 'noname@example.com',
+        },
+      ];
+      vi.mocked(User.find).mockResolvedValue(mockCreators as never);
+
       const result = await getTests();
 
-      expect(Test.find).toHaveBeenCalledWith({});
+      expect(Test.find).toHaveBeenCalledWith({ openChallenge: { $ne: true } });
       expect(mockSort).toHaveBeenCalledWith({ createdAt: -1 });
-      expect(result).toEqual(mockTests);
+      expect(User.find).toHaveBeenCalledWith({
+        clerkId: { $in: ['clerk_1', 'clerk_2'] },
+      });
+      expect(result).toEqual([
+        expect.objectContaining({
+          title: 'Math Test',
+          createdByDisplay: 'John Doe',
+        }),
+        expect.objectContaining({
+          title: 'Science Test',
+          createdByDisplay: 'noname@example.com',
+        }),
+      ]);
     });
   });
 
