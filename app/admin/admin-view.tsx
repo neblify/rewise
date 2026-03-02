@@ -372,9 +372,14 @@ export default function AdminView({
               </thead>
               <tbody className="bg-card divide-y divide-border">
                 {tests.map(test => (
-                  <tr key={test._id}>
+                  <tr key={test._id} className="hover:bg-muted transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                      {test.title}
+                      <Link
+                        href={`/admin/tests/${test._id}`}
+                        className="text-primary hover:underline"
+                      >
+                        {test.title}
+                      </Link>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                       {test.subject}
