@@ -24,7 +24,7 @@ interface AdminViewProps {
     parents: number;
     tests: number;
     questions: number;
-    results: number;
+    challenges: number;
   };
   users: Array<{
     _id: string;
@@ -53,6 +53,12 @@ interface AdminViewProps {
     marks?: number;
     [key: string]: unknown;
   }>;
+  challenges: Array<{
+    _id: string;
+    title: string;
+    creatorName: string;
+    sampleResultId?: string | null;
+  }>;
 }
 
 export default function AdminView({
@@ -60,9 +66,11 @@ export default function AdminView({
   users,
   tests,
   questions,
+  challenges,
 }: AdminViewProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('overview');
+  const [userRoleFilter, setUserRoleFilter] = useState<string | null>(null);
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
 
@@ -76,8 +84,18 @@ export default function AdminView({
   };
 
   const toggleAllUsers = () => {
-    if (selectedUserIds.size === users.length) setSelectedUserIds(new Set());
-    else setSelectedUserIds(new Set(users.map(u => u._id)));
+    const targetUsers = filteredUsers;
+    if (targetUsers.length === 0) return;
+    const allSelected = targetUsers.every(u => selectedUserIds.has(u._id));
+    if (allSelected) {
+      const next = new Set(selectedUserIds);
+      targetUsers.forEach(u => next.delete(u._id));
+      setSelectedUserIds(next);
+    } else {
+      const next = new Set(selectedUserIds);
+      targetUsers.forEach(u => next.add(u._id));
+      setSelectedUserIds(next);
+    }
   };
 
   const handleDeleteSelected = async () => {
@@ -104,7 +122,11 @@ export default function AdminView({
     { id: 'users', label: 'Users', icon: Users },
     { id: 'tests', label: 'Tests', icon: FileText },
     { id: 'questions', label: 'Questions', icon: PenTool },
+    { id: 'challenges', label: 'Challenges', icon: ClipboardList },
   ];
+
+  const filteredUsers =
+    userRoleFilter != null ? users.filter(u => u.role === userRoleFilter) : users;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -118,6 +140,9 @@ export default function AdminView({
                 key={tab.id}
                 onClick={() => {
                   setActiveTab(tab.id);
+                  if (tab.id === 'users') {
+                    setUserRoleFilter(null);
+                  }
                 }}
                 className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                   activeTab === tab.id
@@ -140,36 +165,63 @@ export default function AdminView({
             value={stats.students}
             icon={Users}
             color="blue"
+            onClick={() => {
+              setUserRoleFilter('student');
+              setActiveTab('users');
+            }}
+            clickable
           />
           <StatCard
             title="Total Teachers"
             value={stats.teachers}
             icon={Users}
             color="green"
+            onClick={() => {
+              setUserRoleFilter('teacher');
+              setActiveTab('users');
+            }}
+            clickable
           />
           <StatCard
             title="Total Parents"
             value={stats.parents}
             icon={Users}
             color="purple"
+            onClick={() => {
+              setUserRoleFilter('parent');
+              setActiveTab('users');
+            }}
+            clickable
           />
           <StatCard
             title="Total Tests"
             value={stats.tests}
             icon={FileText}
             color="indigo"
+            onClick={() => {
+              setActiveTab('tests');
+            }}
+            clickable
           />
           <StatCard
             title="Total Questions"
             value={stats.questions}
             icon={PenTool}
             color="yellow"
+            onClick={() => {
+              setActiveTab('questions');
+            }}
+            clickable
           />
           <StatCard
-            title="Total Results"
-            value={stats.results}
+            title="Total Challenges"
+            value={stats.challenges}
             icon={ClipboardList}
             color="pink"
+            onClick={() => {
+              setActiveTab('challenges');
+            }}
+            clickable
           />
         </div>
       )}
@@ -202,8 +254,8 @@ export default function AdminView({
                       type="checkbox"
                       aria-label="Select all users"
                       checked={
-                        users.length > 0 &&
-                        selectedUserIds.size === users.length
+                        filteredUsers.length > 0 &&
+                        filteredUsers.every(u => selectedUserIds.has(u._id))
                       }
                       onChange={toggleAllUsers}
                       className="h-4 w-4 rounded border-border text-primary focus:ring-2 focus:ring-primary focus:ring-offset-0"
@@ -224,7 +276,7 @@ export default function AdminView({
                 </tr>
               </thead>
               <tbody className="bg-card divide-y divide-border">
-                {users.map(user => {
+                {filteredUsers.map(user => {
                   const isAdminUser =
                     user.role === 'admin' || ADMIN_EMAILS.includes(user.email);
 
@@ -389,6 +441,43 @@ export default function AdminView({
           </div>
         </div>
       )}
+
+      {activeTab === 'challenges' && (
+        <div className="bg-card shadow-sm rounded-lg border border-border overflow-hidden">
+          <div className="px-4 py-5 sm:px-6 border-b border-border">
+            <h3 className="text-lg leading-6 font-medium text-foreground">
+              Open Challenges
+            </h3>
+          </div>
+          <div className="divide-y divide-border">
+            {challenges.length === 0 ? (
+              <p className="px-4 py-6 text-sm text-muted-foreground">
+                No Open Challenges found.
+              </p>
+            ) : (
+              challenges.map(challenge => {
+                const href = challenge.sampleResultId
+                  ? `/open-challenge/result/${challenge.sampleResultId}`
+                  : `/open-challenge/test/${challenge._id}`;
+                return (
+                  <Link
+                    key={challenge._id}
+                    href={href}
+                    className="block px-4 py-4 hover:bg-muted transition-colors"
+                  >
+                    <p className="font-medium text-foreground">
+                      {challenge.title}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Created by {challenge.creatorName}
+                    </p>
+                  </Link>
+                );
+              })
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -398,9 +487,18 @@ interface StatCardProps {
   value: number;
   icon: React.ComponentType<{ className?: string }>;
   color: string;
+  onClick?: () => void;
+  clickable?: boolean;
 }
 
-function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  color,
+  onClick,
+  clickable,
+}: StatCardProps) {
   const colorClasses: Record<string, string> = {
     blue: 'bg-blue-100 text-blue-600',
     green: 'bg-green-100 text-green-600',
@@ -411,7 +509,13 @@ function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
   };
 
   return (
-    <div className="bg-card overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6">
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full text-left bg-card overflow-hidden shadow rounded-lg px-4 py-5 sm:p-6 ${
+        clickable ? 'cursor-pointer hover:bg-muted transition-colors' : ''
+      }`}
+    >
       <div className="flex items-center">
         <div className={`flex-shrink-0 rounded-md p-3 ${colorClasses[color]}`}>
           <Icon className="h-6 w-6" aria-hidden="true" />
@@ -427,6 +531,6 @@ function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
           </dd>
         </div>
       </div>
-    </div>
+    </button>
   );
 }

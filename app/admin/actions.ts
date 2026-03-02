@@ -10,14 +10,14 @@ import Friend from '@/lib/db/models/Friend';
 export async function getAdminStats() {
   await dbConnect();
 
-  const [teachers, students, parents, tests, questions, results] =
+  const [teachers, students, parents, tests, questions, challenges] =
     await Promise.all([
       User.countDocuments({ role: 'teacher' }),
       User.countDocuments({ role: 'student' }),
       User.countDocuments({ role: 'parent' }),
       Test.countDocuments(),
       Question.countDocuments(),
-      Result.countDocuments(),
+      Test.countDocuments({ openChallenge: true }),
     ]);
 
   return {
@@ -26,7 +26,7 @@ export async function getAdminStats() {
     parents,
     tests,
     questions,
-    results,
+    challenges,
   };
 }
 
@@ -49,6 +49,68 @@ export async function getQuestions() {
   await dbConnect();
   const questions = await Question.find({}).sort({ createdAt: -1 }).limit(100); // Limit to 100 for now to avoid performance issues
   return JSON.parse(JSON.stringify(questions));
+}
+
+export async function getChallengesForAdmin() {
+  await dbConnect();
+
+  const tests = await Test.find({ openChallenge: true })
+    .select('_id title createdBy')
+    .sort({ createdAt: -1 })
+    .lean();
+
+  if (!tests.length) {
+    return [];
+  }
+
+  const testIds = tests.map(t => t._id);
+
+  const [results, creators] = await Promise.all([
+    Result.find({ testId: { $in: testIds } })
+      .select('_id testId createdAt')
+      .sort({ createdAt: 1 })
+      .lean(),
+    User.find({ clerkId: { $in: tests.map(t => t.createdBy).filter(Boolean) } })
+      .select('clerkId firstName lastName email')
+      .lean(),
+  ]);
+
+  const firstResultByTestId = new Map<string, string>();
+  for (const r of results) {
+    const key = r.testId?.toString();
+    if (!key || firstResultByTestId.has(key)) continue;
+    firstResultByTestId.set(key, r._id.toString());
+  }
+
+  const creatorMap = new Map<string, { firstName?: string; lastName?: string; email?: string }>();
+  for (const c of creators) {
+    creatorMap.set(c.clerkId as string, {
+      firstName: c.firstName as string | undefined,
+      lastName: c.lastName as string | undefined,
+      email: c.email as string | undefined,
+    });
+  }
+
+  return tests.map(t => {
+    const creator = creatorMap.get(t.createdBy as string);
+    const fullName =
+      creator &&
+      [creator.firstName, creator.lastName].filter(Boolean).join(' ').trim();
+    const creatorName =
+      (fullName && fullName.length > 0) ||
+      (creator?.email && creator.email.trim().length > 0)
+        ? fullName || creator!.email!.trim()
+        : 'Unknown';
+
+    const testIdStr = t._id.toString();
+
+    return {
+      _id: testIdStr,
+      title: (t.title as string) ?? 'Open Challenge',
+      creatorName,
+      sampleResultId: firstResultByTestId.get(testIdStr) ?? null,
+    };
+  });
 }
 
 export async function deleteUsers(userIds: string[]) {

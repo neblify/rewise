@@ -57,9 +57,12 @@ describe('Admin Actions', () => {
         if (q.role === 'parent') return Promise.resolve(50) as never;
         return Promise.resolve(0) as never;
       });
-      vi.mocked(Test.countDocuments).mockResolvedValue(5 as never);
+      vi.mocked(Test.countDocuments).mockImplementation((query?: unknown) => {
+        const q = (query || {}) as { openChallenge?: boolean };
+        if (q.openChallenge) return Promise.resolve(2) as never;
+        return Promise.resolve(5) as never;
+      });
       vi.mocked(Question.countDocuments).mockResolvedValue(50 as never);
-      vi.mocked(Result.countDocuments).mockResolvedValue(200 as never);
 
       const stats = await getAdminStats();
 
@@ -69,7 +72,7 @@ describe('Admin Actions', () => {
         parents: 50,
         tests: 5,
         questions: 50,
-        results: 200,
+        challenges: 2,
       });
     });
   });
