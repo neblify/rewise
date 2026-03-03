@@ -153,8 +153,9 @@ export async function addFriend(
     if (primaryEmail && primaryEmail === trimmed) {
       return { error: 'You cannot invite your own self for an Open Challenge.' };
     }
-  } catch {
+  } catch (error) {
     // If Clerk is unavailable, fall back to normal flow
+    console.error('Clerk self-invite check failed:', error);
   }
 
   try {
