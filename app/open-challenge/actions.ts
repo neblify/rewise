@@ -144,6 +144,19 @@ export async function addFriend(
   const trimmed = email.trim().toLowerCase();
   if (!trimmed) return { error: 'Email required' };
 
+  // Prevent users from inviting themselves for an Open Challenge
+  try {
+    const { clerkClient } = await import('@clerk/nextjs/server');
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    const primaryEmail = user.primaryEmailAddress?.emailAddress?.trim().toLowerCase();
+    if (primaryEmail && primaryEmail === trimmed) {
+      return { error: 'You cannot invite your own self for an Open Challenge.' };
+    }
+  } catch {
+    // If Clerk is unavailable, fall back to normal flow
+  }
+
   try {
     await dbConnect();
 
