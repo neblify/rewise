@@ -41,7 +41,6 @@ const TEACHER_NAV_LINKS: { href: string; label: string }[] = [
 
 const ADMIN_NAV_LINKS: { href: string; label: string }[] = [
   { href: '/admin', label: 'Overview' },
-  { href: '/open-challenge', label: 'Open Challenge' },
   { href: '/admin/course-material', label: 'Course Material' },
 ];
 
