@@ -65,21 +65,21 @@ export default async function ResultPage(props: Props) {
   const { id } = params;
 
   await dbConnect();
-  const result = await Result.findById(id).populate({
-    path: 'testId',
-    populate: [
-      {
-        path: 'sections.questions',
-      },
-      {
-        path: 'questions',
-      },
-    ],
-  });
+  const result = await Result.findById(id)
+    .populate({
+      path: 'testId',
+      populate: [
+        { path: 'sections.questions' },
+        { path: 'questions' },
+      ],
+    })
+    .lean();
 
   if (!result) notFound();
 
-  const populatedResult = result as unknown as PopulatedResult;
+  // Serialize to plain objects so Client Components receive no toJSON/circular refs
+  const plain = JSON.parse(JSON.stringify(result)) as unknown as PopulatedResult;
+  const populatedResult = plain;
   const test = populatedResult.testId;
   if ((test as { openChallenge?: boolean }).openChallenge) {
     redirect(`/open-challenge/result/${id}`);

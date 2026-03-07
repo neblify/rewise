@@ -6,6 +6,8 @@ import { ITest, IQuestion } from '@/lib/db/models/Test';
 import { submitTest } from './actions';
 import { cn } from '@/lib/utils';
 import { Clock } from 'lucide-react';
+import { PictureBasedFrame } from '@/components/PictureBasedFrame';
+import { ImagePreviewModal } from '@/components/ImagePreviewModal';
 
 function MatchColumnQuestion({
   leftColumn,
@@ -152,6 +154,7 @@ export default function TestTaker({
 }) {
   const [answers, setAnswers] = useState<Record<string, string | number[]>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imagePreviewSrc, setImagePreviewSrc] = useState<string | null>(null);
   const router = useRouter();
 
   const totalSeconds =
@@ -246,17 +249,18 @@ export default function TestTaker({
               </span>
             </div>
             {q.mediaUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={q.mediaUrl}
-                alt="Question Image"
-                className="mt-4 rounded-lg max-h-64 object-cover"
-              />
+              <div className="mt-4">
+                <PictureBasedFrame
+                  src={q.mediaUrl}
+                  alt="Question image"
+                  onClick={() => setImagePreviewSrc(q.mediaUrl ?? null)}
+                />
+              </div>
             )}
           </div>
 
           {/* Render Input based on Type */}
-          {q.type === 'mcq' && (
+          {(q.type === 'mcq' || (q.type === 'picture_based' && (q.options?.length ?? 0) > 0)) && (
             <div className="space-y-2">
               {q.options?.map(opt => (
                 <label
@@ -298,14 +302,14 @@ export default function TestTaker({
             </div>
           )}
 
-          {[
+          {([
             'fill_in_blanks',
             'single_word',
             'one_sentence',
             'brief_answer',
-            'picture_based',
             'difference',
-          ].includes(q.type) && (
+          ].includes(q.type) ||
+            (q.type === 'picture_based' && !(q.options?.length ?? 0))) && (
             <textarea
               value={(answers[uniqueId] as string) || ''}
               onChange={e => handleAnswerChange(uniqueId, e.target.value)}
@@ -398,6 +402,12 @@ export default function TestTaker({
           </button>
         </div>
       </div>
+
+      <ImagePreviewModal
+        src={imagePreviewSrc}
+        onClose={() => setImagePreviewSrc(null)}
+        alt="Question image"
+      />
     </div>
   );
 }

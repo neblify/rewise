@@ -109,6 +109,38 @@ describe('AI Actions', () => {
       );
       expect(result.error).toBeDefined();
     });
+
+    it('should return picture_based questions with imagePrompt for client Puter generation', async () => {
+      const mockAIResponse = {
+        questions: [
+          {
+            text: 'What is shown in this diagram?',
+            type: 'picture_based',
+            correctAnswer: 'Water cycle',
+            marks: 2,
+            imagePrompt:
+              'A labeled diagram of the water cycle showing evaporation, condensation, precipitation',
+          },
+        ],
+      };
+      mockedCreate.mockResolvedValueOnce({
+        choices: [{ message: { content: JSON.stringify(mockAIResponse) } }],
+      });
+      const result = await generateQuestionsAI(
+        'Science',
+        1,
+        'picture_based',
+        'medium',
+        'CBSE',
+        '8'
+      );
+      expect(result.data).toBeDefined();
+      expect(result.data).toHaveLength(1);
+      expect(result.data![0].type).toBe('picture_based');
+      expect((result.data![0] as { imagePrompt?: string }).imagePrompt).toBe(
+        'A labeled diagram of the water cycle showing evaporation, condensation, precipitation'
+      );
+    });
   });
 
   // Note: PDF extraction tests might fail if 'createRequire' isn't fully mocked for the server action context in Vitest.

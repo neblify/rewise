@@ -4,6 +4,7 @@ import React, { useActionState, useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createTest } from './actions';
 import { extractQuestionsFromPdf, generateQuestionsAI } from './ai-actions';
+import { generateImageWithPuter } from '@/lib/puter/image';
 import { DEFAULT_SECTION_TITLE, isEmptyDefaultSection } from './lib/sections';
 import {
   Plus,
@@ -47,6 +48,7 @@ interface QuestionState {
   correctAnswer?: string | number[];
   marks: number;
   mediaUrl?: string;
+  imagePrompt?: string; // for AI picture_based: filled by server, used by client to generate image via Puter
 }
 
 interface SectionState {
@@ -64,6 +66,8 @@ import {
 import { getGradesForBoard } from '@/lib/constants/levels';
 import { defaultTimedState, appendTimedToFormData } from './lib/timed';
 import { TestTimeLimitField } from './components/TestTimeLimitField';
+import { PictureBasedFrame } from '@/components/PictureBasedFrame';
+import { ImagePreviewModal } from '@/components/ImagePreviewModal';
 
 type CreateMode = 'ai' | 'manual' | 'pdf';
 
@@ -118,6 +122,7 @@ function CreateTestPageContent() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showOverwriteConfirm, setShowOverwriteConfirm] = useState(false);
+  const [imagePreviewSrc, setImagePreviewSrc] = useState<string | null>(null);
 
   const hasGeneratedContent = sections.some(
     s => (s.questions?.length ?? 0) > 0
@@ -226,6 +231,16 @@ function CreateTestPageContent() {
       );
 
       if (res.data) {
+        const questions = res.data as QuestionState[];
+        for (let i = 0; i < questions.length; i++) {
+          const q = questions[i];
+          const qExt = q as QuestionState & { imagePrompt?: string };
+          if (q.type === 'picture_based' && typeof qExt.imagePrompt === 'string') {
+            const mediaUrl = await generateImageWithPuter(qExt.imagePrompt);
+            q.mediaUrl = mediaUrl ?? undefined;
+            delete qExt.imagePrompt;
+          }
+        }
         const timedSuffix =
           timedState.isTimed === 'timed'
             ? ` (Timed ${timedState.durationHours} Hours : ${String(timedState.durationMinutes).padStart(2, '0')} Minutes)`
@@ -234,7 +249,7 @@ function CreateTestPageContent() {
           id: Date.now(),
           title: `AI Generated: ${aiTopic}${timedSuffix}`,
           description: `${aiDifficulty} - ${aiType}`,
-          questions: res.data,
+          questions,
         };
         setSections(
           replaceExisting || isEmptyDefaultSection(sections)
@@ -669,6 +684,14 @@ function CreateTestPageContent() {
                                       placeholder={`Question ${questionNo}`}
                                       rows={2}
                                     />
+                                    {q.type === 'picture_based' && q.mediaUrl && (
+                                      <PictureBasedFrame
+                                        src={q.mediaUrl}
+                                        alt="Question"
+                                        className="mt-2"
+                                        onClick={() => setImagePreviewSrc(q.mediaUrl ?? null)}
+                                      />
+                                    )}
                                   </td>
                                   <td className="px-3 py-2 whitespace-nowrap">
                                     <select
@@ -754,23 +777,25 @@ function CreateTestPageContent() {
                                     </button>
                                   </td>
                                 </tr>
-                                {q.type === 'mcq' && (
+                                {(q.type === 'mcq' || q.type === 'picture_based') && (
                                   <tr>
                                     <td
                                       colSpan={5}
                                       className="px-3 py-2 bg-background"
                                     >
                                       <div className="grid grid-cols-2 gap-2">
-                                        {q.options?.map(
+                                        {(q.options ?? (q.type === 'picture_based' ? ['', '', '', ''] : [])).map(
                                           (opt: string, optIndex: number) => (
                                             <input
                                               key={optIndex}
                                               type="text"
                                               value={opt}
                                               onChange={e => {
-                                                const newOpts = [
-                                                  ...(q.options || []),
-                                                ];
+                                                const base = q.options || [];
+                                                const newOpts = [...base];
+                                                if (q.type === 'picture_based')
+                                                  while (newOpts.length < 4)
+                                                    newOpts.push('');
                                                 newOpts[optIndex] =
                                                   e.target.value;
                                                 updateQuestionExp(
@@ -1145,7 +1170,7 @@ function CreateTestPageContent() {
                                     </td>
                                   </tr>
                                 )}
-                                {!['mcq', 'match_columns'].includes(q.type) && (
+                                {!['mcq', 'match_columns', 'picture_based'].includes(q.type) && (
                                   <tr>
                                     <td
                                       colSpan={5}
@@ -1380,6 +1405,12 @@ function CreateTestPageContent() {
           </div>
         </div>
       )}
+
+      <ImagePreviewModal
+        src={imagePreviewSrc}
+        onClose={() => setImagePreviewSrc(null)}
+        alt="Question image"
+      />
     </div>
   );
 }

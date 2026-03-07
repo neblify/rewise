@@ -147,16 +147,18 @@ export async function generateQuestionsAI(
   
     interface Question {
         text: string;
-        type: string; // Must be one of: 'mcq', 'fill_in_blanks', 'true_false', 'match_columns', 'single_word', 'brief_answer'
-        options?: string[]; // Required for 'mcq' (4 options)
-        correctAnswer: string; 
+        type: string; // Must be one of: 'mcq', 'fill_in_blanks', 'true_false', 'match_columns', 'single_word', 'brief_answer', 'picture_based'
+        options?: string[]; // Required for 'mcq' (4 options); optional for 'picture_based' if MCQ-style
+        correctAnswer: string;
         marks: number; // Suggest marks based on difficulty (1-5)
+        imagePrompt?: string; // REQUIRED for 'picture_based': a detailed, concrete description for generating the question image (e.g. "A labeled diagram of the water cycle showing evaporation, condensation, precipitation")
     }
 
     Notes:
     - For 'mcq', provide 4 options in 'options' array.
     - For 'true_false', options should be ignored, correctAnswer must be "True" or "False".
     - For 'match_columns', provide pairs in 'options' array as "Key - Value" (e.g. ["Father - The male parent", "Mother - The female parent"]). One string per pair; we will split into left column (keys) and right column (values).
+    - For 'picture_based': (1) Set "type" to "picture_based". (2) Provide "imagePrompt": a clear, detailed, educational description of the image to generate (diagrams, charts, scientific illustrations; no text in the image). (3) "text" is the question the student answers about the image. (4) Provide "options": exactly 4 answer choices (array of 4 strings). (5) Provide "correctAnswer": the exact string that matches one of the 4 options. Keep imagePrompt suitable for an image generator (concrete, visual, academic).
     - Ensure questions are academic and appropriate.
     
     Respond ONLY with the JSON array.
@@ -236,7 +238,7 @@ export async function generateQuestionsAI(
           marks: (q.marks as number) || 1,
         };
       }
-      return {
+      const base = {
         id: Date.now() + Math.random(),
         text: q.text as string,
         type: effectiveType,
@@ -244,6 +246,10 @@ export async function generateQuestionsAI(
         correctAnswer: q.correctAnswer as string,
         marks: (q.marks as number) || 1,
       };
+      if (effectiveType === 'picture_based' && typeof q.imagePrompt === 'string') {
+        (base as Record<string, unknown>).imagePrompt = q.imagePrompt;
+      }
+      return base;
     });
 
     return { data: sanitizedQuestions };
