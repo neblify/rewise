@@ -296,7 +296,7 @@ export default function EditTestForm({
             q.type === 'picture_based' &&
             typeof q.imagePrompt === 'string'
           ) {
-            const mediaUrl = await generateImageWithPuter(q.imagePrompt);
+            const mediaUrl = await generateImageWithPuter(q.imagePrompt, true);
             q.mediaUrl = mediaUrl ?? undefined;
             delete q.imagePrompt;
           }

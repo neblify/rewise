@@ -236,7 +236,7 @@ function CreateTestPageContent() {
           const q = questions[i];
           const qExt = q as QuestionState & { imagePrompt?: string };
           if (q.type === 'picture_based' && typeof qExt.imagePrompt === 'string') {
-            const mediaUrl = await generateImageWithPuter(qExt.imagePrompt);
+            const mediaUrl = await generateImageWithPuter(qExt.imagePrompt, true);
             q.mediaUrl = mediaUrl ?? undefined;
             delete qExt.imagePrompt;
           }
