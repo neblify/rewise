@@ -78,6 +78,8 @@ export default async function TeacherDashboard(props: Props) {
   if (board && board !== 'All') {
     filter.board = board;
   }
+  // Exclude Open Challenge tests from the Teacher "All Tests" view
+  filter.openChallenge = { $ne: true };
 
   // Build Sort
   let sortOptions: Record<string, 1 | -1> = {};

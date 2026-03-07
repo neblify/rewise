@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getStudentResults, getLinkedStudents } from './actions';
+import { ScrollToTop } from '@/components/ScrollToTop';
 import { Search, User as UserIcon, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { formatDate } from '@/lib/utils';
-import { useEffect } from 'react';
 
 interface ParentResult {
   _id: string;
@@ -74,6 +74,7 @@ export default function ParentDashboard() {
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-8">
+      <ScrollToTop />
       <div>
         <h1 className="text-3xl font-bold text-foreground">Parent Dashboard</h1>
         <p className="text-muted-foreground mt-1">

@@ -14,8 +14,10 @@ import {
 } from 'lucide-react';
 import { deleteUsers } from './actions';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { ADMIN_EMAILS } from '@/lib/constants/admins';
+import type { ISection } from '@/lib/db/models/Test';
 
 interface AdminViewProps {
   stats: {
@@ -40,9 +42,15 @@ interface AdminViewProps {
     _id: string;
     title: string;
     subject: string;
+    board?: string;
+    grade?: string;
+    sections?: ISection[];
     createdAt: Date;
+    updatedAt?: Date;
     createdByDisplay: string;
     isPublished?: boolean;
+    isTimed?: boolean;
+    durationMinutes?: number;
     [key: string]: unknown;
   }>;
   questions: Array<{
@@ -354,52 +362,106 @@ export default function AdminView({
               <thead className="bg-background">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Title
+                    Test Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Subject
+                    Subject & Board
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    Questions
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Created By
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Status
+                    Dates
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Date
+                    Status
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-card divide-y divide-border">
-                {tests.map(test => (
-                  <tr key={test._id} className="hover:bg-muted transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
-                      <Link
-                        href={`/admin/tests/${test._id}`}
-                        className="text-primary hover:underline"
-                      >
-                        {test.title}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      {test.subject}
-                    </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                          {test.createdByDisplay}
-                        </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                        ${test.isPublished ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}
-                      >
-                        {test.isPublished ? 'Published' : 'Draft'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
-                      {formatDate(test.createdAt)}
-                    </td>
-                  </tr>
-                ))}
+                {tests.map(test => {
+                  const questionCount =
+                    test.sections?.reduce(
+                      (acc: number, s: ISection) =>
+                        acc + (s.questions?.length || 0),
+                      0
+                    ) || 0;
+                  return (
+                    <tr
+                      key={test._id}
+                      className="hover:bg-muted transition-colors"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-foreground">
+                        <Link
+                          href={`/admin/tests/${test._id}`}
+                          className="text-primary hover:underline"
+                        >
+                          {test.title}
+                        </Link>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-col items-start gap-1">
+                          <Badge
+                            variant="outline"
+                            className="font-medium text-foreground bg-card"
+                          >
+                            {test.subject}
+                          </Badge>
+                          <span className="text-muted-foreground text-xs">
+                            {test.board ?? '—'}{' '}
+                            {test.grade ? `• Class ${test.grade}` : ''}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                        {questionCount}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
+                        {test.createdByDisplay}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-muted-foreground text-xs space-y-1">
+                        <div>
+                          <span className="text-muted-foreground">Created:</span>{' '}
+                          {formatDate(test.createdAt)}
+                        </div>
+                        {test.updatedAt && (
+                          <div>
+                            <span className="text-muted-foreground">Updated:</span>{' '}
+                            {formatDate(test.updatedAt)}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1.5">
+                          <Badge
+                            variant={test.isPublished ? 'default' : 'secondary'}
+                            className={
+                              test.isPublished
+                                ? 'bg-green-100 text-green-700 hover:bg-green-200 border-green-200'
+                                : 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200 border-yellow-200'
+                            }
+                          >
+                            {test.isPublished ? 'Published' : 'Draft'}
+                          </Badge>
+                          {test.isPublished && test.isTimed && (
+                            <Badge
+                              variant="outline"
+                              className="bg-amber-50 text-amber-700 border-amber-200 text-xs"
+                            >
+                              Timed
+                              {test.durationMinutes != null &&
+                                test.durationMinutes > 0 &&
+                                ` ${Math.floor(test.durationMinutes / 60)}h ${test.durationMinutes % 60}m`}
+                            </Badge>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

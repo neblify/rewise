@@ -241,6 +241,20 @@
     @apply bg-background text-foreground;
     font-family: var(--font-nunito), system-ui, sans-serif;
   }
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M4 6l4 4 4-4' stroke='currentColor' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 1.75rem center;
+    background-size: 0.75rem 0.75rem;
+    padding-right: 2.75rem;
+    color: inherit;
+  }
+  select::-ms-expand {
+    display: none;
+  }
 }
 
 @layer utilities {
