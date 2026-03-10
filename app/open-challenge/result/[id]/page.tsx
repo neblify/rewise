@@ -66,17 +66,22 @@ export default async function OpenChallengeResultPage(props: Props) {
   const { id } = params;
 
   await dbConnect();
-  const result = await Result.findById(id).populate({
-    path: 'testId',
-    populate: [
-      { path: 'sections.questions' },
-      { path: 'questions' },
-    ],
-  });
+  const rawResult = await Result.findById(id)
+    .populate({
+      path: 'testId',
+      populate: [
+        { path: 'sections.questions' },
+        { path: 'questions' },
+      ],
+    })
+    .lean();
 
-  if (!result) notFound();
+  if (!rawResult) notFound();
 
-  const populatedResult = result as unknown as PopulatedResult;
+  // Fully serialize to plain JSON to avoid Mongoose prototypes / circular refs
+  const populatedResult = JSON.parse(
+    JSON.stringify(rawResult)
+  ) as unknown as PopulatedResult;
   const test = populatedResult.testId as ITest & {
     _id: unknown;
     openChallenge?: boolean;
