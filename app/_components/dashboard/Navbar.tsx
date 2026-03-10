@@ -1,6 +1,6 @@
 'use client';
 
-import { UserButton, useUser } from '@clerk/nextjs';
+import { UserButton } from '@clerk/nextjs';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Menu } from 'lucide-react';
@@ -15,6 +15,12 @@ import { Button } from '@/components/ui/button';
 
 interface NavbarProps {
   variant?: 'student' | 'teacher' | 'parent' | 'admin';
+  /**
+   * Whether the current user is signed in.
+   * Defaults to true because all layouts using this Navbar
+   * are behind auth checks or middleware.
+   */
+  isSignedIn?: boolean;
 }
 
 const STUDENT_NAV_LINKS: { href: string; label: string }[] = [
@@ -35,7 +41,6 @@ const TEACHER_NAV_LINKS: { href: string; label: string }[] = [
 
 const ADMIN_NAV_LINKS: { href: string; label: string }[] = [
   { href: '/admin', label: 'Overview' },
-  { href: '/open-challenge', label: 'Open Challenge' },
   { href: '/admin/course-material', label: 'Course Material' },
 ];
 
@@ -59,8 +64,10 @@ function getNavLinks(
   }
 }
 
-export default function Navbar({ variant = 'student' }: NavbarProps) {
-  const { isSignedIn } = useUser();
+export default function Navbar({
+  variant = 'student',
+  isSignedIn = true,
+}: NavbarProps) {
   const links = getNavLinks(variant);
   const linkContent = (
     <>

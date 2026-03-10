@@ -26,6 +26,9 @@ import {
 import { getGradesForBoard } from '@/lib/constants/levels';
 import { parseTimedFromTest, appendTimedToFormData } from '../lib/timed';
 import { TestTimeLimitField } from '../components/TestTimeLimitField';
+import { generateImageWithPuter } from '@/lib/puter/image';
+import { PictureBasedFrame } from '@/components/PictureBasedFrame';
+import { ImagePreviewModal } from '@/components/ImagePreviewModal';
 
 interface Question {
   id: string;
@@ -35,6 +38,8 @@ interface Question {
   leftColumn?: string[];
   correctAnswer: string | number[];
   marks: number;
+  mediaUrl?: string;
+  imagePrompt?: string;
 }
 
 interface Section {
@@ -137,6 +142,7 @@ export default function EditTestForm({
   const [aiType, setAiType] = useState('mcq');
   const [aiDifficulty, setAiDifficulty] = useState('Medium');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [imagePreviewSrc, setImagePreviewSrc] = useState<string | null>(null);
 
   const addSection = () => {
     setSections([
@@ -283,6 +289,18 @@ export default function EditTestForm({
       );
 
       if (res.data) {
+        const questions = res.data as (Question & { imagePrompt?: string })[];
+        for (let i = 0; i < questions.length; i++) {
+          const q = questions[i];
+          if (
+            q.type === 'picture_based' &&
+            typeof q.imagePrompt === 'string'
+          ) {
+            const mediaUrl = await generateImageWithPuter(q.imagePrompt, true);
+            q.mediaUrl = mediaUrl ?? undefined;
+            delete q.imagePrompt;
+          }
+        }
         const timedSuffix =
           timedState.isTimed === 'timed'
             ? ` (Timed ${timedState.durationHours} Hours : ${String(timedState.durationMinutes).padStart(2, '0')} Minutes)`
@@ -291,7 +309,7 @@ export default function EditTestForm({
           id: generateId(),
           title: `AI Generated: ${aiTopic}${timedSuffix}`,
           description: `${aiDifficulty} - ${aiType}`,
-          questions: res.data.map((q: Question) => ({
+          questions: questions.map((q: Question) => ({
             ...q,
             id: generateId(),
           })),
@@ -565,6 +583,14 @@ export default function EditTestForm({
                                   placeholder={`Question ${questionNo}`}
                                   rows={2}
                                 />
+                                {q.type === 'picture_based' && q.mediaUrl && (
+                                  <PictureBasedFrame
+                                    src={q.mediaUrl}
+                                    alt="Question"
+                                    className="mt-2"
+                                    onClick={() => setImagePreviewSrc(q.mediaUrl ?? null)}
+                                  />
+                                )}
                               </td>
                               <td className="px-3 py-2 whitespace-nowrap">
                                 <select
@@ -645,23 +671,25 @@ export default function EditTestForm({
                                 </button>
                               </td>
                             </tr>
-                            {q.type === 'mcq' && (
+                            {(q.type === 'mcq' || q.type === 'picture_based') && (
                               <tr>
                                 <td
                                   colSpan={5}
                                   className="px-3 py-2 bg-background"
                                 >
                                   <div className="grid grid-cols-2 gap-2">
-                                    {q.options?.map(
+                                    {(q.options ?? (q.type === 'picture_based' ? ['', '', '', ''] : [])).map(
                                       (opt: string, optIndex: number) => (
                                         <input
                                           key={optIndex}
                                           type="text"
                                           value={opt}
                                           onChange={e => {
-                                            const newOpts = [
-                                              ...(q.options || []),
-                                            ];
+                                            const base = q.options || [];
+                                            const newOpts = [...base];
+                                            if (q.type === 'picture_based')
+                                              while (newOpts.length < 4)
+                                                newOpts.push('');
                                             newOpts[optIndex] = e.target.value;
                                             updateQuestionExp(
                                               secIndex,
@@ -960,7 +988,7 @@ export default function EditTestForm({
                                 </td>
                               </tr>
                             )}
-                            {!['mcq', 'match_columns'].includes(q.type) && (
+                            {!['mcq', 'match_columns', 'picture_based'].includes(q.type) && (
                               <tr>
                                 <td
                                   colSpan={5}
@@ -1156,6 +1184,12 @@ export default function EditTestForm({
           </div>
         </div>
       )}
+
+      <ImagePreviewModal
+        src={imagePreviewSrc}
+        onClose={() => setImagePreviewSrc(null)}
+        alt="Question image"
+      />
     </div>
   );
 }

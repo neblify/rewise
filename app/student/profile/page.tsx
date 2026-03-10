@@ -35,6 +35,8 @@ export default async function ProfilePage() {
 
       <div className="bg-card rounded-xl border border-border shadow-sm p-8">
         <UpdateProfileForm
+          initialFirstName={user?.firstName || ''}
+          initialLastName={user?.lastName || ''}
           initialBoard={user?.board || ''}
           initialGrade={user?.grade || ''}
         />
